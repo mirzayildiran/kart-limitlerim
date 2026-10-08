@@ -7,6 +7,7 @@ import { Button, MoneyField, TextField, Choice } from '../../ui/components/contr
 import { toast } from '../../ui/components/toast'
 import { saveAccount, today, accountById } from '../../data/store'
 import { formatLong, toIso } from '../../domain/dates'
+import { formatTLExact } from '../../domain/money'
 import { viewStatement, rollToCurrentCycle } from '../../domain/statement'
 import {
   initStatementFormState,
@@ -14,6 +15,7 @@ import {
   isStatementFormValid,
   updateStatementLine,
   getMinimumHint,
+  statementInterestPreview,
   type StatementFormState,
   type StatementFormErrors,
 } from './statementForm'
@@ -180,6 +182,37 @@ export function StatementSheet({ request }: StatementSheetProps) {
             error={errors.paidAmount}
           />
         )}
+
+        <MoneyField
+          label="Ekstredeki faiz tutarı (varsa)"
+          value={formState.interestCharged}
+          onChange={(v) => setFormState({ ...formState, interestCharged: v })}
+          hint="Ekstrende geçen dönemden faiz yazıyorsa gir; toplam faiz hesabı bunu kullanır."
+        />
+
+        {(() => {
+          const preview = statementInterestPreview(formState, account, view)
+          if (preview.kind === 'none') return null
+          if (preview.kind === 'paidFull') {
+            return (
+              <div class="statement-interest statement-interest-ok">
+                Tamamını ödediğin için bu ekstrede faiz işlemez.
+              </div>
+            )
+          }
+          return (
+            <div class="statement-interest">
+              <p class="statement-interest-title">Bu ekstrede işleyecek faiz: ~{formatTLExact(preview.total)}</p>
+              <p class="statement-interest-detail">
+                Akdi {formatTLExact(preview.contractual)} + gecikme {formatTLExact(preview.late)} + vergiler{' '}
+                {formatTLExact(preview.taxes)} · aylık %{preview.rate}
+              </p>
+              {preview.minimumScenario !== null && (
+                <p class="statement-interest-minimum">Yalnız asgariyi ödersen: ~{formatTLExact(preview.minimumScenario)}</p>
+              )}
+            </div>
+          )
+        })()}
       </div>
     </Sheet>
   )

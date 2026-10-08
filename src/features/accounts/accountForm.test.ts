@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { initFormState, validateForm, isFormValid, formStateToAccount, shouldWarnAvailable, type CardFormState, type KmhFormState, type BankFormState, type CashFormState } from './accountForm'
-import type { CardAccount, KmhAccount, BalanceAccount } from '../../domain/types'
+import { initFormState, validateForm, isFormValid, formStateToAccount, mergeLines, shouldWarnAvailable, type CardFormState, type KmhFormState, type BankFormState, type CashFormState } from './accountForm'
+import type { CardAccount, CardLine, KmhAccount, BalanceAccount } from '../../domain/types'
 
 describe('accountForm', () => {
   describe('initFormState', () => {
@@ -222,6 +222,77 @@ describe('accountForm', () => {
       expect(account.kind).toBe('cash')
       expect(account.name).toBe('Nakit')
       expect(account.balance).toBe(5000)
+    })
+  })
+
+  describe('mergeLines', () => {
+    const mockNewId = (prefix: string) => `${prefix}_test`
+    const existingLine1: CardLine = {
+      id: 'line1',
+      label: 'Kart 1',
+      cutDay: 15,
+      dueOffsetDays: 10,
+      subLimit: null,
+      cycle: '2026-10',
+      statementDebt: 50000,
+      minimumDue: 10000,
+      dueDate: '2026-10-25',
+      payment: 'partial',
+      paidAmount: 5000,
+      interestCharged: 1200,
+      interestHistory: [{ cycle: '2026-09', amount: 800, source: 'statement' }],
+    }
+    const existingLine2: CardLine = {
+      id: 'line2',
+      label: 'Kart 2',
+      cutDay: 20,
+      dueOffsetDays: 10,
+      subLimit: 30000,
+      cycle: '2026-10',
+      statementDebt: 100000,
+      minimumDue: 20000,
+      dueDate: '2026-10-30',
+      payment: 'unpaid',
+      paidAmount: null,
+      interestCharged: null,
+      interestHistory: [],
+    }
+
+    it('preserves data when removing first line', () => {
+      const edited = [
+        { id: 'line2', label: 'Kart 2 Updated', cutDay: '21', dueOffsetDays: '10', subLimit: 30000 },
+      ]
+      const result = mergeLines([existingLine1, existingLine2], edited, mockNewId)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe('line2')
+      expect(result[0].label).toBe('Kart 2 Updated')
+      expect(result[0].cutDay).toBe(21)
+      expect(result[0].statementDebt).toBe(100000)
+      expect(result[0].payment).toBe('unpaid')
+      expect(result[0].interestHistory).toEqual([])
+    })
+
+    it('preserves interest history when editing label', () => {
+      const edited = [{ id: 'line1', label: 'Ana Kart', cutDay: '15', dueOffsetDays: '10', subLimit: null }]
+      const result = mergeLines([existingLine1], edited, mockNewId)
+
+      expect(result[0].label).toBe('Ana Kart')
+      expect(result[0].statementDebt).toBe(50000)
+      expect(result[0].payment).toBe('partial')
+      expect(result[0].paidAmount).toBe(5000)
+      expect(result[0].interestCharged).toBe(1200)
+      expect(result[0].interestHistory).toEqual([{ cycle: '2026-09', amount: 800, source: 'statement' }])
+    })
+
+    it('generates id for new line', () => {
+      const edited = [{ id: '', label: 'Yeni Kart', cutDay: '1', dueOffsetDays: '10', subLimit: null }]
+      const result = mergeLines([], edited, mockNewId)
+
+      expect(result[0].id).toBe('line_test')
+      expect(result[0].cycle).toBeNull()
+      expect(result[0].payment).toBe('unpaid')
+      expect(result[0].interestHistory).toBeUndefined()
     })
   })
 

@@ -30,3 +30,35 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
 }
+
+.statement-interest {
+  padding: 12px 14px;
+  background-color: var(--crit-soft);
+  color: var(--crit);
+  border-radius: var(--r-md);
+}
+
+.statement-interest-ok {
+  background-color: var(--ok-soft);
+  color: var(--ok);
+}
+
+.statement-interest-title {
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.statement-interest-detail {
+  margin: 0.25rem 0;
+  font-size: 0.8125rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.statement-interest-minimum {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
