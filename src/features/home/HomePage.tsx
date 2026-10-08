@@ -139,7 +139,7 @@ function renderCardSection(): JSX.Element | null {
               sub={subText}
               available={card.available}
               limit={card.limit}
-              onClick={() => openSheet({ type: 'account', id: card.id })}
+              onClick={() => openSheet({ type: 'accountDetail', id: card.id })}
             />
           )
         })}
@@ -181,7 +181,7 @@ function renderKmhSection(): JSX.Element | null {
               available={kmh.available}
               limit={kmh.limit}
               tone="kmh"
-              onClick={() => openSheet({ type: 'account', id: kmh.id })}
+              onClick={() => openSheet({ type: 'accountDetail', id: kmh.id })}
             />
           )
         })}
