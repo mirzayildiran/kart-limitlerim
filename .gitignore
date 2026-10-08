@@ -1,0 +1,25 @@
+# Dependencies & build output
+node_modules
+dist
+dist-ssr
+dev-dist
+coverage
+*.local
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editors & OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.sw?
+
+# Personal data — never commit
+legacy/
+*.export.json
+.env
+.env.*
