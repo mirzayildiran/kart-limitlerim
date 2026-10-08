@@ -47,6 +47,16 @@ export interface CardLine {
   dueDate?: IsoDate | null
   payment: PaymentState
   paidAmount?: Kurus | null
+  /** Interest actually printed on the current statement, if the user entered it. */
+  interestCharged?: Kurus | null
+  /** Interest per past cycle, appended when a cycle closes. Newest last. */
+  interestHistory?: InterestRecord[]
+}
+
+export interface InterestRecord {
+  cycle: CycleKey
+  amount: Kurus
+  source: 'estimate' | 'statement'
 }
 
 export interface RateOverride {
