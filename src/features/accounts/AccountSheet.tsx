@@ -8,15 +8,19 @@ import { toast } from '../../ui/components/toast'
 import { saveAccount, removeAccount, newId, accountById } from '../../data/store'
 import { CURRENT_RATES } from '../../domain/rates'
 import { formatTLExact } from '../../domain/money'
-import type { CardLine } from '../../domain/types'
+import type { Account, CardAccount } from '../../domain/types'
 import {
   initFormState,
   validateForm,
   isFormValid,
   formStateToAccount,
+  mergeLines,
   shouldWarnAvailable,
   type FormState,
   type CardFormState,
+  type KmhFormState,
+  type BankFormState,
+  type CashFormState,
   type FormErrors,
 } from './accountForm'
 import './accountsheet.css'
@@ -63,29 +67,17 @@ export function AccountSheet({ request }: AccountSheetProps) {
       const accountId = id || newId('acc')
       const builtAccount = formStateToAccount(formState, accountId, isEdit ? account?.createdAt : undefined)
 
-      // Merge with existing lines' statement data if editing a card account
-      if (isEdit && account && account.kind === 'card' && formState.kind === 'card') {
-        const existingAccount = account as any
-        const existingLines = existingAccount.lines ?? []
-        const builtCardAccount = builtAccount as any
-        builtCardAccount.lines = builtCardAccount.lines.map((line: CardLine, i: number) => {
-          const existing = existingLines[i]
-          if (existing) {
-            return {
-              ...line,
-              cycle: existing.cycle,
-              statementDebt: existing.statementDebt,
-              minimumDue: existing.minimumDue,
-              dueDate: existing.dueDate,
-              payment: existing.payment,
-              paidAmount: existing.paidAmount,
-            }
-          }
-          return line
-        })
+      // Merge with existing lines' statement/interest data if editing a card account
+      let finalAccount: Account = builtAccount
+      if (isEdit && account && account.kind === 'card' && formState.kind === 'card' && builtAccount.kind === 'card') {
+        const cardAccount = account
+        const formCardState = formState as CardFormState
+        const merged = mergeLines(cardAccount.lines, formCardState.lines, newId)
+        const cardBuilt = builtAccount as CardAccount
+        finalAccount = { ...cardBuilt, lines: merged }
       }
 
-      await saveAccount(builtAccount)
+      await saveAccount(finalAccount)
       toast(isEdit ? 'Kaydedildi' : 'Kaydedildi')
       closeSheet()
     } catch (err) {
@@ -303,7 +295,7 @@ function CardFields({ state, errors, setFormState }: { state: CardFormState; err
   )
 }
 
-function KmhFields({ state, errors, setFormState }: { state: any; errors: FormErrors; setFormState: (s: FormState) => void }) {
+function KmhFields({ state, errors, setFormState }: { state: KmhFormState; errors: FormErrors; setFormState: (s: FormState) => void }) {
   const warning = shouldWarnAvailable(state.available, state.limit)
 
   return (
@@ -352,7 +344,7 @@ function KmhFields({ state, errors, setFormState }: { state: any; errors: FormEr
   )
 }
 
-function BankFields({ state, errors, setFormState }: { state: any; errors: FormErrors; setFormState: (s: FormState) => void }) {
+function BankFields({ state, errors, setFormState }: { state: BankFormState; errors: FormErrors; setFormState: (s: FormState) => void }) {
   return (
     <>
       <MoneyField
@@ -371,7 +363,7 @@ function BankFields({ state, errors, setFormState }: { state: any; errors: FormE
   )
 }
 
-function CashFields({ state, errors, setFormState }: { state: any; errors: FormErrors; setFormState: (s: FormState) => void }) {
+function CashFields({ state, errors, setFormState }: { state: CashFormState; errors: FormErrors; setFormState: (s: FormState) => void }) {
   return (
     <MoneyField
       label="Elindeki nakit"

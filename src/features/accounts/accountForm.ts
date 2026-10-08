@@ -313,6 +313,36 @@ export function formStateToAccount(state: FormState, id: string, createdAt?: num
   } as BalanceAccount
 }
 
+/**
+ * Merge edited card lines with existing lines by id, preserving statement/interest fields.
+ * New lines (id='') get fresh ids; edited lines keep all fields except the editable ones.
+ */
+export function mergeLines(existingLines: CardLine[], editedFormLines: CardLineFormState[], newIdFn: (prefix: string) => string): CardLine[] {
+  const existingById = new Map(existingLines.map((line) => [line.id, line]))
+
+  return editedFormLines.map((formLine) => {
+    const finalId = formLine.id || newIdFn('line')
+    const existing = existingById.get(finalId)
+
+    return {
+      id: finalId,
+      label: formLine.label.trim(),
+      cutDay: parseInt(formLine.cutDay, 10),
+      dueOffsetDays: parseInt(formLine.dueOffsetDays, 10),
+      subLimit: formLine.subLimit,
+      // Preserve statement & interest fields from existing line
+      cycle: existing?.cycle ?? null,
+      statementDebt: existing?.statementDebt ?? null,
+      minimumDue: existing?.minimumDue ?? null,
+      dueDate: existing?.dueDate ?? null,
+      payment: existing?.payment ?? 'unpaid',
+      paidAmount: existing?.paidAmount ?? null,
+      interestCharged: existing?.interestCharged ?? null,
+      interestHistory: existing?.interestHistory,
+    }
+  })
+}
+
 export function shouldWarnAvailable(available: Kurus | null, limit: Kurus | null): boolean {
   return available !== null && limit !== null && available > limit && limit > 0
 }
