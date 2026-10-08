@@ -1,0 +1,50 @@
+import type { Db, Snapshot } from './db'
+
+/** Portable backup file. Lets users move devices; nothing is synced anywhere. */
+export interface BackupFile {
+  app: 'kart-limitlerim'
+  schema: 1
+  exportedAt: string
+  data: Snapshot
+}
+
+export function makeBackup(snapshot: Snapshot, now = new Date()): BackupFile {
+  return { app: 'kart-limitlerim', schema: 1, exportedAt: now.toISOString(), data: snapshot }
+}
+
+export class BackupError extends Error {}
+
+const isArr = (x: unknown): x is unknown[] => Array.isArray(x)
+const hasId = (x: unknown) => typeof x === 'object' && x !== null && typeof (x as { id?: unknown }).id === 'string'
+
+/** Validate untrusted JSON text and return a backup, or throw BackupError with a user-facing message. */
+export function parseBackup(text: string): BackupFile {
+  let raw: unknown
+  try {
+    raw = JSON.parse(text)
+  } catch {
+    throw new BackupError('Dosya okunamadı. Kart Limitlerim yedek dosyası seçtiğinden emin ol.')
+  }
+  const b = raw as Partial<BackupFile>
+  if (b?.app !== 'kart-limitlerim') throw new BackupError('Bu dosya bir Kart Limitlerim yedeği değil.')
+  if (b.schema !== 1) throw new BackupError('Bu yedek uygulamanın daha yeni bir sürümüyle alınmış. Uygulamayı güncelleyip tekrar dene.')
+  const d = b.data as Partial<Snapshot> | undefined
+  const keys = ['accounts', 'expenses', 'categories', 'recurring', 'rules'] as const
+  for (const k of keys) {
+    const list = d?.[k]
+    if (!isArr(list) || !list.every(hasId)) throw new BackupError('Yedek dosyası eksik ya da bozuk.')
+  }
+  return b as BackupFile
+}
+
+/** Replace everything on this device with the backup's contents. */
+export async function restoreBackup(db: Db, backup: BackupFile): Promise<void> {
+  const stores = ['accounts', 'expenses', 'categories', 'recurring', 'rules'] as const
+  const tx = db.transaction(stores, 'readwrite')
+  for (const s of stores) {
+    const store = tx.objectStore(s)
+    await store.clear()
+    for (const item of backup.data[s]) await store.put(item as never)
+  }
+  await tx.done
+}

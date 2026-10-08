@@ -1,0 +1,165 @@
+import { computed, signal } from '@preact/signals'
+import { nextHue } from '../domain/categories'
+import { startOfDay } from '../domain/dates'
+import { byMostAvailable, isCard, isKmh, isLiquid, outlook, spendingPower, statementItems } from '../domain/power'
+import type { Account, Category, Expense, MerchantRule, RecurringPayment } from '../domain/types'
+import { makeBackup, parseBackup, restoreBackup } from './backup'
+import * as repo from './db'
+
+/**
+ * App state as signals. Components read the signals; mutations go through the
+ * actions below, which write IndexedDB first and then update state.
+ */
+
+export const ready = signal(false)
+export const loadError = signal<string | null>(null)
+
+export const accounts = signal<Account[]>([])
+export const expenses = signal<Expense[]>([])
+export const categories = signal<Category[]>([])
+export const recurring = signal<RecurringPayment[]>([])
+export const rules = signal<MerchantRule[]>([])
+
+/** Re-evaluated on focus so date-based views roll over at midnight. */
+export const today = signal(startOfDay(new Date()))
+
+export const cards = computed(() => byMostAvailable(accounts.value.filter(isCard)))
+export const kmhAccounts = computed(() => byMostAvailable(accounts.value.filter(isKmh)))
+export const liquidAccounts = computed(() => byMostAvailable(accounts.value.filter(isLiquid)))
+export const power = computed(() => spendingPower(accounts.value))
+export const statements = computed(() => statementItems(accounts.value, today.value))
+export const forecast = computed(() => outlook(accounts.value, recurring.value, today.value))
+export const activeCategories = computed(() =>
+  categories.value.filter((c) => !c.archived).sort((a, b) => a.order - b.order),
+)
+export const categoryById = computed(() => new Map(categories.value.map((c) => [c.id, c])))
+export const accountById = computed(() => new Map(accounts.value.map((a) => [a.id, a])))
+
+let db: repo.Db | null = null
+
+function requireDb(): repo.Db {
+  if (!db) throw new Error('Veritabanı henüz açılmadı.')
+  return db
+}
+
+export function newId(prefix: string): string {
+  const rand = crypto.getRandomValues(new Uint32Array(2))
+  return `${prefix}_${Date.now().toString(36)}${rand[0].toString(36)}${rand[1].toString(36)}`.slice(0, 32)
+}
+
+function hydrate(s: repo.Snapshot) {
+  accounts.value = s.accounts
+  expenses.value = s.expenses
+  categories.value = s.categories
+  recurring.value = s.recurring
+  rules.value = s.rules
+}
+
+export async function init(): Promise<void> {
+  try {
+    db = await repo.openAppDb()
+    hydrate(await repo.loadAll(db))
+    // Ask the browser not to evict our data under storage pressure.
+    navigator.storage?.persist?.().catch(() => {})
+  } catch {
+    loadError.value = 'Veriler açılamadı. Gizli sekmedeysen normal sekmede ya da ana ekrana eklenmiş uygulamada dene.'
+  } finally {
+    ready.value = true
+  }
+  const refreshDay = () => {
+    const d = startOfDay(new Date())
+    if (+d !== +today.value) today.value = d
+  }
+  document.addEventListener('visibilitychange', refreshDay)
+  window.addEventListener('focus', refreshDay)
+}
+
+const upsert = <T extends { id: string }>(list: T[], item: T) => {
+  const i = list.findIndex((x) => x.id === item.id)
+  return i < 0 ? [...list, item] : list.map((x, j) => (j === i ? item : x))
+}
+const mergeAccounts = (changed: Account[]) => {
+  let next = accounts.value
+  for (const a of changed) next = upsert(next, a)
+  accounts.value = next
+}
+
+// ---- accounts ----
+export async function saveAccount(a: Account): Promise<void> {
+  const next = { ...a, updatedAt: Date.now() }
+  await repo.putAccount(requireDb(), next)
+  accounts.value = upsert(accounts.value, next)
+}
+
+export async function removeAccount(id: string): Promise<void> {
+  await repo.deleteAccount(requireDb(), id)
+  accounts.value = accounts.value.filter((a) => a.id !== id)
+}
+
+// ---- expenses ----
+export async function saveExpense(before: Expense | null, after: Expense): Promise<void> {
+  const changed = await repo.writeExpense(requireDb(), before, after)
+  expenses.value = upsert(expenses.value, after)
+  mergeAccounts(changed)
+}
+
+export async function removeExpense(e: Expense): Promise<void> {
+  const changed = await repo.writeExpense(requireDb(), e, null)
+  expenses.value = expenses.value.filter((x) => x.id !== e.id)
+  mergeAccounts(changed)
+}
+
+export async function importExpenses(items: Expense[]): Promise<void> {
+  const changed = await repo.writeExpenses(requireDb(), items)
+  let next = expenses.value
+  for (const e of items) next = upsert(next, e)
+  expenses.value = next
+  mergeAccounts(changed)
+}
+
+// ---- categories ----
+export async function createCategory(name: string): Promise<Category> {
+  const c: Category = {
+    id: newId('cat'),
+    name: name.trim(),
+    hue: nextHue(categories.value),
+    builtin: false,
+    order: Math.max(0, ...categories.value.map((x) => x.order)) + 1,
+  }
+  await repo.putCategory(requireDb(), c)
+  categories.value = upsert(categories.value, c)
+  return c
+}
+
+export async function saveCategory(c: Category): Promise<void> {
+  await repo.putCategory(requireDb(), c)
+  categories.value = upsert(categories.value, c)
+}
+
+// ---- recurring ----
+export async function saveRecurring(r: RecurringPayment): Promise<void> {
+  await repo.putRecurring(requireDb(), r)
+  recurring.value = upsert(recurring.value, r)
+}
+
+export async function removeRecurring(id: string): Promise<void> {
+  await repo.deleteRecurring(requireDb(), id)
+  recurring.value = recurring.value.filter((r) => r.id !== id)
+}
+
+// ---- merchant rules ----
+export async function saveRule(r: MerchantRule): Promise<void> {
+  await repo.putRule(requireDb(), r)
+  rules.value = upsert(rules.value, r)
+}
+
+// ---- backup ----
+export async function exportBackupText(): Promise<string> {
+  return JSON.stringify(makeBackup(await repo.loadAll(requireDb())), null, 2)
+}
+
+export async function importBackupText(text: string): Promise<void> {
+  const backup = parseBackup(text)
+  await restoreBackup(requireDb(), backup)
+  hydrate(await repo.loadAll(requireDb()))
+}

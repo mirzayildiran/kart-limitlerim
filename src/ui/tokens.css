@@ -1,0 +1,144 @@
+/*
+ * Kart Limitlerim design tokens.
+ * Light is the base; dark redefines tokens only. Components never use raw colors.
+ * Semantic colors (ok / warn / crit) are separate from the accent.
+ */
+:root {
+  color-scheme: light;
+
+  /* Ground and surfaces: sage-tinted neutrals, biased toward the accent */
+  --bg: #eef1ec;
+  --surface: #ffffff;
+  --surface-2: #f4f6f2;
+  --surface-3: #e8ece6;
+  --line: #dce2da;
+  --line-strong: #c7cfc6;
+
+  /* Text */
+  --ink: #121a15;
+  --muted: #59645d;
+  --faint: #8a948d;
+
+  /* Accent: "free limit" green */
+  --accent: #0b7a56;
+  --accent-strong: #08623f;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcefe5;
+  --accent-tint: #c3e4d3;
+
+  /* Money sources */
+  --cash: #2d5f8e;
+  --cash-soft: #dfe8f1;
+  --kmh: #6b5aa6;
+  --kmh-soft: #e9e5f4;
+
+  /* Semantic */
+  --ok: #0b7a56;
+  --warn: #a35f0e;
+  --warn-soft: #f7ead4;
+  --warn-bar: #cf8a2c;
+  --crit: #b4372a;
+  --crit-soft: #f6dfd9;
+
+  --shadow-1: 0 1px 2px rgb(18 26 21 / 0.05), 0 4px 14px rgb(18 26 21 / 0.05);
+  --shadow-2: 0 8px 28px rgb(18 26 21 / 0.14);
+  --scrim: rgb(10 16 13 / 0.45);
+
+  /* Type */
+  --font-display: 'Schibsted Grotesk Variable', 'Schibsted Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Onest Variable', 'Onest', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --text-xs: 0.75rem;   /* 12 */
+  --text-sm: 0.8125rem; /* 13 */
+  --text-md: 0.9375rem; /* 15 */
+  --text-lg: 1.125rem;  /* 18 */
+  --text-xl: 1.375rem;  /* 22 */
+  --text-2xl: 1.75rem;  /* 28 */
+  --text-hero: clamp(2.75rem, 13vw, 4rem);
+
+  /* Space (4px grid) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --r-pill: 999px;
+
+  --gutter: 16px;
+  --max-w: 560px;
+  --tabbar-h: 64px;
+  --tap: 44px;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0b100e;
+    --surface: #131a17;
+    --surface-2: #19221e;
+    --surface-3: #212c27;
+    --line: #25312b;
+    --line-strong: #334039;
+    --ink: #e4ebe6;
+    --muted: #9ba9a1;
+    --faint: #6c7a73;
+    --accent: #46c699;
+    --accent-strong: #6fd6b0;
+    --accent-ink: #04130d;
+    --accent-soft: #15332a;
+    --accent-tint: #1d4a3b;
+    --cash: #8ab8e4;
+    --cash-soft: #172636;
+    --kmh: #b3a6e8;
+    --kmh-soft: #241f3a;
+    --ok: #46c699;
+    --warn: #e7ae5c;
+    --warn-soft: #362812;
+    --warn-bar: #d99a40;
+    --crit: #f0907c;
+    --crit-soft: #3a1c16;
+    --shadow-1: none;
+    --shadow-2: 0 10px 30px rgb(0 0 0 / 0.5);
+    --scrim: rgb(0 0 0 / 0.6);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b100e;
+  --surface: #131a17;
+  --surface-2: #19221e;
+  --surface-3: #212c27;
+  --line: #25312b;
+  --line-strong: #334039;
+  --ink: #e4ebe6;
+  --muted: #9ba9a1;
+  --faint: #6c7a73;
+  --accent: #46c699;
+  --accent-strong: #6fd6b0;
+  --accent-ink: #04130d;
+  --accent-soft: #15332a;
+  --accent-tint: #1d4a3b;
+  --cash: #8ab8e4;
+  --cash-soft: #172636;
+  --kmh: #b3a6e8;
+  --kmh-soft: #241f3a;
+  --ok: #46c699;
+  --warn: #e7ae5c;
+  --warn-soft: #362812;
+  --warn-bar: #d99a40;
+  --crit: #f0907c;
+  --crit-soft: #3a1c16;
+  --shadow-1: none;
+  --shadow-2: 0 10px 30px rgb(0 0 0 / 0.5);
+  --scrim: rgb(0 0 0 / 0.6);
+}
