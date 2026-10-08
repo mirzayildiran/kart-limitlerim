@@ -31,6 +31,8 @@ export function go(r: Route) {
 /** Every editor in the app. Exactly one sheet is open at a time. */
 export type SheetRequest =
   | { type: 'account'; id?: string; kind?: AccountKind }
+  /** Read-only overview of one card/KMH/bank account with interest figures and an edit button. */
+  | { type: 'accountDetail'; id: string }
   | { type: 'statement'; accountId: string; lineIndex: number }
   | { type: 'expense'; expense?: Expense; accountId?: string }
   | { type: 'recurring'; id?: string }

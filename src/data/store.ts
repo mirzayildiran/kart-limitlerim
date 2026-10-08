@@ -1,6 +1,7 @@
 import { computed, signal } from '@preact/signals'
 import { nextHue } from '../domain/categories'
 import { startOfDay } from '../domain/dates'
+import { closeCycle } from '../domain/interest'
 import { byMostAvailable, isCard, isKmh, isLiquid, outlook, spendingPower, statementItems } from '../domain/power'
 import type { Account, Category, Expense, MerchantRule, RecurringPayment } from '../domain/types'
 import { makeBackup, parseBackup, restoreBackup } from './backup'
@@ -59,6 +60,7 @@ export async function init(): Promise<void> {
   try {
     db = await repo.openAppDb()
     hydrate(await repo.loadAll(db))
+    await closeCycles()
     // Ask the browser not to evict our data under storage pressure.
     navigator.storage?.persist?.().catch(() => {})
   } catch {
@@ -68,10 +70,29 @@ export async function init(): Promise<void> {
   }
   const refreshDay = () => {
     const d = startOfDay(new Date())
-    if (+d !== +today.value) today.value = d
+    if (+d !== +today.value) {
+      today.value = d
+      closeCycles().catch(() => {})
+    }
   }
   document.addEventListener('visibilitychange', refreshDay)
   window.addEventListener('focus', refreshDay)
+}
+
+/**
+ * When a statement cut has passed, record the closed cycle's interest in the
+ * card's history and reset the line for the new statement.
+ */
+async function closeCycles(): Promise<void> {
+  if (!db) return
+  for (const a of accounts.value) {
+    if (a.kind !== 'card') continue
+    const lines = a.lines.map((l) => closeCycle(l, a, today.value))
+    if (lines.every((l, i) => l === a.lines[i])) continue
+    const next = { ...a, lines }
+    await repo.putAccount(db, next)
+    accounts.value = upsert(accounts.value, next)
+  }
 }
 
 const upsert = <T extends { id: string }>(list: T[], item: T) => {
