@@ -1,0 +1,32 @@
+.statement-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.statement-summary {
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: 0.5rem;
+}
+
+.statement-summary p {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--fg-secondary);
+}
+
+.statement-sheet-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.statement-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
