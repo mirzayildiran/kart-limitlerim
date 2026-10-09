@@ -300,3 +300,32 @@ describe('regressions', () => {
     expect(r.txns[1].date).toBe('2026-10-09')
   })
 })
+
+describe('row band', () => {
+  it('8. an installment line far below the row date still belongs to that row', () => {
+    // Vertical layout as read from a real Ziraat Dinamik screen: the "3/3 Taksidi)" line sits
+    // about 86px under the row's amount line, past the usual reach, but above the next row's top.
+    const r = parsePage(
+      makePage(
+        { t: '06/08 ORNEK MARKET', x: 220, y: 1000 },
+        { t: '06', x: 40, y: 1020 },
+        { t: '03.Tak ORNEK', x: 220, y: 1020 },
+        { t: '376,83 TL', right: 960, y: 1020 },
+        { t: 'EKİ', x: 40, y: 1040 },
+        { t: '2026', x: 40, y: 1060 },
+        { t: '(1130,49 TL İşlemin', x: 220, y: 1060 },
+        { t: '3/3 Taksidi)', x: 220, y: 1126 },
+        { t: '05', x: 40, y: 1244 },
+        { t: 'EKİ', x: 40, y: 1264 },
+        { t: '2026', x: 40, y: 1284 },
+        { t: 'MONEYPAY/YEMEK', x: 220, y: 1244 },
+        { t: '289,99 TL', right: 960, y: 1262 },
+      ),
+      TODAY,
+    )
+    expect(r.txns).toHaveLength(2)
+    expect(r.txns[0].installment).toEqual({ index: 3, count: 3, total: 113049 })
+    expect(r.txns[0].date).toBe('2026-10-06')
+    expect(r.txns[1].installment).toBeNull()
+  })
+})
