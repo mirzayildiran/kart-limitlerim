@@ -329,3 +329,26 @@ describe('row band', () => {
     expect(r.txns[1].installment).toBeNull()
   })
 })
+
+describe('row starts at a day token', () => {
+  it('9. a transfer row with no amount starts its own row and does not swallow the row above', () => {
+    const r = parsePage(
+      makePage(
+        { t: 'Thecof Ankara TR - 21:23', x: 220, y: 280 },
+        { t: '3', x: 40, y: 280 },
+        { t: 'Eki', x: 40, y: 300 },
+        { t: '21:23', x: 40, y: 320 },
+        { t: '-190,00 TL', x: 220, y: 320 },
+        // Transfer row: day "2" alone, then the description line (no amount, cut by the tab bar)
+        { t: '2', x: 40, y: 420 },
+        { t: '£ 9519 Karttan Aktarım 2100/3651416 İscep -', x: 220, y: 440 },
+      ),
+      TODAY,
+    )
+    expect(r.txns).toHaveLength(1)
+    expect(r.txns[0].amount).toBe(19000)
+    expect(r.txns[0].description).toBe('Thecof Ankara TR')
+    expect(r.txns[0].date).toBe('2026-10-03')
+    expect(r.skipped.some((s) => s.includes('Karttan'))).toBe(true)
+  })
+})
