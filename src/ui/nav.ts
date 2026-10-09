@@ -21,9 +21,13 @@ function parse(hash: string): Route {
 }
 
 export const route = signal<Route>(parse(location.hash))
-window.addEventListener('hashchange', () => (route.value = parse(location.hash)))
+window.addEventListener('hashchange', () => {
+  route.value = parse(location.hash)
+  closeSheet()
+})
 
 export function go(r: Route) {
+  closeSheet()
   if (location.hash !== ROUTES[r]) location.hash = ROUTES[r]
   window.scrollTo({ top: 0 })
 }
