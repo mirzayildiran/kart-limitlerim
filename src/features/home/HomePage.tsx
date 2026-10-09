@@ -21,6 +21,19 @@ import { Button, EmptyState, Pill } from '../../ui/components/controls'
 import { LimitStrip } from '../../ui/components/LimitStrip'
 import './home-page.css'
 
+const dateFormatter = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' })
+
+function renderTopbar(): JSX.Element {
+  return (
+    <header class="home-topbar">
+      <span class="home-app-name">Kart Limitlerim</span>
+      <time class="home-date" dateTime={today.value.toISOString()}>
+        {dateFormatter.format(today.value)}
+      </time>
+    </header>
+  )
+}
+
 /** Expenses for the current month */
 const thisMonthExpenses = computed(() => {
   const key = cycleKeyOf(today.value)
@@ -62,18 +75,24 @@ function renderRibbon(power_: typeof power.value): JSX.Element | null {
       </div>
       <div class="home-ribbon-legend">
         <div class="home-ribbon-legend-item">
-          <span class="home-ribbon-legend-dot home-ribbon-card" />
-          <span>Kartlar</span>
+          <span class="home-ribbon-legend-head">
+            <span class="home-ribbon-legend-dot home-ribbon-card" />
+            <span>Kartlar</span>
+          </span>
           <span class="home-ribbon-legend-amount num">{formatTL(power_.cards)}</span>
         </div>
         <div class="home-ribbon-legend-item">
-          <span class="home-ribbon-legend-dot home-ribbon-kmh" />
-          <span>KMH</span>
+          <span class="home-ribbon-legend-head">
+            <span class="home-ribbon-legend-dot home-ribbon-kmh" />
+            <span>KMH</span>
+          </span>
           <span class="home-ribbon-legend-amount num">{formatTL(power_.kmh)}</span>
         </div>
         <div class="home-ribbon-legend-item">
-          <span class="home-ribbon-legend-dot home-ribbon-cash" />
-          <span>Nakit</span>
+          <span class="home-ribbon-legend-head">
+            <span class="home-ribbon-legend-dot home-ribbon-cash" />
+            <span>Nakit</span>
+          </span>
           <span class="home-ribbon-legend-amount num">{formatTL(power_.liquid)}</span>
         </div>
       </div>
@@ -287,13 +306,13 @@ function renderExpenseSection(): JSX.Element | null {
                   class="home-expense-row"
                   onClick={() => openSheet({ type: 'expense', expense })}
                 >
-                  <div class="home-expense-row-left">
-                    <div class="home-expense-row-label">{expense.note || cat?.name || 'Diğer'}</div>
-                    <div class="home-expense-row-detail">
+                  <span class="home-expense-row-left">
+                    <span class="home-expense-row-label">{expense.note || cat?.name || 'Diğer'}</span>
+                    <span class="home-expense-row-detail">
                       {account?.name} · {formatShort(expenseDate)}
-                    </div>
-                  </div>
-                  <div class="home-expense-row-amount num">−{formatTLExact(expense.amount)}</div>
+                    </span>
+                  </span>
+                  <span class="home-expense-row-amount num">−{formatTLExact(expense.amount)}</span>
                 </button>
               )
             })}
@@ -343,22 +362,22 @@ function renderStatementsSection(): JSX.Element | null {
               class="home-statement-row"
               onClick={() => openSheet({ type: 'statement', accountId: account.id, lineIndex: item.lineIndex })}
             >
-              <div class="home-statement-row-left">
-                <div class="home-statement-row-name">
+              <span class="home-statement-row-left">
+                <span class="home-statement-row-name">
                   {account.name}
                   {lineLabel}
-                </div>
-                <div class="home-statement-row-sub">
+                </span>
+                <span class="home-statement-row-sub">
                   Kesim {formatShort(view.cut)} · son ödeme {view.dueIsExact ? '' : '~'}
                   {formatShort(view.due)}
-                </div>
-              </div>
-              <div class="home-statement-row-right">
-                <div class={`home-statement-row-amount num${minOutstanding == null ? ' is-warn' : ''}`}>
+                </span>
+              </span>
+              <span class="home-statement-row-right">
+                <span class={`home-statement-row-amount num${minOutstanding == null ? ' is-warn' : ''}`}>
                   {minOutstanding == null ? 'Tutar girilmedi' : `${minIsEst ? '~' : ''}${formatTL(minOutstanding)}`}
-                </div>
-                <div class="home-statement-row-status">{statusPill}</div>
-              </div>
+                </span>
+                <span class="home-statement-row-status">{statusPill}</span>
+              </span>
             </button>
           )
         })}
@@ -374,6 +393,7 @@ export function HomePage() {
   if (accountsValue.length === 0) {
     return (
       <div class="home-page">
+        {renderTopbar()}
         <EmptyState title="İlk kartını ekle">
           <p>Kartlarının limitini ve kullanılabilir limitini gir; uygulama ne kadar harcayabileceğini hesaplasın.</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
@@ -394,6 +414,7 @@ export function HomePage() {
 
   return (
     <div class="home-page">
+      {renderTopbar()}
       <div class="home-hero">
         <div class="home-hero-eyebrow">Şu an harcayabileceğin</div>
         <div class="home-hero-amount num">{formatTL(powerValue.total)}</div>

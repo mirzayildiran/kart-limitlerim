@@ -85,7 +85,7 @@
 .interest-nudge {
   margin-top: var(--s-4);
   padding-top: var(--s-4);
-  border-top: 1px solid rgba(180, 55, 42, 0.2);
+  border-top: 1px solid color-mix(in srgb, var(--crit) 20%, transparent);
   font-size: var(--text-sm);
   color: var(--muted);
   line-height: 1.5;
