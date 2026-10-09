@@ -1,0 +1,147 @@
+.expense-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+}
+
+.expense-sheet-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Account selection */
+.expense-account-chips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.expense-account-empty {
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.expense-account-empty p {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-text-secondary);
+}
+
+.expense-account-scroll {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-sm);
+}
+
+.expense-chip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  min-width: 120px;
+  text-align: center;
+  transition: border-color 150ms;
+}
+
+.expense-chip input {
+  display: none;
+}
+
+.expense-chip input:checked + .expense-chip-name {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.expense-chip input:checked + .expense-chip-name + .expense-chip-balance {
+  color: var(--color-accent);
+}
+
+.expense-chip:hover:not(.is-disabled) {
+  border-color: var(--color-accent);
+}
+
+.expense-chip.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.expense-chip-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: color 150ms;
+}
+
+.expense-chip-balance {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  transition: color 150ms;
+  font-family: var(--font-monospace);
+}
+
+/* New category inline form */
+.expense-new-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-surface-secondary);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-md);
+}
+
+/* Date and note row */
+.expense-date-note {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 480px) {
+  .expense-date-note {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Preview line */
+.expense-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-surface-secondary);
+  border-left: 4px solid var(--color-ok);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+.expense-preview.is-negative {
+  border-left-color: var(--color-crit);
+}
+
+.expense-preview .num {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+/* Interest nudge */
+.expense-interest-nudge {
+  padding: var(--spacing-md);
+  background: var(--color-surface-secondary);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.expense-interest-nudge .pill {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
