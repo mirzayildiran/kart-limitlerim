@@ -5,9 +5,12 @@ import './ui/base.css'
 import './app.css'
 import { render } from 'preact'
 import { init } from './data/store'
+import { applySavedTheme } from './ui/theme'
 import { App } from './app.tsx'
 
 // Initialize data store (don't await before first render)
 init().catch(() => {})
+
+applySavedTheme()
 
 render(<App />, document.getElementById('app')!)
