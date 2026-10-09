@@ -32,8 +32,20 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // OCR runtime (~27 MB) is too big to precache on install; it is cached on first use instead.
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globIgnores: ['**/ocr/**'],
         navigateFallback: 'index.html',
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.includes('/ocr/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ocr-assets',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            },
+          },
+        ],
       },
     }),
   ],
