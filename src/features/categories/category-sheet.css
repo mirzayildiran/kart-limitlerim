@@ -1,0 +1,15 @@
+.category-sheet-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+}
+
+.category-sheet-text {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.category-sheet-danger {
+  padding-top: var(--s-2);
+  border-top: 1px solid var(--line);
+}
