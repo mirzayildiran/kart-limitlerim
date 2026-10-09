@@ -26,7 +26,9 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
     opener.current = document.activeElement
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    const first = panel.current?.querySelector<HTMLElement>('[data-autofocus], input, select, textarea, button:not([data-close])')
+    const first =
+      panel.current?.querySelector<HTMLElement>('[data-autofocus]') ??
+      panel.current?.querySelector<HTMLElement>('input, select, textarea, button:not([data-close])')
     first?.focus({ preventScroll: true })
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()

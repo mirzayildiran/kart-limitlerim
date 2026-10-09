@@ -7,7 +7,7 @@
   border-top: 1px solid var(--line);
   height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  z-index: 100;
+  z-index: 30;
 }
 
 .tabbar-inner {
