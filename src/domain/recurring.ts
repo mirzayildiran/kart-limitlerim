@@ -13,7 +13,7 @@ export function occurrences(p: RecurringPayment, from: Date, to: Date): Date[] {
 
   const out: Date[] = []
   let index = 0
-  let y = start.getFullYear()
+  const y = start.getFullYear()
   let m = start.getMonth()
   // Walk month by month from the start; bounded by `to` and the end rule.
   for (let guard = 0; guard < 1200; guard++, m++) {
