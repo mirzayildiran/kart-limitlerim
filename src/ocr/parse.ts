@@ -81,7 +81,7 @@ interface Anchor {
   line: Line
   amount: Amount
   pending: boolean
-  dateBlock: { date: IsoDate | null; inferred: boolean; dist: number } | null
+  dateBlock: { date: IsoDate | null; inferred: boolean; dist: number; y0: number } | null
   others: Line[]
 }
 
@@ -138,12 +138,24 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
   for (const b of blocks) {
     const hit = nearest(anchors, b, gap)
     if (hit && (!hit.anchor.dateBlock || hit.dist < hit.anchor.dateBlock.dist)) {
-      hit.anchor.dateBlock = { date: b.date, inferred: b.inferred, dist: hit.dist }
+      hit.anchor.dateBlock = { date: b.date, inferred: b.inferred, dist: hit.dist, y0: b.y0 }
     }
   }
+  // Pass 1: lines close to an anchor. Pass 2 (below) gives the rest to the row band they sit in.
+  const orphans: Line[] = []
   for (const l of others) {
     const hit = nearest(anchors, l, gap)
     if (hit) hit.anchor.others.push(l)
+    else orphans.push(l)
+  }
+  // A row's top is its first element: date block, amount line or description line. Its band runs down to the next row's top.
+  const tops = anchors.map((a) =>
+    Math.min(a.line.y0, a.dateBlock?.y0 ?? Infinity, ...a.others.map((l) => l.y0)),
+  )
+  for (const l of orphans) {
+    let owner = -1
+    for (let i = 0; i < anchors.length; i++) if (tops[i] <= l.y0) owner = i
+    if (owner >= 0) anchors[owner].others.push(l)
     else if (textOf(l.words, dateWords)) skipped.push(l.text)
   }
 
