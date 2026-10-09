@@ -352,3 +352,33 @@ describe('row starts at a day token', () => {
     expect(r.skipped.some((s) => s.includes('Karttan'))).toBe(true)
   })
 })
+
+/** Verbatim words from the real İş Bankası screen (second OCR pass), page width 923. */
+const REAL_ISBANK_WORDS: Array<[string, number, number]> = [
+  ['3', 55, 1576], ['&', 122, 1580], ['Thecof', 168, 1584], ['Ankara', 280, 1584], ['TR', 386, 1585],
+  ['21:23', 455, 1585], ['-', 434, 1598], ['Eki', 46, 1610], ['21:2319', 33, 1629], ['-190,00', 117, 1629],
+  ['TL', 238, 1629], ['21:23', 33, 1643], ['İscep', 679, 1732], ['2', 55, 1733], ['£', 125, 1733],
+  ['Aktarım', 355, 1737], ['2100/3651416', 477, 1737], ['9519', 169, 1738], ['Karttan', 242, 1738],
+  ['2', 55, 1748], ['-', 760, 1751], ['Ana', 161, 1899], ['Sayfa', 218, 1898], ['Menü', 429, 1899],
+  ['Hayatım', 646, 1899],
+]
+
+describe('real İş Bankası words (second OCR pass)', () => {
+  it('10. the 190 row parses and the transfer row is skipped', () => {
+    const words = REAL_ISBANK_WORDS.map(([text, x0, y0]) => ({
+      text,
+      x0,
+      y0,
+      x1: x0 + 12 * [...text].length,
+      y1: y0 + 23,
+      confidence: 90,
+    }))
+    const r = parsePage({ width: 923, height: 1920, words }, TODAY)
+    expect(r.txns).toHaveLength(1)
+    expect(r.txns[0].date).toBe('2026-10-03')
+    expect(r.txns[0].amount).toBe(19000)
+    expect(r.txns[0].direction).toBe('debit')
+    expect(r.txns[0].description).toBe('Thecof Ankara TR')
+    expect(r.skipped.some((s) => s.includes('Karttan'))).toBe(true)
+  })
+})
