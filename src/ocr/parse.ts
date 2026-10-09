@@ -66,6 +66,8 @@ interface Span {
 }
 
 interface DateBlock extends Span {
+  /** Stacked day/month/year parts (not a full date). These start a row even without an amount. */
+  stacked: boolean
   date: IsoDate | null
   /** A month or year was missing and borrowed from the previous row. */
   inferred: boolean
@@ -135,27 +137,45 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
     }
   }
 
+  // A stacked day block attaches only to an amount line at or below its top. One that
+  // attaches to nothing starts a row of its own (e.g. a transfer row with no amount).
+  const phantoms: number[] = []
   for (const b of blocks) {
-    const hit = nearest(anchors, b, gap)
-    if (hit && (!hit.anchor.dateBlock || hit.dist < hit.anchor.dateBlock.dist)) {
-      hit.anchor.dateBlock = { date: b.date, inferred: b.inferred, dist: hit.dist, y0: b.y0 }
+    const pool = b.stacked ? anchors.filter((a) => a.line.y0 >= b.y0 - 1) : anchors
+    const hit = nearest(pool, b, gap)
+    if (hit) {
+      if (!hit.anchor.dateBlock || hit.dist < hit.anchor.dateBlock.dist) {
+        hit.anchor.dateBlock = { date: b.date, inferred: b.inferred, dist: hit.dist, y0: b.y0 }
+      }
+    } else if (b.stacked) {
+      phantoms.push(b.y0)
     }
   }
-  // Pass 1: lines close to an anchor. Pass 2 (below) gives the rest to the row band they sit in.
+
+  // Pass 1: lines close to an anchor, unless a row start lies between them.
+  // Pass 2 (below): the rest belong to the row whose band they fall in.
   const orphans: Line[] = []
   for (const l of others) {
     const hit = nearest(anchors, l, gap)
-    if (hit) hit.anchor.others.push(l)
+    const lo = hit ? Math.min(hit.anchor.line.y0, l.y0) : 0
+    const hi = hit ? Math.max(hit.anchor.line.y0, l.y0) : 0
+    if (hit && !phantoms.some((p) => p > lo && p <= hi)) hit.anchor.others.push(l)
     else orphans.push(l)
   }
-  // A row's top is its first element: date block, amount line or description line. Its band runs down to the next row's top.
-  const tops = anchors.map((a) =>
-    Math.min(a.line.y0, a.dateBlock?.y0 ?? Infinity, ...a.others.map((l) => l.y0)),
-  )
+
+  // A row starts at its first element: date block, amount line or description line.
+  // A row's band runs down to the next start, anchor or phantom.
+  const starts: { y: number; owner: number }[] = [
+    ...anchors.map((a, i) => ({
+      y: Math.min(a.line.y0, a.dateBlock?.y0 ?? Infinity, ...a.others.map((l) => l.y0)),
+      owner: i,
+    })),
+    ...phantoms.map((y) => ({ y, owner: -1 })),
+  ].sort((p, q) => p.y - q.y)
   for (const l of orphans) {
-    let owner = -1
-    for (let i = 0; i < anchors.length; i++) if (tops[i] <= l.y0) owner = i
-    if (owner >= 0) anchors[owner].others.push(l)
+    let start: { y: number; owner: number } | null = null
+    for (const st of starts) if (st.y <= l.y0) start = st
+    if (start && start.owner >= 0) anchors[start.owner].others.push(l)
     else if (textOf(l.words, dateWords)) skipped.push(l.text)
   }
 
@@ -364,7 +384,7 @@ function buildDateBlocks(
     const m = FULL_DATE_RE.exec(w.text)
     if (!m) continue
     dateWords.add(w)
-    blocks.push({ y0: w.y0, y1: w.y1, date: isoOf(Number(m[3]), Number(m[2]), Number(m[1])), inferred: false })
+    blocks.push({ y0: w.y0, y1: w.y1, stacked: false, date: isoOf(Number(m[3]), Number(m[2]), Number(m[1])), inferred: false })
   }
 
   const left = words.filter((w) => w.x0 < LEFT_COLUMN * W && !dateWords.has(w)).sort((p, q) => p.y0 - q.y0)
@@ -398,7 +418,7 @@ function buildDateBlocks(
     const date = year !== null ? isoOf(year, month, day) : resolveNoYear(day, month, today)
     for (const x of [dayWord, mo, tail]) if (x) dateWords.add(x)
     lastMonth = month
-    blocks.push({ y0: dayWord.y0, y1: (tail ?? mo ?? dayWord).y1, date, inferred })
+    blocks.push({ y0: dayWord.y0, y1: (tail ?? mo ?? dayWord).y1, stacked: true, date, inferred })
   }
 
   // Pass 2: a month that no day claimed. Needs a year or time below, so a description word is never a month.
@@ -417,7 +437,7 @@ function buildDateBlocks(
     const date = day === null ? null : year !== null ? isoOf(year, month, day) : resolveNoYear(day, month, today)
     for (const x of [dayAbove, mo, tail]) if (x) dateWords.add(x)
     lastMonth = month
-    blocks.push({ y0: (dayAbove ?? mo).y0, y1: (tail ?? mo).y1, date, inferred: false })
+    blocks.push({ y0: (dayAbove ?? mo).y0, y1: (tail ?? mo).y1, stacked: true, date, inferred: false })
   }
   return { blocks, dateWords }
 }
