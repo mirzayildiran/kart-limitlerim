@@ -35,8 +35,11 @@ Görevi bitirmeden önce hepsi temiz geçmeli:
 ```bash
 npx tsc -b
 npm test
+npm run lint
 npm run build
 ```
+
+`npm run lint` (ESLint + `scripts/check-css.mjs`) bu kuralları CI'da zorlar: ham `#hex` / `rgb(` / `hsl(` yok (yalnızca `tokens.css`; bilerek istisna gerekiyorsa satıra `/* allow-color */`), `alert`/`confirm`/`prompt` yok, sinyal dizisi `.value` üzerinde yerinde `sort`/`reverse`/`splice` yok (`[...x.value].sort()` kullan).
 
 - Kullanılmayan değişken veya import bırakma (TypeScript hata verir).
 - `@ts-ignore`, `any`, `eslint-disable` kullanma.
