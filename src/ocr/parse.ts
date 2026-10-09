@@ -20,7 +20,8 @@ const AMOUNT_RE = /^([+\-−*]?)(\d{1,3}(?:\.\d{3})+,\d{2}|\d+,\d{2}|\d+\.\d{2})
 const TL_RE = /^(tl|try|₺)$/i
 const TL_SUFFIX_RE = /(tl|try|₺)$/i
 const FULL_DATE_RE = /^(\d{1,2})[./](\d{1,2})[./](\d{4})$/
-const TIME_RE = /^\d{1,2}:\d{2}$/
+/** OCR sometimes glues junk digits to a time: "21:2319" is 21:23. */
+const TIME_RE = /^\d{1,2}:\d{2}\d*$/
 const YEAR_RE = /^\d{4}$/
 
 /** Whole-word month names and abbreviations, folded (so "eyl" and "eyi" both mean September). */
@@ -58,6 +59,8 @@ interface Line {
   text: string
   y0: number
   y1: number
+  /** Vertical centre; row ownership compares centres, so a line's top edge never decides it. */
+  yc: number
 }
 
 interface Span {
@@ -157,8 +160,8 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
   const orphans: Line[] = []
   for (const l of others) {
     const hit = nearest(anchors, l, gap)
-    const lo = hit ? Math.min(hit.anchor.line.y0, l.y0) : 0
-    const hi = hit ? Math.max(hit.anchor.line.y0, l.y0) : 0
+    const lo = hit ? Math.min(hit.anchor.line.yc, l.yc) : 0
+    const hi = hit ? Math.max(hit.anchor.line.yc, l.yc) : 0
     if (hit && !phantoms.some((p) => p > lo && p <= hi)) hit.anchor.others.push(l)
     else orphans.push(l)
   }
@@ -174,7 +177,7 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
   ].sort((p, q) => p.y - q.y)
   for (const l of orphans) {
     let start: { y: number; owner: number } | null = null
-    for (const st of starts) if (st.y <= l.y0) start = st
+    for (const st of starts) if (st.y <= l.yc) start = st
     if (start && start.owner >= 0) anchors[start.owner].others.push(l)
     else if (textOf(l.words, dateWords)) skipped.push(l.text)
   }
@@ -273,6 +276,7 @@ function groupLines(words: OcrWord[], H: number): Line[] {
       text: ws.map((w) => w.text).join(' '),
       y0: Math.min(...ws.map((w) => w.y0)),
       y1: Math.max(...ws.map((w) => w.y1)),
+      yc: (Math.min(...ws.map((w) => w.y0)) + Math.max(...ws.map((w) => w.y1))) / 2,
     }
   })
 }
@@ -402,9 +406,21 @@ function buildDateBlocks(
     if (!free(dayWord)) continue
     const day = dayOf(dayWord.text)
     if (day === null) continue
+    // OCR's second pass can repeat a day token just below the first: keep the first.
+    if (left.some((o) => o !== dayWord && o.text === dayWord.text && o.y0 < dayWord.y0 && dayWord.y0 - o.y0 <= H && sameColumn(o, dayWord))) {
+      dateWords.add(dayWord)
+      continue
+    }
     const mo = below(dayWord, (c) => monthOf(c.text) !== null && sameColumn(c, dayWord))
     const monthNow = mo ? monthOf(mo.text) : null
-    if (monthNow === null && lastMonth === null) continue
+    // Without a month, only a bare day token in the date column counts (it starts a row, e.g. a transfer).
+    const bareDay = /^\d{1,2}$/.test(dayWord.text) && dayWord.x0 < 0.12 * W
+    if (monthNow === null && !bareDay) continue
+    if (monthNow === null && lastMonth === null) {
+      dateWords.add(dayWord)
+      blocks.push({ y0: dayWord.y0, y1: dayWord.y1, stacked: true, date: null, inferred: false })
+      continue
+    }
     const month: number = monthNow ?? lastMonth ?? 0
     const tail = below(mo ?? dayWord, (c) => YEAR_RE.test(c.text) || (monthNow !== null && TIME_RE.test(c.text)))
 
@@ -439,6 +455,9 @@ function buildDateBlocks(
     lastMonth = month
     blocks.push({ y0: (dayAbove ?? mo).y0, y1: (tail ?? mo).y1, stacked: true, date, inferred: false })
   }
+  // Left-column times are date parts even when no block claims them.
+  for (const w of words) if (w.x0 < LEFT_COLUMN * W && TIME_RE.test(w.text)) dateWords.add(w)
+
   return { blocks, dateWords }
 }
 
