@@ -1,0 +1,36 @@
+.install-guide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.install-guide-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.install-guide-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.install-guide-platform {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.install-guide-steps {
+  margin: 0;
+  padding-left: var(--s-5);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  line-height: 1.5;
+}

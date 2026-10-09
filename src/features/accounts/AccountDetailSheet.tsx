@@ -9,6 +9,7 @@ import { openSheet, closeSheet, type SheetRequest } from '../../ui/nav'
 import { Button, Pill } from '../../ui/components/controls'
 import { Sheet } from '../../ui/components/Sheet'
 import { LimitStrip } from '../../ui/components/LimitStrip'
+import { Amount } from '../../ui/components/Amount'
 import { cardInterestPanelData, interestHistory, kmhDailyCost, statementRows } from './detailModel'
 import { rateFor } from '../../domain/interest'
 import './account-detail.css'
@@ -46,15 +47,15 @@ function renderCardContent(account: CardAccount): JSX.Element {
       <div class="account-detail-stats">
         <div class="stat-cell">
           <span class="stat-label">Kullanılabilir</span>
-          <span class="stat-value">{formatTL(available)}</span>
+          <Amount value={available} size="md" />
         </div>
         <div class="stat-cell">
           <span class="stat-label">Limit</span>
-          <span class="stat-value">{formatTL(account.limit)}</span>
+          <Amount value={account.limit} size="md" />
         </div>
         <div class="stat-cell">
           <span class="stat-label">Kullanılan</span>
-          <span class="stat-value muted">{formatTL(used)}</span>
+          <Amount value={used} size="md" tone="muted" />
         </div>
       </div>
 
@@ -63,9 +64,7 @@ function renderCardContent(account: CardAccount): JSX.Element {
         <div class="interest-panel">
           <h3>İşleyen faiz</h3>
 
-          <span class="interest-big">
-            {formatTLExact(data.totalInterest + (data.currentProjected ?? 0))}
-          </span>
+          <Amount value={data.totalInterest + (data.currentProjected ?? 0)} exact size="xl" tone="crit" />
           <span class="interest-sub">
             Bu kartta toplam işleyen faiz
           </span>
@@ -214,22 +213,22 @@ function renderKmhContent(account: KmhAccount): JSX.Element {
       <div class="account-detail-stats">
         <div class="stat-cell">
           <span class="stat-label">Kullanılabilir</span>
-          <span class="stat-value">{formatTL(available)}</span>
+          <Amount value={available} size="md" />
         </div>
         <div class="stat-cell">
           <span class="stat-label">Limit</span>
-          <span class="stat-value">{formatTL(account.limit)}</span>
+          <Amount value={account.limit} size="md" />
         </div>
         <div class="stat-cell">
           <span class="stat-label">Kullanılan</span>
-          <span class="stat-value muted">{formatTL(used)}</span>
+          <Amount value={used} size="md" tone="muted" />
         </div>
       </div>
 
       {dailyCost !== null && (
         <div class="interest-panel">
           <h3>İşleyen faiz</h3>
-          <span class="interest-big">{formatTLExact(dailyCost)}</span>
+          <Amount value={dailyCost} exact size="xl" tone="crit" />
           <span class="interest-sub">KMH borcun her gün faiz işletiyor</span>
 
           <div class="interest-line">
@@ -250,7 +249,9 @@ function renderKmhContent(account: KmhAccount): JSX.Element {
 function renderBalanceContent(account: BalanceAccount): JSX.Element {
   return (
     <div class="balance-content">
-      <div class="balance-value">{formatTL(account.balance)}</div>
+      <div class="balance-value">
+        <Amount value={account.balance} size="hero" />
+      </div>
       {account.note && <p class="balance-note">{account.note}</p>}
     </div>
   )
