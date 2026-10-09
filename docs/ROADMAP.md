@@ -2,39 +2,43 @@
 
 Her aşamanın sonunda telefonda denenebilir, çalışan bir sürüm çıkar.
 
-## Aşama 0 — Araştırma ve temel ✅ / 🚧
+## Aşama 0 — Araştırma ve temel ✅
 
 - [x] Cihaz üzerinde OCR seçenekleri (Tesseract.js 7, Türkçe veri, iOS PWA kısıtları)
 - [x] Kart faizi, KMH faizi, KKDF/BSMV ve asgari ödeme kuralları için ilk tarama
-- [ ] Faiz ve asgari ödeme oranlarının birincil kaynaklardan (TCMB, BDDK) doğrulanması
+- [x] Faiz ve asgari ödeme oranlarının birincil kaynaklardan doğrulanması (TCMB ve BDDK kaynakları `src/domain/rates.ts` içinde tarih ile belirtili)
 - [x] Proje iskeleti: Vite + Preact + TypeScript, PWA, CI, GitHub Pages
-- [ ] Tasarım dili ve bileşen seti
+- [x] Tasarım dili ve bileşen seti (`src/ui/tokens.css`, `src/ui/components/`)
 
-## Aşama 1 — Çekirdek PWA
+## Aşama 1 — Çekirdek PWA ✅
 
-- [ ] Veri modeli ve IndexedDB katmanı (hesaplar, ekstreler, harcamalar, kategoriler, düzenli ödemeler)
-- [ ] Harcama gücü ekranı: kartlar → KMH → nakit ve hesaplar → harcamalar → asgari ödemeler
-- [ ] Kesim ve son ödeme döngüsü, asgari ödeme takibi
-- [ ] Harcama ekleme; harcama kaynağın limitinden ya da bakiyesinden düşer
-- [ ] Kendi kategorilerini oluşturma
-- [ ] Düzenli ödemeler ve taksitler
-- [ ] Yedek dışa/içe aktarma (JSON)
-- [ ] Çevrim dışı çalışma ve "ana ekrana ekle" akışı
+- [x] Veri modeli ve IndexedDB katmanı (hesaplar, ekstreler, harcamalar, kategoriler, düzenli ödemeler)
+- [x] Harcama gücü ekranı: kartlar → KMH → nakit ve hesaplar → harcamalar → asgari ödemeler
+- [x] Kesim ve son ödeme döngüsü, asgari ödeme takibi
+- [x] Harcama ekleme; harcama kaynağın limitinden ya da bakiyesinden düşer
+- [x] Kendi kategorilerini oluşturma
+- [x] Düzenli ödemeler ve taksitler
+- [x] Yedek dışa/içe aktarma (JSON)
+- [x] Çevrim dışı çalışma ve "ana ekrana ekle" akışı (manifest ve service worker)
 
-## Aşama 2 — Faiz motoru
+## Aşama 2 — Faiz motoru 🚧
 
-- [ ] Güncellenebilir oran tablosu (kaynak ve geçerlilik tarihiyle)
-- [ ] Asgari / kısmi / tam ödeme senaryolarında faiz tahmini
-- [ ] KMH günlük faiz tahmini
-- [ ] Kart bazında oranı elle değiştirme
+- [ ] Güncellenebilir oran tablosu (kaynak ve geçerlilik tarihiyle). Tablo bugün kod içinde (`src/domain/rates.ts`); uzaktan güncelleme yok.
+- [x] Asgari / kısmi / tam ödeme senaryolarında faiz tahmini
+- [x] KMH günlük faiz tahmini
+- [x] Kart bazında oranı elle değiştirme
 
-## Aşama 3 — Ekran görüntüsünden aktarma
+## Aşama 3 — Ekran görüntüsünden aktarma 🚧
 
-- [ ] Görüntü ön işleme (gri ton, ölçekleme, koyu tema tersleme) Web Worker'da
-- [ ] Tesseract.js ile cihazda okuma; dil verisi uygulamayla birlikte, çevrim dışı
-- [ ] Banka bazında satır ayrıştırıcıları
-- [ ] Onay ekranı, mükerrer kontrolü, satıcıya göre kategori önerisi
+- [ ] Görüntü ön işleme (gri ton, ölçekleme, koyu tema tersleme) Web Worker'da. Tesseract kendi worker'ında çalışır; ön işleme bugün ana iş parçacığında.
+- [x] Tesseract.js ile cihazda okuma; dil verisi uygulamayla birlikte, çevrim dışı
+- [x] Banka bazında satır ayrıştırıcıları (Ziraat Dinamik, Ziraat Bankkart, Akbank, İş Bankası, Garanti)
+- [x] Onay ekranı, mükerrer kontrolü, satıcıya göre kategori önerisi
 - [ ] Android'de "Paylaş → Kart Limitlerim" (Web Share Target)
+
+## Aşama 3.5 — Doğruluk
+
+Gerçek ekran görüntüleriyle yapılan değerlendirmede beş bankada 29 satırın 28'i doğru okundu (28/29).
 
 ## Aşama 4 — Mağaza sürümleri
 
