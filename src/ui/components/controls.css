@@ -140,8 +140,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  background: #fff; /* allow-color */
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); /* allow-color */
   transition: transform 0.18s var(--ease);
 }
 .switch input:checked {
