@@ -130,7 +130,7 @@ describe('parsePage: Garanti', () => {
     expect(r.txns.map((t) => [t.bankCategory, t.description])).toEqual([
       ['Eğitim', 'ORNEK KURSU ANKARA'],
       ['Market', 'ORNEK MARKET'],
-      ['Diğer', 'Kart Ödemesi'],
+      [null, 'Kart Ödemesi'],
     ])
   })
 
@@ -178,5 +178,125 @@ describe('parsePage: generic fallback and confidence', () => {
     )
     expect(r.txns[0].description).toBe('')
     expect(r.txns[0].confidence).toBeCloseTo(0.8)
+  })
+})
+
+/** Regression cases from the real-screenshot evaluation. All data is invented. */
+describe('regressions', () => {
+  it('1. a category starting with "Mar" in the date column is not a month', () => {
+    const r = parsePage(
+      makePage(
+        { t: '02', x: 40, y: 300 },
+        { t: 'EYL', x: 40, y: 320 },
+        { t: '2026', x: 40, y: 340 },
+        { t: 'ORNEK ODEME', x: 220, y: 300 },
+        { t: '45,00 TL', right: 960, y: 300 },
+        // Row with the category cropped into the date column, no month printed
+        { t: '23', x: 40, y: 500 },
+        { t: 'Market', x: 40, y: 520 },
+        { t: 'ORNEK MARKET', x: 220, y: 500 },
+        { t: '45,00 TL', right: 960, y: 500 },
+      ),
+      TODAY,
+    )
+    expect(r.txns[1].date).toBe('2026-09-23')
+    expect(r.txns[1].date).not.toBe('2026-03-23')
+  })
+
+  it('2. split "Toplam" headers and USD/zero amounts never become debits', () => {
+    const r = parsePage(
+      makePage(
+        { t: 'Toplam USD', right: 960, y: 100 },
+        { t: 'Harcama Tutarı', right: 960, y: 120 },
+        { t: '0,00 USD', right: 960, y: 140 },
+        { t: 'Toplam', x: 40, y: 200 },
+        { t: '12,50 TL', right: 960, y: 220 },
+        { t: '30', x: 40, y: 400 },
+        { t: 'EKİ', x: 40, y: 420 },
+        { t: '2026', x: 40, y: 440 },
+        { t: 'ORNEK KAFE ANKARA TR', x: 220, y: 400 },
+        { t: '60,00 TL', right: 960, y: 400 },
+      ),
+      TODAY,
+    )
+    expect(r.txns.map((t) => t.amount)).toEqual([6000])
+    expect(r.txns.some((t) => t.amount === 0)).toBe(false)
+  })
+
+  it('3. a credit row carries no bank category', () => {
+    const r = parsePage(garantiPage(), TODAY)
+    expect(r.txns[2].direction).toBe('credit')
+    expect(r.txns[2].bankCategory).toBeNull()
+  })
+
+  it('4. Ziraat Dinamik is detected from the Provizyondaki tab without BANKKART', () => {
+    const p = makePage(
+      { t: 'Dönem İçi Hareketler', x: 40, y: 60 },
+      { t: 'Bekleyen Taksitler', x: 300, y: 60 },
+      { t: 'Provizyondaki İşlemler', x: 600, y: 60 },
+    )
+    expect(detectProfile(p)).toBe('ziraat-dinamik')
+    const b = makePage(
+      { t: 'BANKKART', x: 40, y: 20 },
+      { t: 'Provizyondaki İşlemler', x: 600, y: 60 },
+    )
+    expect(detectProfile(b)).toBe('ziraat-bankkart')
+  })
+
+  it('5. an installment split over four lines is read from the whole row', () => {
+    const r = parsePage(
+      makePage(
+        { t: '02', x: 40, y: 300 },
+        { t: 'EYL', x: 40, y: 320 },
+        { t: '2026', x: 40, y: 340 },
+        { t: '06/08 S/TRENDYOL', x: 220, y: 300 },
+        { t: '-376,83 TL', right: 960, y: 300 },
+        { t: '03.Tak ISTANB', x: 220, y: 320 },
+        { t: '(1130,49 TL İşlemin', x: 220, y: 340 },
+        { t: '3/3 Taksidi)', x: 220, y: 360 },
+      ),
+      TODAY,
+    )
+    expect(r.txns).toHaveLength(1)
+    expect(r.txns[0].installment).toEqual({ index: 3, count: 3, total: 113049 })
+    expect(r.txns[0].amount).toBe(37683)
+  })
+
+  it('6. a cut-off last row borrows month and year from the previous row', () => {
+    const r = parsePage(
+      makePage(
+        { t: '02', x: 40, y: 300 },
+        { t: 'EYL', x: 40, y: 320 },
+        { t: '2026', x: 40, y: 340 },
+        { t: 'ORNEK MARKET', x: 220, y: 300 },
+        { t: '10,00 TL', right: 960, y: 300 },
+        { t: '27', x: 40, y: 500 },
+        { t: 'ORNEK KAFE', x: 220, y: 500 },
+        { t: '20,00 TL', right: 960, y: 500 },
+      ),
+      TODAY,
+    )
+    expect(r.txns[1].date).toBe('2026-09-27')
+    expect(r.txns[1].confidence).toBe(0.8)
+  })
+
+  it('7. a missing day leaves the date null, and a day above the month is attached', () => {
+    const r = parsePage(
+      makePage(
+        { t: 'ORNEK ISTANBUL TR', x: 220, y: 280 },
+        { t: 'Eki', x: 40, y: 300 },
+        { t: '12:05', x: 40, y: 320 },
+        { t: '-100,00 TL', x: 220, y: 320 },
+        { t: '9', x: 40, y: 500 },
+        { t: 'ORNEK MAGAZA ANKARA TR', x: 220, y: 500 },
+        { t: 'Eki', x: 40, y: 520 },
+        { t: '12:05', x: 40, y: 540 },
+        { t: '-200,00 TL', x: 220, y: 540 },
+      ),
+      TODAY,
+    )
+    expect(r.txns[0].date).toBeNull()
+    expect(r.txns[0].confidence).toBe(0.7)
+    expect(r.txns[1].date).toBe('2026-10-09')
   })
 })
