@@ -24,6 +24,7 @@ import {
   TextField,
 } from '../../ui/components/controls'
 import { Sheet } from '../../ui/components/Sheet'
+import { Icon } from '../../ui/components/Icon'
 import { toast } from '../../ui/components/toast'
 import type { SheetRequest } from '../../ui/nav'
 import {
@@ -284,6 +285,12 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
       }
     >
       <div class="expense-sheet">
+        {!isEdit && (
+          <Button type="button" variant="secondary" block onClick={() => openSheet({ type: 'import' })}>
+            <Icon name="image" size={20} />
+            Ekran görüntüsünden ekle
+          </Button>
+        )}
         <MoneyField
           label="Tutar"
           value={amount}
