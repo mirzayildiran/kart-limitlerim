@@ -11,14 +11,24 @@ export function toLira(k: Kurus): number {
   return k / 100
 }
 
+/** "12.345" — whole lira without the ₺ sign, for big amounts drawn with their own currency glyph. */
+export function formatNumberTL(k: Kurus): string {
+  return whole.format(Math.round(k / 100))
+}
+
+/** "1.234,56" — keeps kuruş when present, without the ₺ sign. */
+export function formatNumberTLExact(k: Kurus): string {
+  return exact.format(k / 100)
+}
+
 /** "12.345 ₺" — rounded to whole lira, for summaries. */
 export function formatTL(k: Kurus): string {
-  return `${whole.format(Math.round(k / 100))} ₺`
+  return `${formatNumberTL(k)} ₺`
 }
 
 /** "1.234,56 ₺" — keeps kuruş when present, for individual amounts. */
 export function formatTLExact(k: Kurus): string {
-  return `${exact.format(k / 100)} ₺`
+  return `${formatNumberTLExact(k)} ₺`
 }
 
 /** Number only, for prefilling inputs: 123456 → "1.234,56". */

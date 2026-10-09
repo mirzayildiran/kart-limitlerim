@@ -16,6 +16,7 @@ import {
   sourceLine,
   taxLine,
 } from './settingsModel'
+import { InstallGuide } from './InstallGuide'
 import './settings-page.css'
 
 /** Keep in step with package.json "version". */
@@ -236,6 +237,7 @@ export function SettingsPage() {
       <header class="settings-header">
         <h1>Ayarlar</h1>
       </header>
+      <InstallGuide />
       <AppearanceSection />
       <CategoriesSection />
       <BackupSection />

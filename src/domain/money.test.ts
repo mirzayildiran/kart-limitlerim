@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatInput, formatTL, formatTLExact, parseTL, toLira, toKurus } from './money'
+import { formatInput, formatNumberTL, formatNumberTLExact, formatTL, formatTLExact, parseTL, toLira, toKurus } from './money'
 
 describe('money', () => {
   describe('toKurus', () => {
@@ -131,6 +131,32 @@ describe('money', () => {
       const result = formatTLExact(-123456)
       expect(result).toContain('-')
       expect(result).toContain('₺')
+    })
+  })
+
+  describe('formatNumberTL', () => {
+    it('formats whole lira without the currency sign', () => {
+      expect(formatNumberTL(1296100)).toBe('12.961')
+      expect(formatNumberTL(123456)).toBe('1.235')
+      expect(formatNumberTL(0)).toBe('0')
+      expect(formatNumberTL(-123456)).toBe('-1.235')
+    })
+
+    it('is the same as formatTL minus the sign', () => {
+      expect(formatTL(1296100)).toBe(`${formatNumberTL(1296100)} ₺`)
+    })
+  })
+
+  describe('formatNumberTLExact', () => {
+    it('keeps kuruş without the currency sign', () => {
+      expect(formatNumberTLExact(123456)).toBe('1.234,56')
+      expect(formatNumberTLExact(1250)).toBe('12,5')
+      expect(formatNumberTLExact(123400)).toBe('1.234')
+      expect(formatNumberTLExact(0)).toBe('0')
+    })
+
+    it('is the same as formatTLExact minus the sign', () => {
+      expect(formatTLExact(123456)).toBe(`${formatNumberTLExact(123456)} ₺`)
     })
   })
 

@@ -1,0 +1,44 @@
+.recurring-due-banner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  background: var(--warn-soft);
+  border-radius: var(--r-lg);
+  color: var(--ink);
+}
+
+.recurring-due-banner-title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.recurring-due-banner-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recurring-due-banner-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s-3);
+  font-size: var(--text-sm);
+}
+
+.recurring-due-banner-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recurring-due-banner-amount {
+  flex: 0 0 auto;
+  font-weight: 600;
+}
