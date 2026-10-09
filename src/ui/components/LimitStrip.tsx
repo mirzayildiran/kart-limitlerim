@@ -1,5 +1,6 @@
 import { formatTL } from '../../domain/money'
 import type { Kurus } from '../../domain/types'
+import { Amount } from './Amount'
 import { Pill } from './controls'
 import './limit-strip.css'
 
@@ -40,7 +41,7 @@ export function LimitStrip({ name, sub, available, limit, tone = 'card', onClick
             <Pill tone="crit">Limit dolu</Pill>
           ) : (
             <>
-              <span class="limit-strip-amount num">{formatTL(available)}</span>
+              <Amount value={available} size="lg" />
               <span class="limit-strip-caption">kullanılabilir</span>
             </>
           )}

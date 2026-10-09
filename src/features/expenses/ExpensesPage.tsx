@@ -1,6 +1,6 @@
 import { computed, signal } from '@preact/signals'
 import { cycleKeyOf, formatMonth } from '../../domain/dates'
-import { formatTL, formatTLExact } from '../../domain/money'
+import { formatTLExact } from '../../domain/money'
 import {
   accountById,
   categoryById,
@@ -9,6 +9,7 @@ import {
 } from '../../data/store'
 import { openSheet, route } from '../../ui/nav'
 import { Button, EmptyState } from '../../ui/components/controls'
+import { Amount } from '../../ui/components/Amount'
 import {
   expensesByMonth,
   groupExpensesByDay,
@@ -119,8 +120,8 @@ export function ExpensesPage() {
           {/* Month summary */}
           <section class="expenses-summary">
             <div class="expenses-summary-total">
-              <div class="expenses-summary-amount num">
-                {formatTL(monthTotal.value)}
+              <div class="expenses-summary-amount">
+                <Amount value={monthTotal.value} size="xl" />
               </div>
               <div class="expenses-summary-label">
                 {monthCount.value} {monthCount.value === 1 ? 'harcama' : 'harcama'}
