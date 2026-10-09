@@ -231,6 +231,7 @@
 }
 
 .expenses-item-label {
+  display: block;
   font-size: 14px;
   font-weight: 500;
   color: var(--color-text);
@@ -240,6 +241,7 @@
 }
 
 .expenses-item-sub {
+  display: block;
   font-size: 12px;
   color: var(--color-text-secondary);
   overflow: hidden;
@@ -248,6 +250,7 @@
 }
 
 .expenses-item-amount {
+  display: block;
   font-size: 14px;
   font-weight: 600;
   flex-shrink: 0;
