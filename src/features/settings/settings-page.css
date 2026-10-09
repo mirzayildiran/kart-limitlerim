@@ -1,0 +1,172 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  padding-bottom: var(--s-4);
+}
+
+.settings-header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.settings-section-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0 var(--s-1);
+}
+
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+.settings-card:not(.settings-pad) > * + * {
+  border-top: 1px solid var(--line);
+}
+
+.settings-pad {
+  padding: var(--s-4);
+}
+
+.settings-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.settings-text {
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+.settings-note {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.settings-muted {
+  color: var(--muted);
+}
+
+/* Tappable rows: iOS-style, 52px tall */
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--s-4);
+  text-align: left;
+}
+
+.settings-row-tap:active {
+  background: var(--surface-2);
+}
+
+.settings-row-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+
+.settings-row-add {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.settings-chev {
+  color: var(--faint);
+  flex: none;
+}
+
+.settings-dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.settings-dot-builtin {
+  background: var(--accent);
+}
+
+.settings-dot-custom {
+  background: var(--kmh);
+}
+
+.settings-archived {
+  margin-top: var(--s-2);
+}
+
+.settings-archived-summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--s-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.settings-archived > .settings-card {
+  margin-top: var(--s-2);
+}
+
+/* Backup */
+.settings-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--warn-soft);
+}
+
+.settings-error {
+  font-size: var(--text-sm);
+  color: var(--crit);
+  padding: var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--crit-soft);
+}
+
+/* Rates */
+.settings-rate-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.settings-rate-item {
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.settings-rate-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings-foot {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
