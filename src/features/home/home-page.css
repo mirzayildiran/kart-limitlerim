@@ -50,14 +50,6 @@
   letter-spacing: 0.05em;
 }
 
-.home-hero-amount {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: var(--text-hero);
-  line-height: 1;
-  color: var(--ink);
-}
-
 /* Ribbon visualization */
 .home-ribbon {
   display: flex;
@@ -145,17 +137,6 @@
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   text-align: center;
-}
-
-.home-outlook-amount {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-xl);
-  color: var(--ink);
-}
-
-.home-outlook-amount.is-crit {
-  color: var(--crit);
 }
 
 .home-outlook-label {

@@ -19,6 +19,8 @@ import {
 import { openSheet, go } from '../../ui/nav'
 import { Button, EmptyState, Pill } from '../../ui/components/controls'
 import { LimitStrip } from '../../ui/components/LimitStrip'
+import { Amount } from '../../ui/components/Amount'
+import { RecurringDueBanner } from './RecurringDueBanner'
 import './home-page.css'
 
 const dateFormatter = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' })
@@ -110,14 +112,14 @@ function renderOutlookTiles(forecast_: typeof forecast.value): JSX.Element {
   return (
     <div class="home-outlook">
       <div class="home-outlook-tile">
-        <div class="home-outlook-amount num">{formatTL(powerAfter)}</div>
+        <Amount value={powerAfter} size="xl" />
         <div class="home-outlook-label">Kesime kadar</div>
         <div class="home-outlook-sub">
           {formatShort(forecast_.until)} · {forecast_.days} gün{forecast_.recurringCount > 0 ? ' · düzenli ödemeler düşüldü' : ''}
         </div>
       </div>
       <div class="home-outlook-tile">
-        <div class={`home-outlook-amount num${cashAfterIsNegative ? ' is-crit' : ''}`}>{formatTL(cashAfter)}</div>
+        <Amount value={cashAfter} size="xl" tone={cashAfterIsNegative ? 'crit' : 'default'} />
         <div class="home-outlook-label">Ödemelerden sonra nakit</div>
         <div class="home-outlook-sub">
           {cashAfterIsNegative && minimumShorfall > 0 && (
@@ -403,6 +405,9 @@ export function HomePage() {
             <Button variant="secondary" block onClick={() => openSheet({ type: 'account', kind: 'bank' })}>
               Nakit veya hesap ekle
             </Button>
+            <Button variant="ghost" block onClick={() => go('settings')}>
+              Yedekten geri yükle
+            </Button>
           </div>
         </EmptyState>
       </div>
@@ -417,10 +422,11 @@ export function HomePage() {
       {renderTopbar()}
       <div class="home-hero">
         <div class="home-hero-eyebrow">Şu an harcayabileceğin</div>
-        <div class="home-hero-amount num">{formatTL(powerValue.total)}</div>
+        <Amount value={powerValue.total} size="hero" />
         {renderRibbon(powerValue)}
         {renderOutlookTiles(forecastValue)}
       </div>
+      <RecurringDueBanner />
 
       {renderCardSection()}
       {renderKmhSection()}
