@@ -4,6 +4,8 @@ dist
 dist-ssr
 dev-dist
 coverage
+# Copied from node_modules by scripts/copy-ocr-assets.mjs (predev/prebuild)
+public/ocr/
 *.local
 *.tsbuildinfo
 
