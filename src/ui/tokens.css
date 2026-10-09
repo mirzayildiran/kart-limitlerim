@@ -45,7 +45,7 @@
   --scrim: rgb(10 16 13 / 0.45);
 
   /* Type */
-  --font-display: 'Schibsted Grotesk Variable', 'Onest Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'KL Lira', 'Schibsted Grotesk Variable', 'Onest Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: 'Onest Variable', 'Onest', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   --text-xs: 0.75rem;   /* 12 */

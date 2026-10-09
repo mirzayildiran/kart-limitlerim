@@ -1,6 +1,7 @@
 import '@fontsource-variable/onest'
 import '@fontsource-variable/schibsted-grotesk'
 import './ui/tokens.css'
+import './ui/fonts.css'
 import './ui/base.css'
 import './app.css'
 import { render } from 'preact'
