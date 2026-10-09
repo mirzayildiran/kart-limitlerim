@@ -1,5 +1,6 @@
 import { createWorker, OEM, PSM, type LoggerMessage, type Page, type Worker as OcrWorker } from 'tesseract.js'
 import { preprocessForOcr, toOriginal } from './preprocess'
+import { DATE_WHITELIST, dateColumnRect, mergeWords, needsDateColumnPass } from './merge'
 import type { OcrPage, OcrProgress, OcrWord } from './types'
 
 const USER_ERROR = 'Görüntü okunamadı. Daha net bir ekran görüntüsüyle tekrar dene.'
@@ -96,12 +97,34 @@ export async function recognize(image: Blob, onProgress?: (p: OcrProgress) => vo
 
     onProgress?.({ stage: 'reading', progress: 0 })
     const { data } = await worker.recognize(prepared.canvas, {}, { blocks: true })
+    let words = toWords(data, prepared.scale)
+
+    // Second pass for the date column: large isolated day numbers are missed by PSM 11.
+    // Only for statements that already show amounts, to keep the common case fast.
+    if (needsDateColumnPass(words)) {
+      onProgress?.({ stage: 'reading', progress: 0.9 })
+      const rectangle = dateColumnRect(prepared.canvas.width, prepared.canvas.height)
+      await worker.setParameters({
+        tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
+        tessedit_char_whitelist: DATE_WHITELIST,
+      })
+      try {
+        const { data: dateData } = await worker.recognize(prepared.canvas, { rectangle }, { blocks: true })
+        words = mergeWords(words, toWords(dateData, prepared.scale))
+      } finally {
+        // The worker is shared: always restore the main-pass settings.
+        await worker.setParameters({
+          tessedit_pageseg_mode: PSM.SPARSE_TEXT,
+          tessedit_char_whitelist: '',
+        })
+      }
+    }
     onProgress?.({ stage: 'done', progress: 1 })
 
     return {
       width: prepared.width,
       height: prepared.height,
-      words: toWords(data, prepared.scale),
+      words,
     }
   } catch (error) {
     throw new Error(USER_ERROR, { cause: error })
