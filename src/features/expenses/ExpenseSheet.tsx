@@ -86,6 +86,8 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
   const [showNewCat, setShowNewCat] = useState<boolean>(false)
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [newCatError, setNewCatError] = useState<string | null>(null)
+  // Validation messages appear only after the first save attempt.
+  const [submitted, setSubmitted] = useState<boolean>(false)
 
   // Initialize accountId on mount
   useEffect(() => {
@@ -159,8 +161,12 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
     canFocus: canFocusAccount(a),
   }))
 
-  const amountError = amount === null ? 'Tutarı yaz, örneğin 250.' : amount <= 0 ? 'Tutar sıfırdan büyük olmalı.' : null
-  const accountError = accountId === null ? 'Önce bir kart ya da hesap ekle.' : null
+  const amountRaw = amount === null ? 'Tutarı yaz, örneğin 250.' : amount <= 0 ? 'Tutar sıfırdan büyük olmalı.' : null
+  const accountRaw = accountId === null ? 'Önce bir kart ya da hesap ekle.' : null
+  const categoryRaw = categoryId === null ? 'Bir kategori seç.' : null
+  const amountError = submitted ? amountRaw : null
+  const accountError = submitted ? accountRaw : null
+  const categoryError = submitted ? categoryRaw : null
 
   const handleCategoryChange = async (value: string) => {
     if (value === '__new__') {
@@ -191,6 +197,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
   }
 
   const handleSave = async () => {
+    setSubmitted(true)
     if (!selectedAccount || amount === null || !categoryId) return
 
     setIsSaving(true)
@@ -255,7 +262,6 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
     openSheet({ type: 'account', kind: 'card' })
   }
 
-  const isValid = amount !== null && accountId !== null && categoryId !== null
   const afterIsNegative = (availableAfter ?? 0) < 0
 
   return (
@@ -269,7 +275,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
             variant="primary"
             block
             type="button"
-            disabled={!isValid || isSaving}
+            disabled={isSaving}
             onClick={handleSave}
           >
             Kaydet
@@ -312,7 +318,10 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
               ) : (
                 <div class="expense-account-scroll">
                   {accountOptions.map(({ account: acct, canFocus }) => (
-                    <label key={acct.id} class={`expense-chip ${!canFocus ? 'is-disabled' : ''}`}>
+                    <label
+                      key={acct.id}
+                      class={`expense-chip${accountId === acct.id ? ' is-selected' : ''}${!canFocus ? ' is-disabled' : ''}`}
+                    >
                       <input
                         type="radio"
                         name="account"
@@ -332,7 +341,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
           )}
         </Field>
 
-        <Field label="Kategori">
+        <Field label="Kategori" error={categoryError}>
           {() => (
             <div>
               <Choice<string>
