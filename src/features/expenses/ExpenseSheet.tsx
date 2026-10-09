@@ -184,7 +184,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
       setCategoryId(newCat.id)
       setNewCatName('')
       setShowNewCat(false)
-    } catch (e) {
+    } catch {
       setNewCatError('Kategori oluşturulamadı.')
     }
   }
@@ -222,7 +222,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
       }
 
       closeSheet()
-    } catch (e) {
+    } catch {
       toast('Harcama kaydedilemedi. Tekrar dene.')
     } finally {
       setIsSaving(false)
@@ -243,7 +243,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
       }
 
       closeSheet()
-    } catch (e) {
+    } catch {
       toast('Harcama silinemedi. Tekrar dene.')
     } finally {
       setIsSaving(false)
