@@ -79,9 +79,6 @@
 }
 
 .expenses-summary-amount {
-  font-size: 32px;
-  font-family: var(--font-display);
-  font-weight: 600;
   display: block;
   margin-bottom: var(--spacing-sm);
 }
@@ -271,9 +268,5 @@
 
   .expenses-header h1 {
     font-size: 24px;
-  }
-
-  .expenses-summary-amount {
-    font-size: 28px;
   }
 }

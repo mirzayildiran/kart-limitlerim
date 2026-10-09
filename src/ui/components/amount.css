@@ -1,0 +1,53 @@
+.amount {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.amount-hero {
+  font-size: var(--text-hero);
+  font-weight: 800;
+}
+
+.amount-xl {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+.amount-lg {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.amount-md {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.amount-muted {
+  color: var(--muted);
+}
+
+.amount-crit {
+  color: var(--crit);
+}
+
+.amount-ok {
+  color: var(--ok);
+}
+
+/* Currency sign: body font, so it never reads as a pound sign. */
+.amount-cur {
+  margin-left: 0.1em;
+  font-family: var(--font-body);
+  font-size: 0.62em;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.amount-crit .amount-cur {
+  color: var(--crit);
+}
