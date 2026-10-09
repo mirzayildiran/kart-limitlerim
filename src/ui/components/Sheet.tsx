@@ -14,7 +14,7 @@ interface Props {
 
 /**
  * Bottom sheet dialog. Traps focus loosely (focus moves in on open and back to
- * the opener on close), closes on Escape and on scrim tap, locks page scroll.
+ * the opener on close), closes on Escape and on a tap on the scrim, locks page scroll.
  */
 export function Sheet({ open, title, onClose, children, footer }: Props) {
   const titleId = useId()
@@ -41,7 +41,8 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
 
   if (!open) return null
   return (
-    <div class="sheet-scrim" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div class="sheet-scrim" role="presentation">
+      <button type="button" class="sheet-backdrop" aria-label="Kapat" tabIndex={-1} onClick={onClose} />
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={panel}>
         <div class="sheet-grab" aria-hidden="true" />
         <header class="sheet-head">
