@@ -1,0 +1,40 @@
+.recurring-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-4);
+}
+
+.recurring-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.recurring-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+}
+
+.recurring-choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.recurring-empty {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.recurring-preview {
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
