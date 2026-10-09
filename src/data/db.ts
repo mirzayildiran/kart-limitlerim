@@ -123,3 +123,20 @@ export async function getMeta<T>(db: Db, key: string): Promise<T | undefined> {
 export async function setMeta(db: Db, key: string, value: unknown): Promise<void> {
   await db.put('meta', { key, value })
 }
+
+export const deleteCategory = (db: Db, id: string) => db.delete('categories', id)
+
+/** Wipe every store and re-seed the default categories, all in one transaction. */
+export async function resetAll(db: Db): Promise<void> {
+  const tx = db.transaction(['accounts', 'expenses', 'categories', 'recurring', 'rules', 'meta'], 'readwrite')
+  const ops = [
+    tx.objectStore('accounts').clear(),
+    tx.objectStore('expenses').clear(),
+    tx.objectStore('categories').clear(),
+    tx.objectStore('recurring').clear(),
+    tx.objectStore('rules').clear(),
+    tx.objectStore('meta').clear(),
+    ...DEFAULT_CATEGORIES.map((c) => tx.objectStore('categories').put(c)),
+  ]
+  await Promise.all([...ops, tx.done])
+}

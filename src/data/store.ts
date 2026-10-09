@@ -184,3 +184,18 @@ export async function importBackupText(text: string): Promise<void> {
   await restoreBackup(requireDb(), backup)
   hydrate(await repo.loadAll(requireDb()))
 }
+
+// ---- settings: categories, reset ----
+/** Delete a user category. Refuses while any expense or recurring payment still uses it. */
+export async function removeCategory(id: string): Promise<void> {
+  const used = expenses.value.some((e) => e.categoryId === id) || recurring.value.some((r) => r.categoryId === id)
+  if (used) throw new Error('Bu kategoriyle kayıtlı harcamalar var; arşivleyebilirsin.')
+  await repo.deleteCategory(requireDb(), id)
+  categories.value = categories.value.filter((c) => c.id !== id)
+}
+
+/** Erase everything on this device and start over with the default categories. */
+export async function resetAllData(): Promise<void> {
+  await repo.resetAll(requireDb())
+  hydrate(await repo.loadAll(requireDb()))
+}
