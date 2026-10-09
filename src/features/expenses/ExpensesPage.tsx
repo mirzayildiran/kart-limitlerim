@@ -188,18 +188,18 @@ export function ExpensesPage() {
                         class="expenses-item"
                         onClick={() => openSheet({ type: 'expense', expense: exp })}
                       >
-                        <div class="expenses-item-main">
-                          <div class="expenses-item-label">
+                        <span class="expenses-item-main">
+                          <span class="expenses-item-label">
                             {exp.note || catName}
-                          </div>
-                          <div class="expenses-item-sub">
+                          </span>
+                          <span class="expenses-item-sub">
                             {catName} · {accName}
                             {installmentText}
-                          </div>
-                        </div>
-                        <div class="expenses-item-amount num">
+                          </span>
+                        </span>
+                        <span class="expenses-item-amount num">
                           {formatTLExact(exp.amount)}
-                        </div>
+                        </span>
                       </button>
                     )
                   })}
