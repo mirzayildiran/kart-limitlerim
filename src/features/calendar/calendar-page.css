@@ -1,0 +1,197 @@
+.calendar-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.calendar-header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cal-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.cal-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.cal-section-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cal-meta {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.cal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.cal-day-title {
+  margin: var(--s-2) 0 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.cal-day-title.is-today {
+  color: var(--accent);
+}
+
+/* Shared row content */
+.cal-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cal-item-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.cal-item-detail {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.cal-item-amount {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* Timeline events */
+.cal-event,
+.cal-item {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cal-event:active,
+.cal-item:active {
+  background: var(--surface-2);
+}
+
+.cal-event-icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.cal-event-cut .cal-event-icon {
+  color: var(--accent);
+}
+
+.cal-event-recurring .cal-event-icon {
+  color: var(--accent);
+}
+
+.cal-event-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cal-event-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.cal-event-detail {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.cal-event-amount {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.cal-event.is-soon .cal-event-icon,
+.cal-event.is-soon .cal-event-detail,
+.cal-event.is-soon .cal-event-amount {
+  color: var(--warn);
+}
+
+/* Pending recurring charges */
+.cal-pending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--warn-soft);
+  border-radius: var(--r-md);
+}
+
+.cal-pending-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.cal-pending-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-2);
+}
+
+.cal-hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
