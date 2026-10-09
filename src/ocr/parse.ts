@@ -10,6 +10,10 @@ const LEFT_COLUMN = 0.2
 const DATE_REACH = 3
 /** A text line joins the nearest row only within this many word heights. */
 const ROW_REACH = 2.5
+/** Month/year parts must sit within this many px of their day token. */
+const COLUMN_TOLERANCE = 40
+/** A "Toplam" line this close (in line heights) marks an amount as a total, not a row. */
+const TOTAL_REACH = 1.6
 
 /** Sign may be OCR'd as "*" for "+". */
 const AMOUNT_RE = /^([+\-−*]?)(\d{1,3}(?:\.\d{3})+,\d{2}|\d+,\d{2}|\d+\.\d{2})$/
@@ -19,10 +23,11 @@ const FULL_DATE_RE = /^(\d{1,2})[./](\d{1,2})[./](\d{4})$/
 const TIME_RE = /^\d{1,2}:\d{2}$/
 const YEAR_RE = /^\d{4}$/
 
-/** Keys are the first three folded letters with "l" read as "i" (OCR: EYL ↔ EYİ). */
-const MONTHS: Partial<Record<string, number>> = {
-  oca: 1, sub: 2, mar: 3, nis: 4, may: 5, haz: 6, tem: 7, agu: 8, eyi: 9,
-  eki: 10, kas: 11, ara: 12,
+/** Whole-word month names and abbreviations, folded (so "eyl" and "eyi" both mean September). */
+const MONTH_WORDS: Partial<Record<string, number>> = {
+  oca: 1, ocak: 1, sub: 2, subat: 2, mar: 3, mart: 3, nis: 4, nisan: 4, may: 5, mayis: 5,
+  haz: 6, haziran: 6, tem: 7, temmuz: 7, agu: 8, agustos: 8, eyl: 9, eyi: 9, eylul: 9,
+  eki: 10, ekim: 10, kas: 11, kasim: 11, ara: 12, aralik: 12,
 }
 
 const HEADER_RE = /toplam|bonus|son donem|donem ici harcamalar|hesap ozeti|harcama tutar|\blimit\b/
@@ -38,8 +43,9 @@ const GLYPH_TOKENS = new Set(['ba', 'ri', 'fa', 'va', 'el', 'lte', '4g'])
 const INSTALLMENT_NOISE_RE = /islemin|taksid|taksit/
 const INSTALLMENT_TOKEN_RE = /\b\d{1,2}\s*\/\s*\d{1,2}\s*tak\w*|\b\d{1,2}\s*\.\s*tak\w*/gi
 const BARE_FRACTION_RE = /^\d{1,2}\s*\/\s*\d{1,2}\)?$/
-const INSTALLMENT_COUNT_RE = /(\d{1,2})\s*\/\s*(\d{1,2})\s*tak/
-const INSTALLMENT_TOTAL_RE = /\(\s*([\d.,]+)\s*(?:tl)?\s*islemin/
+/** Run on folded row text (lowercase, no diacritics). */
+const INSTALLMENT_COUNT_RE = /(\d{1,2})\s*\/\s*(\d{1,2})\s*taksi[dt]/
+const INSTALLMENT_TOTAL_RE = /\(\s*([\d.,]+)\s*tl\s*islemin/
 const INSTALLMENT_LINE_RE = /islemin/
 const CREDIT_RE = /odeme|tesekk|iade/
 const TRANSFER_RE = /karttan|aktarim/
@@ -61,7 +67,7 @@ interface Span {
 
 interface DateBlock extends Span {
   date: IsoDate | null
-  /** Month was missing and borrowed from the previous row. */
+  /** A month or year was missing and borrowed from the previous row. */
   inferred: boolean
 }
 
@@ -83,7 +89,8 @@ interface Anchor {
 export function detectProfile(page: OcrPage): BankProfileId {
   const t = fold(page.words.map((w) => w.text).join(' '))
   if (t.includes('bankkart')) return 'ziraat-bankkart'
-  if (t.includes('dinamik') || (t.includes('donem ici hareketler') && t.includes('provizyondaki'))) return 'ziraat-dinamik'
+  // Both Ziraat apps show "Provizyondaki İşlemler"; without BANKKART it is the Dinamik app.
+  if (t.includes('provizyondaki') || t.includes('dinamik')) return 'ziraat-dinamik'
   if (t.includes('kredi karti') && t.includes('gelecek donem')) return 'akbank'
   if (t.includes('donem ici') && t.includes('taksitler') && t.includes('hesap ozeti')) return 'isbank'
   if (t.includes('bonus') || t.includes('son donem ici hareketleri')) return 'garanti'
@@ -103,7 +110,8 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
   const others: Line[] = []
 
   let pending = false
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
     const folded = fold(line.text)
     if (HEADER_RE.test(folded)) {
       skipped.push(line.text)
@@ -116,6 +124,10 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
     }
     if (UI_RE.test(folded) || isChromeLine(folded)) continue
     const amount = findAmount(line, dateWords)
+    if (amount && nearTotal(lines, i, H)) {
+      skipped.push(line.text)
+      continue
+    }
     if (amount && !INSTALLMENT_LINE_RE.test(folded)) {
       anchors.push({ line, amount, pending, dateBlock: null, others: [] })
     } else {
@@ -148,11 +160,9 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
       .filter((p) => p.text !== '')
       .sort((p, q) => p.y0 - q.y0)
 
-    let bankCategory: string | null = null
-    if (id === 'garanti' && parts.length >= 2) {
-      bankCategory = parts[0].text
-      parts = parts.slice(1)
-    }
+    const splitCategory = id === 'garanti' && parts.length >= 2
+    const bankPiece = splitCategory ? parts[0].text : null
+    if (splitCategory) parts = parts.slice(1)
     const description = parts
       .map((p) => p.text)
       .join(' ')
@@ -165,7 +175,12 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
       continue
     }
 
-    const folded = fold(raw)
+    const credit = a.amount.sign === '+' || a.amount.sign === '*' || CREDIT_RE.test(fold(description))
+    // Credits (payments, refunds) carry no spending category from the bank.
+    const bankCategory = credit ? null : bankPiece
+
+    // Installment info may be split across lines, so search the whole row band.
+    const folded = fold(rowLines.map((l) => l.text).join(' '))
     const count = INSTALLMENT_COUNT_RE.exec(folded)
     const totalMatch = INSTALLMENT_TOTAL_RE.exec(folded)
     const total = totalMatch ? parseTL(normaliseDecimal(totalMatch[1])) : null
@@ -183,7 +198,6 @@ export function parsePage(page: OcrPage, today: Date, profile?: BankProfileId): 
     if (!description) c -= 0.2
     const confidence = Math.round(Math.min(1, Math.max(0, c)) * 100) / 100
 
-    const credit = a.amount.sign === '+' || a.amount.sign === '*' || CREDIT_RE.test(fold(description))
     txns.push({
       date,
       description,
@@ -250,12 +264,24 @@ function normaliseDecimal(s: string): string {
 
 function findAmount(line: Line, dateWords: Set<OcrWord>): Amount | null {
   let found: Amount | null = null
-  for (const w of line.words) {
+  for (let i = 0; i < line.words.length; i++) {
+    const w = line.words[i]
     if (dateWords.has(w)) continue
+    const next = line.words[i + 1]
+    if (next && /^(usd|eur)$/i.test(next.text)) continue // foreign-currency totals
     const parsed = parseAmount(w.text)
-    if (parsed) found = { word: w, ...parsed }
+    if (parsed && parsed.kurus > 0) found = { word: w, ...parsed }
   }
   return found
+}
+
+/** True when a "Toplam" line sits right above or below this line. */
+function nearTotal(lines: Line[], i: number, H: number): boolean {
+  const reach = TOTAL_REACH * H
+  const line = lines[i]
+  return [lines[i - 1], lines[i + 1]].some(
+    (o) => o !== undefined && /toplam/.test(fold(o.text)) && Math.max(0, o.y0 - line.y1, line.y0 - o.y1) <= reach,
+  )
 }
 
 /** Words that are neither dates, amounts nor "TL", as one string. */
@@ -286,10 +312,9 @@ function dayOf(text: string): number | null {
   return d >= 1 && d <= 31 ? d : null
 }
 
+/** Whole word only: "Market" is not "Mar". */
 function monthOf(text: string): number | null {
-  const f = fold(text)
-  if (!/^[a-z]{3,9}$/.test(f)) return null
-  return MONTHS[f.slice(0, 3).replace(/l/g, 'i')] ?? null
+  return MONTH_WORDS[fold(text).replace(/[^a-z]/g, '')] ?? null
 }
 
 function isoOf(y: number, m: number, d: number): IsoDate | null {
@@ -310,8 +335,10 @@ function resolveNoYear(day: number, month: number, today: Date): IsoDate | null 
 }
 
 /**
- * Date blocks: full "dd.mm.yyyy" words, and stacked left-column parts
- * (day / month / year-or-time). A missing month borrows the previous block's.
+ * Date blocks, from full "dd.mm.yyyy" words and from stacked left-column parts:
+ *  - day, month and year-or-time, stacked (the normal case);
+ *  - a missing month, or a cut-off row with only the day, borrows the previous block's month (and year);
+ *  - a month with no day above it gives a block with a null date (the review UI asks the user).
  */
 function buildDateBlocks(
   words: OcrWord[],
@@ -330,30 +357,55 @@ function buildDateBlocks(
 
   const left = words.filter((w) => w.x0 < LEFT_COLUMN * W && !dateWords.has(w)).sort((p, q) => p.y0 - q.y0)
   const reach = DATE_REACH * H
+  const free = (c: OcrWord) => !dateWords.has(c)
+  const sameColumn = (a: OcrWord, b: OcrWord) => Math.abs(a.x0 - b.x0) <= COLUMN_TOLERANCE
   const below = (from: OcrWord, ok: (w: OcrWord) => boolean) =>
-    left.find((c) => !dateWords.has(c) && c !== from && c.y0 >= from.y0 && c.y0 - from.y1 <= reach && ok(c))
+    left.find((c) => free(c) && c !== from && c.y0 >= from.y0 && c.y0 - from.y1 <= reach && ok(c))
 
   let lastMonth: number | null = null
+  let lastYear: number | null = null
+
+  // Pass 1: day first, then month and year/time below it.
   for (const dayWord of left) {
-    if (dateWords.has(dayWord)) continue
+    if (!free(dayWord)) continue
     const day = dayOf(dayWord.text)
     if (day === null) continue
-
-    const mo = below(dayWord, (c) => monthOf(c.text) !== null)
+    const mo = below(dayWord, (c) => monthOf(c.text) !== null && sameColumn(c, dayWord))
     const monthNow = mo ? monthOf(mo.text) : null
-    let month = monthNow
-    let inferred = false
-    if (month === null) {
-      if (lastMonth === null || !below(dayWord, (c) => YEAR_RE.test(c.text))) continue
-      month = lastMonth
+    if (monthNow === null && lastMonth === null) continue
+    const month: number = monthNow ?? lastMonth ?? 0
+    const tail = below(mo ?? dayWord, (c) => YEAR_RE.test(c.text) || (monthNow !== null && TIME_RE.test(c.text)))
+
+    let year: number | null = tail && YEAR_RE.test(tail.text) ? Number(tail.text) : null
+    let inferred = monthNow === null
+    if (year !== null) lastYear = year
+    else if (monthNow === null && lastYear !== null) {
+      year = lastYear
       inferred = true
     }
-    const tail = below(mo ?? dayWord, (c) => YEAR_RE.test(c.text) || (monthNow !== null && TIME_RE.test(c.text)))
-    const date =
-      tail && YEAR_RE.test(tail.text) ? isoOf(Number(tail.text), month, day) : resolveNoYear(day, month, today)
+    const date = year !== null ? isoOf(year, month, day) : resolveNoYear(day, month, today)
     for (const x of [dayWord, mo, tail]) if (x) dateWords.add(x)
     lastMonth = month
     blocks.push({ y0: dayWord.y0, y1: (tail ?? mo ?? dayWord).y1, date, inferred })
+  }
+
+  // Pass 2: a month that no day claimed. Needs a year or time below, so a description word is never a month.
+  for (const mo of left) {
+    if (!free(mo)) continue
+    const month = monthOf(mo.text)
+    if (month === null) continue
+    const tail = below(mo, (c) => YEAR_RE.test(c.text) || TIME_RE.test(c.text))
+    const dayAbove = left
+      .filter((d) => free(d) && d !== mo && d.y1 <= mo.y0 + 1 && mo.y0 - d.y1 <= reach && sameColumn(d, mo) && dayOf(d.text) !== null)
+      .sort((p, q) => q.y0 - p.y0)[0]
+    if (!tail && !dayAbove) continue
+    const day = dayAbove ? dayOf(dayAbove.text) : null
+    const year = tail && YEAR_RE.test(tail.text) ? Number(tail.text) : null
+    if (year !== null) lastYear = year
+    const date = day === null ? null : year !== null ? isoOf(year, month, day) : resolveNoYear(day, month, today)
+    for (const x of [dayAbove, mo, tail]) if (x) dateWords.add(x)
+    lastMonth = month
+    blocks.push({ y0: (dayAbove ?? mo).y0, y1: (tail ?? mo).y1, date, inferred: false })
   }
   return { blocks, dateWords }
 }
