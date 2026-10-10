@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023", "WebWorker"],
+    "types": [],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src",
+    "../../src/ai/*.ts",
+    "../../src/domain/insightsTypes.ts",
+    "../../src/domain/types.ts"
+  ],
+  "exclude": [
+    "../../src/ai/client.ts",
+    "../../src/ai/*.test.ts"
+  ]
+}
