@@ -442,6 +442,42 @@ describe('computeInsights', () => {
     })
   })
 
+  describe('accountId', () => {
+    it('names the card for a statement due and a minimum-interest note', () => {
+      const a = card({ id: 'c7', lines: [withStatement({ dueDate: '2026-10-12' })] })
+      const result = computeInsights(input({ accounts: [a] }))
+      expect(byKind(result, 'statementDue')[0].accountId).toBe('c7')
+      expect(byKind(result, 'minimumInterest')[0].accountId).toBe('c7')
+    })
+
+    it('names the account for a near-limit card or KMH and for its interest', () => {
+      const result = computeInsights(input({ accounts: [kmh({ id: 'k9', available: 0 })] }))
+      expect(byKind(result, 'cardNearLimit')[0].accountId).toBe('k9')
+      const interest = computeInsights(input({ accounts: [kmh({ id: 'k9', available: 3_000_000 })] }))
+      expect(byKind(interest, 'kmhInterest')[0].accountId).toBe('k9')
+    })
+
+    it('names the recommended card', () => {
+      const a = card({ id: 'c1', name: 'Akbank', available: 3_000_000, lines: [line({ cutDay: 5, dueOffsetDays: 10 })] })
+      const b = card({ id: 'c2', name: 'Yapı Kredi', available: 5_000_000, lines: [line({ cutDay: 20, dueOffsetDays: 5 })] })
+      expect(byKind(computeInsights(input({ accounts: [a, b] })), 'bestCard')[0].accountId).toBe('c1')
+    })
+
+    it('leaves budget-wide insights without an account', () => {
+      const result = computeInsights(
+        input({
+          accounts: [bank(100_000), card({ lines: [withStatement()] })],
+          budgets: [{ categoryId: 'yemek', monthly: 100_000 }],
+          expenses: [exp('yemek', 200_000, '2026-10-03'), exp('market', 60_000, '2026-10-03'), exp('market', 40_000, '2026-09-02')],
+        }),
+      )
+      for (const kind of ['cashShortfall', 'budgetOver', 'categoryIncrease'] as const) {
+        expect(byKind(result, kind).length).toBeGreaterThan(0)
+        expect(byKind(result, kind).every((i) => i.accountId === undefined)).toBe(true)
+      }
+    })
+  })
+
   describe('ordering', () => {
     it('sorts crit, then warn, then info, keeping rule order within a severity', () => {
       const result = computeInsights(

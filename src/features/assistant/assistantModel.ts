@@ -1,7 +1,44 @@
 import { LIMITS } from '../../ai/protocol'
-import type { InsightSeverity } from '../../domain/insightsTypes'
+import type { IconName } from '../../ui/components/Icon'
+import type { InsightInput, InsightKind, InsightSeverity } from '../../domain/insightsTypes'
 
 /** Pure helpers for the assistant screens. */
+
+/**
+ * The budget picture the assistant reads. Özet and the assistant page both build
+ * their suggestions from the same input, so both call this with the store's signals.
+ */
+export function assistantInput(src: InsightInput): InsightInput {
+  return {
+    accounts: src.accounts,
+    expenses: src.expenses,
+    categories: src.categories,
+    recurring: src.recurring,
+    budgets: src.budgets,
+    today: src.today,
+  }
+}
+
+/** Drawn icon for the kind of suggestion: due and limit alerts, card interest, KMH, spending pace. */
+export function insightIcon(kind: InsightKind): IconName {
+  switch (kind) {
+    case 'statementDue':
+    case 'cardNearLimit':
+    case 'cashShortfall':
+      return 'alert'
+    case 'minimumInterest':
+      return 'card'
+    case 'kmhInterest':
+      return 'bank'
+    case 'budgetOver':
+    case 'budgetPace':
+    case 'monthPace':
+    case 'categoryIncrease':
+      return 'wallet'
+    default:
+      return 'info'
+  }
+}
 
 export const QUICK_PROMPTS: string[] = [
   'Bu ay nasıl gidiyorum?',
