@@ -43,3 +43,7 @@ FINISH: critique on captures, fix round, finish reviewer verdict, DESIGN.md Roll
 - Rows that open a sheet end in a chevron; cut rows read "Ekstre kesimi".
 - The 52 px payment date tile from Özet is not used here: the day divider already carries the date, so a tile would repeat it on every row; the 36 px account medallion keeps the Owned Colour Rule.
 - Light-theme medallions get a 1 px inner hairline (yellow and green tiles vanish on white otherwise).
+
+## Finish record (2026-10-10)
+
+Dual-agent critique 24/40 → fix round → finish reviewer `fix` → two scoring rounds (day headers title-sm on a toned band, hero period total, neutral light warning wash with amber edge, as-built brief, labelled synthetic fixture) → `disposition: ship` (covers the scored fixes).
