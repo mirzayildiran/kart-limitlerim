@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { Icon } from '../../ui/components/Icon'
-import { locked, shielded, unlock } from '../../platform/lock'
+import { locked, shielded, unlock, unlockResult } from '../../platform/lock'
+import { lockMessage } from './lockMessage'
 import './lock-screen.css'
 
 /** How long the cover fades out once the app is open again; matches .lock-screen.is-leaving. */
@@ -45,7 +46,6 @@ export function LockScreen() {
   useEffect(() => {
     if (isLocked) button.current?.focus({ preventScroll: true })
   }, [isLocked])
-  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     // Keep VoiceOver and keyboard focus out of the hidden content.
@@ -54,7 +54,6 @@ export function LockScreen() {
       setShown(true)
       return
     }
-    setFailed(false)
     const t = setTimeout(() => setShown(false), reducedMotion() ? 0 : LEAVE_MS)
     return () => clearTimeout(t)
   }, [covered])
@@ -63,11 +62,9 @@ export function LockScreen() {
 
   async function onUnlock() {
     setBusy(true)
-    setFailed(false)
+    unlockResult.value = null
     await unlock()
     setBusy(false)
-    // Still locked after the attempt: Face ID failed or was cancelled.
-    if (locked.value) setFailed(true)
   }
 
   return (
@@ -92,7 +89,7 @@ export function LockScreen() {
             {busy ? 'Doğrulanıyor…' : 'Face ID ile aç'}
           </button>
           <p class="lock-error" role="alert">
-            {failed ? 'Açılamadı. Tekrar dene ya da iPhone şifreni kullan.' : ''}
+            {busy ? '' : lockMessage(unlockResult.value)}
           </p>
         </div>
       )}
