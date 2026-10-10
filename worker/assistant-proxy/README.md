@@ -90,6 +90,6 @@ Cloudflare'in **WAF → Rate limiting rules** kuralları yalnızca özel alan ad
 
 ## CORS hakkında
 
-Yalnızca `ALLOWED_ORIGINS` içindeki kaynaklar kabul edilir. Diğer kaynaklardan ve `Origin` başlığı olmayan isteklerden 403 döner. Bu bir güvenlik sınırı değildir, çünkü `Origin` başlığı tarayıcı dışında kolayca değiştirilebilir. Asıl koruma anahtarların sunucuda kalması ve hız sınırıdır.
+Yalnızca `ALLOWED_ORIGINS` içindeki kaynaklar kabul edilir: GitHub Pages sitesi, yerel Vite (`http://localhost:5173`) ve iOS uygulaması (`capacitor://localhost`). Ayrıca `LAN_DEV_PORT` tanımlıysa (varsayılan `5173`), özel ağ adreslerinden (10/8, 172.16/12, 192.168/16) yalnızca bu porttaki `http://` kaynakları kabul edilir; telefon canlı testte Mac'teki Vite'a böyle bağlanır (`scripts/ios-dev.mjs`). Bu satırı silmek kuralı kapatır. Diğer kaynaklardan ve `Origin` başlığı olmayan isteklerden 403 döner. Bu bir güvenlik sınırı değildir, çünkü `Origin` başlığı tarayıcı dışında kolayca değiştirilebilir. Asıl koruma anahtarların sunucuda kalması ve hız sınırıdır.
 
 Yeni bir kaynak eklemek için `wrangler.toml` içindeki `ALLOWED_ORIGINS` değerini düzenle ve `wrangler deploy` çalıştır.

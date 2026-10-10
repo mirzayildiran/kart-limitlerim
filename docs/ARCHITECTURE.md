@@ -58,7 +58,7 @@ Sohbet akışı:
 
 1. `budgetSummary` (`src/domain/insightsSummary.ts`) toplamları, hesap adlarını, ekstre rakamlarını, kategori karşılaştırmasını ve önerileri hazır biçimlenmiş metinler olarak bir özet nesnesine koyar. Tek tek harcama, not, kimlik ve düzenli ödeme adı girmez.
 2. `askAssistant` (`src/ai/client.ts`) özeti ve son 12 mesajı aracıya gönderir (30 sn zaman aşımı). Aracının adresi derleme sırasında `VITE_ASSISTANT_PROXY_URL` ile verilir; yoksa sohbet kapalıdır.
-3. Worker kaynağı (`ALLOWED_ORIGINS`), boyutu ve biçimi (`parseAssistantRequest`) denetler, IP başına hız sınırı uygular, sistem istemini (`SYSTEM_PROMPT`) ve özeti ekleyip Gemini, Groq ve OpenRouter'ı bu sırayla dener. İstek içeriği günlüğe yazılmaz.
+3. Worker kaynağı (`ALLOWED_ORIGINS`; iOS için `capacitor://localhost`, canlı testte özel ağdaki `http://…:5173` için `LAN_DEV_PORT`), boyutu ve biçimi (`parseAssistantRequest`) denetler, IP başına hız sınırı uygular, sistem istemini (`SYSTEM_PROMPT`) ve özeti ekleyip Gemini, Groq ve OpenRouter'ı bu sırayla dener. İstek içeriği günlüğe yazılmaz.
 4. Model yalnızca özetteki rakamları kullanır; yeni hesap yapmaz. Her yanıtın altına "Tahmindir, finansal tavsiye değildir." ibaresini uygulama ekler.
 
 Sohbet geçmişi yalnızca bellekte tutulur. Worker, `main` dalına her gönderimde `deploy.yml` içindeki `scripts/deploy-assistant.sh` ile kurulur (depo gizli değerleri: `CLOUDFLARE_API_TOKEN`, `GEMINI_API_KEY`, `GROQ_API_KEY`, isteğe bağlı `OPENROUTER_API_KEY`).
