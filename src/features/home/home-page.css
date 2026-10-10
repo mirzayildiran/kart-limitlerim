@@ -267,7 +267,8 @@
 }
 
 .home-hero .amount-hero {
-  font-size: clamp(3.25rem, 17vw, 4.75rem);
+  /* Already the largest type on screen: it follows the screen width, not Dynamic Type, so 7 digits always fit. */
+  font-size: clamp(2.5rem, 17vw, 4.75rem);
   letter-spacing: -0.04em;
   font-variant-numeric: proportional-nums;
 }
@@ -392,6 +393,8 @@
 /* Payments: a date tile in the card's colour */
 .home-statement-row {
   display: flex;
+  /* Large text: the amount column wraps under the name instead of squeezing it. */
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--s-3);
   padding: var(--s-3);
@@ -436,7 +439,7 @@
 }
 
 .home-statement-row-left {
-  flex: 1;
+  flex: 1 1 5.5rem;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -447,9 +450,12 @@
   font-weight: 600;
   font-size: var(--text-md);
   color: var(--ink);
+  /* Two lines before truncating, so large text keeps the name readable. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
 }
 
 .home-statement-row-sub {
@@ -459,6 +465,7 @@
 
 .home-statement-row-right {
   flex: 0 0 auto;
+  margin-left: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
