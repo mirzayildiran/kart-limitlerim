@@ -227,3 +227,8 @@
 .budget-plan-add-btn {
   gap: var(--s-2);
 }
+
+/* Several rows each carry an edit link: neutral ink, so lime stays for the one forward action. */
+.budget-plan-edit {
+  color: var(--muted);
+}
