@@ -16,6 +16,7 @@ const ERROR_CODES: readonly AssistantErrorCode[] = [
   'rate_limited',
   'bad_request',
   'unavailable',
+  'no_consent',
 ]
 
 const MESSAGES: Record<AssistantErrorCode, string> = {
@@ -25,6 +26,7 @@ const MESSAGES: Record<AssistantErrorCode, string> = {
   rate_limited: 'Asistan şu an çok yoğun. Birkaç dakika sonra yeniden dene.',
   bad_request: 'Mesaj asistana iletilemedi. Mesajı kısaltıp yeniden dene.',
   unavailable: 'Asistan şu an yanıt veremiyor. Daha sonra yeniden dene.',
+  no_consent: 'Sohbet kapalı. Açmak için önce onay ekranını onayla.',
 }
 
 /** A failed assistant call, carrying the code the UI maps to a message. */
@@ -57,8 +59,16 @@ export function trimHistory(messages: ChatMessage[]): ChatMessage[] {
 export async function askAssistant(
   summary: BudgetSummary,
   messages: ChatMessage[],
-  opts: { url?: string | null; fetchImpl?: typeof fetch; timeoutMs?: number; signal?: AbortSignal } = {},
+  opts: {
+    /** Required, so no caller can send without the user's consent (App Store 5.1.2, KVKK). */
+    consented: boolean
+    url?: string | null
+    fetchImpl?: typeof fetch
+    timeoutMs?: number
+    signal?: AbortSignal
+  },
 ): Promise<AssistantReply> {
+  if (opts.consented !== true) throw new AssistantError('no_consent')
   const url = opts.url === undefined ? PROXY_URL : opts.url
   if (!url) throw new AssistantError('not_configured')
   if (typeof navigator !== 'undefined' && navigator.onLine === false) throw new AssistantError('offline')

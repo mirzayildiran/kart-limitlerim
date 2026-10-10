@@ -25,10 +25,13 @@ const LINKS: Record<string, DeepLink> = {
 
 /** Maps a kartlimitlerim:// URL to where the app should go; null for anything else. */
 export function parseDeepLink(url: string): DeepLink | null {
-  const statement = /^kartlimitlerim:\/\/ekstre\/([A-Za-z0-9_-]+)\/(\d{1,2})\/?$/i.exec(url.trim())
+  if (url.length > 200) return null
+  const statement = /^kartlimitlerim:\/\/ekstre\/([A-Za-z0-9_-]{1,64})\/(\d{1,2})\/?$/i.exec(url.trim())
   if (statement) return { sheet: 'statement', accountId: statement[1], lineIndex: Number(statement[2]) }
   const m = /^kartlimitlerim:\/\/([^/?#]+)\/?(?:[?#].*)?$/i.exec(url.trim())
-  return m ? (LINKS[m[1].toLowerCase()] ?? null) : null
+  // Own keys only: "constructor" or "__proto__" must not resolve to Object.prototype members.
+  const key = m?.[1].toLowerCase()
+  return key !== undefined && Object.hasOwn(LINKS, key) ? LINKS[key] : null
 }
 
 /** The link a due-date reminder opens: that card line's statement. */
