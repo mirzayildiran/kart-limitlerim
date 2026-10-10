@@ -13,6 +13,9 @@ export interface Reminder {
   at: Date
   title: string
   body: string
+  /** The card line it is about; tapping the notification opens its statement. */
+  accountId: string
+  lineIndex: number
 }
 
 /** Days before the due date to remind; 0 is the morning of the due date. */
@@ -35,6 +38,8 @@ export function reminderPlan(accounts: Account[], now: Date): Reminder[] {
         at,
         title: `${name} son ödeme ${when}`,
         body: 'Ödemeyi yaptıysan uygulamada işaretle.',
+        accountId: account.id,
+        lineIndex,
       })
     }
   }
