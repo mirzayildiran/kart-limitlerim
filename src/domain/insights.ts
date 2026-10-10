@@ -22,10 +22,19 @@ const CATEGORY_RATIO_NUM = 13
 const CATEGORY_RATIO_DEN = 10
 const CATEGORY_MAX = 3
 
-/** Month pace is worth a note only when it runs this far above last month (+10%). */
+/**
+ * Month pace is worth a note only when it runs this far above last month (+10%).
+ * Earlier in the month the projection is too noisy; PACE_MIN_DAYS guards that.
+ */
 const MONTH_PACE_NUM = 11
 const MONTH_PACE_DEN = 10
-/** Same minimum day count as the budget pace check: earlier estimates are too noisy. */
+/** Above twice last month's total the note becomes a warning. */
+const MONTH_ALARM_FACTOR = 2
+
+/** The best-card suggestion needs this much free limit: a fifth of the card's limit… */
+const BEST_CARD_MIN_FREE_SHARE = 5
+/** …and at least 1.000 ₺. */
+const BEST_CARD_MIN_FREE: Kurus = 100_000
 
 /** Taxes on interest (KKDF + BSMV = 15% + 15%), applied on top of the rate. */
 const TAX_FACTOR = 1.3
@@ -46,6 +55,7 @@ function cashShortfall(input: InsightInput): Insight[] {
       title: 'Kesime kadar nakit yetmeyebilir',
       body: `${formatShort(o.until)} kesimine kadar tahmini ${formatTL(short)} eksik kalabilir. Asgari ödemeler ve düzenli ödemeler eldeki nakit ve KMH ile karşılanamıyor.`,
       amount: short,
+      target: { type: 'calendar' },
     },
   ]
 }
@@ -83,10 +93,12 @@ function statementDueInsight(item: StatementItem): Insight | null {
     id: `statementDue:${account.id}:${lineIndex}`,
     kind: 'statementDue',
     severity,
-    title: `${lineName(account, lineIndex)} asgari ödemesi ${when}`,
+    title: `${lineName(account, lineIndex)} ekstresinin asgari ödemesi ${when}`,
     body: `Son ödeme ${formatShort(view.due)}. Ödenmemiş asgari tutar ${formatTL(minimumOutstanding)}${estimate}.`,
     amount: minimumOutstanding,
     accountId: account.id,
+    target: { type: 'statement', accountId: account.id, lineIndex },
+    dueInDays: view.daysLeft,
   }
 }
 
@@ -101,10 +113,11 @@ function cardNearLimit(input: InsightInput): Insight[] {
       id: `cardNearLimit:${a.id}`,
       kind: 'cardNearLimit',
       severity: 'warn',
-      title: health === 'empty' ? `${a.name} limiti doldu` : `${a.name} limiti azalıyor`,
+      title: health === 'empty' ? `${a.name} limiti doldu` : `${a.name} limitinin büyük kısmı dolu`,
       body: `Boş limit ${formatTL(free)}, toplam limit ${formatTL(a.limit)}.`,
       amount: free,
       accountId: a.id,
+      target: { type: 'accountDetail', accountId: a.id },
     })
   }
   return out
@@ -128,10 +141,11 @@ function kmhInterestInsight(a: KmhAccount, used: Kurus, daily: Kurus): Insight {
     id: `kmhInterest:${a.id}`,
     kind: 'kmhInterest',
     severity: 'warn',
-    title: `${a.name} borcu faiz işletiyor`,
+    title: `${a.name} borcu faiz işliyor`,
     body: `Kullandığın ${formatTL(used)} için günlük yaklaşık ${formatTL(daily)} faiz ve vergi işliyor (tahmini).`,
     amount: daily,
     accountId: a.id,
+    target: { type: 'accountDetail', accountId: a.id },
   }
 }
 
@@ -150,6 +164,7 @@ function minimumInterest(input: InsightInput): Insight[] {
         body: `Yalnızca asgariyi ödersen sonraki ekstreye tahmini ${formatTL(projected.total)} faiz yansır.`,
         amount: projected.total,
         accountId: a.id,
+        target: { type: 'accountDetail', accountId: a.id },
       })
     })
   }
@@ -201,6 +216,7 @@ function categoryIncrease(input: InsightInput, budgeted: Set<string>): Insight[]
       title: `${c.name} harcaması arttı`,
       body: `Bu ay ${formatTL(c.thisMonth)}, geçen ay aynı günlerde ${formatTL(c.lastMonth)}. Yaklaşık %${pct} daha fazla.`,
       amount: c.diff,
+      target: { type: 'expenses' },
     }
   })
 }
@@ -215,6 +231,7 @@ function budgetOver(rows: BudgetRow[]): Insight[] {
       title: `${r.name} bütçesi aşıldı`,
       body: `Bu ay ${formatTL(r.spent)} harcadın, hedefin ${formatTL(r.monthly)}. ${formatTL(r.spent - r.monthly)} fazlası var.`,
       amount: r.spent - r.monthly,
+      target: { type: 'expenses' },
     }))
 }
 
@@ -228,22 +245,29 @@ function budgetPace(rows: BudgetRow[]): Insight[] {
       title: `${r.name} bütçesi bu hızla aşılabilir`,
       body: `Bu ay şimdiye kadar ${formatTL(r.spent)} harcadın, hedefin ${formatTL(r.monthly)}. Bu hızla ay sonunda tahmini ${formatTL(r.projected)} harcarsın.`,
       amount: r.projected,
+      target: { type: 'expenses' },
     }))
 }
 
+/**
+ * Month-end estimate against last month. Shown from the seventh day on; a warning
+ * when the estimate is more than twice last month's total, otherwise a note.
+ */
 function monthPace(input: InsightInput): Insight[] {
   const pace = paceOfMonth(input.expenses, input.today)
   if (pace.daysPassed < PACE_MIN_DAYS || pace.lastMonthTotal <= 0) return []
   // Integer comparison: projected > 1.1 × last month's total.
   if (pace.projected * MONTH_PACE_DEN <= pace.lastMonthTotal * MONTH_PACE_NUM) return []
+  const alarm = pace.projected > pace.lastMonthTotal * MONTH_ALARM_FACTOR
   return [
     {
       id: 'monthPace',
       kind: 'monthPace',
-      severity: 'info',
+      severity: alarm ? 'warn' : 'info',
       title: 'Bu ay geçen aydan fazla harcıyorsun',
-      body: `Bu hızla ay sonunda tahmini ${formatTL(pace.projected)} harcarsın. Geçen ay toplam ${formatTL(pace.lastMonthTotal)} idi.`,
+      body: `Bu hızla giderse ay sonunda yaklaşık ${formatTL(pace.projected)} olabilir. Geçen ay toplam ${formatTL(pace.lastMonthTotal)} idi.`,
       amount: pace.projected,
+      target: { type: 'expenses' },
     },
   ]
 }
@@ -266,15 +290,20 @@ function bestCard(input: InsightInput): Insight[] {
   }
   if (!best) return []
 
+  // Only recommend a card that still has room for a purchase: a fifth of its limit and at least 1.000 ₺.
+  const room = best.card.available
+  if (room * BEST_CARD_MIN_FREE_SHARE < best.card.limit || room < BEST_CARD_MIN_FREE) return []
+
   return [
     {
       id: `bestCard:${best.card.id}`,
       kind: 'bestCard',
       severity: 'info',
-      title: `Bugünkü alışveriş için ${best.card.name}`,
-      body: `Bugün yapacağın bir alışverişin tahmini son ödemesi ${formatShort(best.due)}, yani ${best.days} gün sonra. Boş limit ${formatTL(best.card.available)}.`,
-      amount: best.card.available,
+      title: `Bugünkü alışverişte en uzun faizsiz süre: ${best.card.name}`,
+      body: `Bugün yapacağın bir alışverişin tahmini son ödemesi ${formatShort(best.due)}, yani ${best.days} gün sonra. Boş limit ${formatTL(room)}.`,
+      amount: room,
       accountId: best.card.id,
+      target: { type: 'accountDetail', accountId: best.card.id },
     },
   ]
 }

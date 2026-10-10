@@ -31,13 +31,23 @@ export type InsightKind =
   | 'budgetPace'
   | 'monthPace'
 
+/**
+ * Where tapping a suggestion leads. The domain only names the place; the UI turns
+ * it into a sheet or a page, so this file stays free of UI code.
+ */
+export type InsightTarget =
+  | { type: 'statement'; accountId: string; lineIndex: number }
+  | { type: 'accountDetail'; accountId: string }
+  | { type: 'expenses' }
+  | { type: 'calendar' }
+
 /** One rule-based suggestion. Texts are Turkish, addressed with "sen". */
 export interface Insight {
   /** Stable for the same situation, e.g. "statementDue:acc1:0". */
   id: string
   kind: InsightKind
   severity: InsightSeverity
-  /** Short headline, e.g. "Asgari ödeme 3 gün sonra". */
+  /** Short headline, e.g. "Akbank ekstresinin asgari ödemesi 3 gün sonra". */
   title: string
   /** One or two plain sentences with the figures already formatted. */
   body: string
@@ -45,6 +55,10 @@ export interface Insight {
   amount?: Kurus
   /** The account (card, KMH) the insight concerns; absent for budget-wide notes. */
   accountId?: string
+  /** Where tapping the suggestion leads. Absent: the suggestion is read-only. */
+  target?: InsightTarget
+  /** Statement minimums only: days until the due date; negative once it has passed. */
+  dueInDays?: number
 }
 
 /**

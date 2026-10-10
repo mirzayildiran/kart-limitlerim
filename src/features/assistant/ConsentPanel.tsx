@@ -64,8 +64,8 @@ export function ConsentPanel({ summary, onAccept }: Props) {
           ))}
         </ul>
         <p class="consent-note">
-          Aracı sunucu istekleri kaydetmez; yalnızca kötüye kullanımı önlemek için IP adresini bir saatlik sayaçta
-          tutar.
+          Aracı sunucu mesajlarını ve özetini kaydetmez; yalnızca kötüye kullanımı önlemek için IP adresini bir
+          saatlik sayaçta tutar.
         </p>
       </div>
 

@@ -3,13 +3,13 @@ import { PROXY_URL } from '../../ai/client'
 import { accounts, budgets, categories, expenses, recurring, today } from '../../data/store'
 import { computeInsights } from '../../domain/insights'
 import { budgetSummary } from '../../domain/insightsSummary'
-import type { InsightInput } from '../../domain/insightsTypes'
+import type { Insight, InsightInput, InsightTarget } from '../../domain/insightsTypes'
 import { accountColors } from '../../ui/accountColor'
-import { go, route } from '../../ui/nav'
-import { Button, EmptyState } from '../../ui/components/controls'
+import { go, openSheet, route } from '../../ui/nav'
+import { Button, EmptyState, Pill } from '../../ui/components/controls'
 import { Icon } from '../../ui/components/Icon'
 import { toast } from '../../ui/components/toast'
-import { assistantInput, DISCLAIMER, insightIcon, severityLabel } from './assistantModel'
+import { assistantInput, DISCLAIMER, dueTag, insightIcon, severityLabel } from './assistantModel'
 import { BudgetPlan } from './BudgetPlan'
 import { ChatPanel, resetChat } from './ChatPanel'
 import { ConsentPanel } from './ConsentPanel'
@@ -33,6 +33,58 @@ function closeChat() {
   revokeConsent()
   resetChat()
   toast('Sohbet kapatıldı. Artık hiçbir veri gönderilmiyor.')
+}
+
+/** Opens what a suggestion points to: a statement or account sheet, or a page. */
+function openTarget(target: InsightTarget) {
+  if (target.type === 'expenses') go('expenses')
+  else if (target.type === 'calendar') go('calendar')
+  else if (target.type === 'statement') {
+    openSheet({ type: 'statement', accountId: target.accountId, lineIndex: target.lineIndex })
+  } else openSheet({ type: 'accountDetail', id: target.accountId })
+}
+
+/** One suggestion. With a destination the whole row is the button; without one it is plain text. */
+function InsightRow({ item, medal }: { item: Insight; medal: number | undefined }) {
+  const sev = item.severity === 'info' ? null : severityLabel(item.severity)
+  const tag = item.dueInDays === undefined ? null : dueTag(item.dueInDays)
+  const target = item.target
+  const content = (
+    <>
+      <span class={`assistant-medal${medal === undefined ? ' is-plain' : ''}`} data-slot={medal} aria-hidden="true">
+        <Icon name={insightIcon(item.kind)} size={18} />
+      </span>
+      <span class="assistant-insight-text">
+        <span class="assistant-insight-title">
+          {sev && <span class="sr-only">{sev}: </span>}
+          {item.title}
+        </span>
+        <span class="assistant-insight-body">{item.body}</span>
+      </span>
+      {tag && (
+        <span class="assistant-insight-tag" aria-hidden="true">
+          <Pill tone={tag.tone}>{tag.label}</Pill>
+        </span>
+      )}
+      {target && (
+        <span class="assistant-insight-chevron" aria-hidden="true">
+          <Icon name="chevron" size={16} />
+        </span>
+      )}
+    </>
+  )
+
+  return (
+    <li class="assistant-insight" data-severity={item.severity}>
+      {target ? (
+        <button type="button" class="assistant-insight-hit" onClick={() => openTarget(target)}>
+          {content}
+        </button>
+      ) : (
+        <div class="assistant-insight-hit is-static">{content}</div>
+      )}
+    </li>
+  )
 }
 
 export function AssistantPage() {
@@ -68,28 +120,13 @@ export function AssistantPage() {
         ) : (
           /* One slate container; rows arrive crit → warn → info from computeInsights. */
           <ul class="assistant-list">
-            {list.map((item) => {
-              const slot = item.accountId === undefined ? undefined : slots.get(item.accountId)
-              const sev = item.severity === 'info' ? null : severityLabel(item.severity)
-              return (
-                <li key={item.id} class="assistant-insight" data-severity={item.severity}>
-                  <span
-                    class={`assistant-medal${slot === undefined ? ' is-plain' : ''}`}
-                    data-slot={slot}
-                    aria-hidden="true"
-                  >
-                    <Icon name={insightIcon(item.kind)} size={18} />
-                  </span>
-                  <span class="assistant-insight-text">
-                    <span class="assistant-insight-title">
-                      {sev && <span class="sr-only">{sev}: </span>}
-                      {item.title}
-                    </span>
-                    <span class="assistant-insight-body">{item.body}</span>
-                  </span>
-                </li>
-              )
-            })}
+            {list.map((item) => (
+              <InsightRow
+                key={item.id}
+                item={item}
+                medal={item.accountId === undefined ? undefined : slots.get(item.accountId)}
+              />
+            ))}
           </ul>
         )}
         <p class="assistant-note">Öneriler cihazında hesaplanır, internete bağlanmaz.</p>
@@ -102,23 +139,25 @@ export function AssistantPage() {
         <BudgetPlan />
       </section>
 
-      <section class="assistant-section" aria-labelledby="assistant-chat">
-        <h2 class="assistant-section-title" id="assistant-chat">
-          Sohbet
-        </h2>
-        {PROXY_URL === null ? (
-          <p class="assistant-quiet">Sohbet bu sürümde kapalı. Yukarıdaki öneriler yine de çalışır.</p>
-        ) : assistantConsent.value === null ? (
-          <ConsentPanel summary={sum} onAccept={grantConsent} />
-        ) : (
-          <>
-            <ChatPanel summary={sum} />
-            <Button variant="ghost" block onClick={closeChat}>
-              Sohbeti kapat
-            </Button>
-          </>
-        )}
-      </section>
+      {PROXY_URL === null ? (
+        <p class="assistant-quiet">Sohbet bu sürümde kapalı. Yukarıdaki öneriler yine de çalışır.</p>
+      ) : (
+        <section class="assistant-section" aria-labelledby="assistant-chat">
+          <h2 class="assistant-section-title" id="assistant-chat">
+            Sohbet
+          </h2>
+          {assistantConsent.value === null ? (
+            <ConsentPanel summary={sum} onAccept={grantConsent} />
+          ) : (
+            <>
+              <ChatPanel summary={sum} />
+              <Button variant="ghost" block onClick={closeChat}>
+                Sohbeti kapat
+              </Button>
+            </>
+          )}
+        </section>
+      )}
 
       <p class="assistant-disclaimer">{DISCLAIMER}</p>
     </div>
