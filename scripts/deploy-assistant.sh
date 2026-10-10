@@ -49,7 +49,7 @@ jq -n \
   '{GEMINI_API_KEY: $g, GROQ_API_KEY: $q, OPENROUTER_API_KEY: $o} | with_entries(select(.value != ""))' \
   > "$SECRETS_FILE"
 if [ "$(jq 'length' "$SECRETS_FILE")" = "0" ]; then
-  echo "::warning::Hiç yapay zekâ anahtarı yok; aracı 'not_configured' yanıtı verecek."
+  echo "::warning::Bu çalıştırmada yapay zekâ anahtarı verilmedi; Worker'daki mevcut gizli değerler korunuyor (hiç yoksa aracı 'not_configured' döner)."
 else
   $WRANGLER secret bulk "$SECRETS_FILE"
 fi
@@ -58,11 +58,15 @@ URL="https://kart-limitlerim-asistan.$SUB.workers.dev"
 echo "Aracı adresi: $URL"
 
 # Duman testi: yalnızca durum kodu yazılır, yanıt metni günlüğe girmez.
-sleep 5
-STATUS=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$URL/" \
-  -H "Origin: $ORIGIN" -H 'content-type: application/json' \
-  --data '{"v":1,"summary":{"date":"2026-01-01","power":{},"outlook":{},"accounts":[],"categories":[],"month":{},"budgets":[],"insights":[]},"messages":[{"role":"user","text":"Merhaba"}]}' \
-  || echo "000")
+# Yeni workers.dev alt alanının TLS sertifikası birkaç dakika sürebilir; bağlanana kadar dene.
+for _ in $(seq 1 20); do
+  sleep 15
+  STATUS=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$URL/" \
+    -H "Origin: $ORIGIN" -H 'content-type: application/json' \
+    --data '{"v":1,"summary":{"date":"2026-01-01","power":{},"outlook":{},"accounts":[],"categories":[],"month":{},"budgets":[],"insights":[]},"messages":[{"role":"user","text":"Merhaba"}]}' \
+    || true)
+  [ "$STATUS" != "000" ] && break
+done
 echo "Duman testi durum kodu: $STATUS"
 [ "$STATUS" = "200" ] || echo "::warning::Aracı duman testinde $STATUS döndü."
 
