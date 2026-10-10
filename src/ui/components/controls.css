@@ -101,6 +101,26 @@
   font-weight: 600;
   font-size: var(--text-lg);
 }
+/* Hero amount (MoneyField size="hero"): the first and largest field of a sheet. */
+.money-input-hero .input-money {
+  min-height: 72px;
+  padding: 0 52px 0 var(--s-4);
+  border-radius: var(--r-lg);
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.money-input-hero .input-money::placeholder {
+  color: var(--faint);
+}
+/* The display stack leads with KL Lira, so the ₺ is Onest's, never the grotesk's £-like glyph. */
+.money-input-hero .money-suffix {
+  right: var(--s-4);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--muted);
+}
 .row-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -220,9 +240,16 @@
   border: 1px solid var(--line);
   border-radius: var(--r-md);
 }
+.choice-segment .choice-item {
+  min-width: 0;
+}
+/* Segment options: ≥44 px tall and one line; a label that does not fit is the caller's to shorten. */
 .choice-segment .choice-item span {
   width: 100%;
+  min-height: var(--tap);
+  padding: 0 var(--s-2);
   justify-content: center;
+  white-space: nowrap;
   border: 0;
   border-radius: var(--r-sm);
   background: transparent;

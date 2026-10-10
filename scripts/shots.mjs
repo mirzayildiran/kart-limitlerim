@@ -216,7 +216,7 @@ async function openScreen(page, screen) {
     case 'sheet-expense-filled':
       await openExpense()
       await dialog.getByLabel('Tutar', { exact: true }).fill('1250')
-      await tap(dialog.locator('.choice-item').first())
+      await tap(dialog.getByRole('radiogroup', { name: 'Kategori' }).getByRole('radio').first())
       break
     case 'sheet-import':
       await openExpense()

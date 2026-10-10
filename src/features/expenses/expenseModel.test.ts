@@ -7,6 +7,7 @@ import {
   previewAvailable,
   validateCategoryName,
   interestNudge,
+  interestNudgeAmount,
   monthNavigation,
   filterExpenses,
   facetTotals,
@@ -230,6 +231,24 @@ describe('expenseModel', () => {
       })
       const text = interestNudge(account, 100000)
       expect(text).toBeTruthy()
+    })
+  })
+
+  describe('interestNudgeAmount', () => {
+    it('returns null for zero or negative amounts', () => {
+      expect(interestNudgeAmount(mockCardAccount(), 0)).toBeNull()
+      expect(interestNudgeAmount(mockKmhAccount(), -1000)).toBeNull()
+    })
+
+    it('applies the override rate with taxes (1.30)', () => {
+      const account = mockCardAccount({ rateOverride: { contractual: 5, late: 6 } })
+      // 1000 ₺ × 5% × 1.30 = 65 ₺
+      expect(interestNudgeAmount(account, 100000)).toBe(6500)
+    })
+
+    it('matches the figure inside the sentence', () => {
+      const account = mockKmhAccount({ rateOverride: { contractual: 5, late: 6 } })
+      expect(interestNudge(account, 100000)).toContain('~65 ₺')
     })
   })
 
