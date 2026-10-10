@@ -1,4 +1,4 @@
-import { makeBackup, parseBackup, type BackupFile } from './backup'
+import { normalizeSnapshot, parseBackup, serializeBackup, type BackupFile } from './backup'
 import type { Snapshot } from './db'
 
 /**
@@ -29,8 +29,9 @@ export function hasUserData(s: Snapshot): boolean {
   return s.accounts.length > 0 || s.expenses.length > 0 || s.recurring.length > 0 || s.budgets.length > 0
 }
 
-/** Compares data regardless of when it was exported. */
-export function dataKey(s: Snapshot): string {
+/** Compares data regardless of when it was exported, or of key order and defaults in the records. */
+export function dataKey(snapshot: Snapshot): string {
+  const s = normalizeSnapshot(snapshot)
   return JSON.stringify([s.accounts, s.expenses, s.categories, s.recurring, s.rules, s.budgets])
 }
 
@@ -105,7 +106,7 @@ export function createAutoBackup(deps: AutoBackupDeps) {
     if (key === lastKey) return writing
     // Writes run one after another so two rotations never interleave.
     writing = writing
-      .then(() => writeRotated(files, JSON.stringify(makeBackup(snapshot, now()), null, 2)))
+      .then(() => writeRotated(files, serializeBackup(snapshot, now())))
       .then(() => {
         lastKey = key
       })

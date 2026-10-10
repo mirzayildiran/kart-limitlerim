@@ -5,7 +5,7 @@ import { closeCycle } from '../domain/interest'
 import { byMostAvailable, isCard, isKmh, isLiquid, outlook, spendingPower, statementItems } from '../domain/power'
 import { runway } from '../domain/runway'
 import type { Account, Category, CategoryBudget, Expense, Kurus, MerchantRule, RecurringPayment } from '../domain/types'
-import { makeBackup, parseBackup, restoreBackup } from './backup'
+import { parseBackup, restoreBackup, serializeBackup } from './backup'
 import * as repo from './db'
 
 /**
@@ -200,7 +200,7 @@ export async function saveBudget(categoryId: string, monthly: Kurus | null): Pro
 
 // ---- backup ----
 export async function exportBackupText(): Promise<string> {
-  return JSON.stringify(makeBackup(await repo.loadAll(requireDb())), null, 2)
+  return serializeBackup(await repo.loadAll(requireDb()))
 }
 
 export async function importBackupText(text: string): Promise<void> {
