@@ -3,7 +3,7 @@ import type { JSX } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { cycleKeyOf, formatShort } from '../../domain/dates'
 import { displayHue } from '../../domain/categories'
-import { formatTL, formatTLExact } from '../../domain/money'
+import { formatTL, formatTLExact, spokenTL } from '../../domain/money'
 import { byMostAvailable } from '../../domain/power'
 import type { Account, Kurus } from '../../domain/types'
 import {
@@ -137,7 +137,7 @@ function renderSpread(list: Account[], colors: Map<string, number>, total: Kurus
     .map((a) => ({ a, value: a.kind === 'card' || a.kind === 'kmh' ? Math.max(0, a.available) : Math.max(0, a.balance) }))
     .filter((p) => p.value > 0)
   return (
-    <div class="home-spread" role="img" aria-label={parts.map((p) => `${p.a.name} ${formatTL(p.value)}`).join(', ')}>
+    <div class="home-spread" role="img" aria-label={`Hesaplara göre dağılım: ${parts.map((p) => `${p.a.name} ${spokenTL(p.value)}`).join(', ')}`}>
       {parts.map(({ a, value }, i) => (
         <span
           key={a.id}
@@ -171,8 +171,7 @@ function HeroFigure({ value }: { value: Kurus }) {
       </span>
       {change && (
         <span key={`d${change.key}`} class={`home-hero-delta num${change.delta < 0 ? ' is-down' : ' is-up'}`} aria-live="polite">
-          {change.delta < 0 ? '−' : '+'}
-          {formatTL(Math.abs(change.delta))}
+          {figure(`${change.delta < 0 ? '−' : '+'}${formatTL(Math.abs(change.delta))}`)}
         </span>
       )}
     </p>
@@ -274,7 +273,7 @@ function renderExpenseSection(): JSX.Element | null {
                       {account?.name} · {formatShort(expenseDate)}
                     </span>
                   </span>
-                  <span class="home-expense-row-amount num">−{figure(formatTLExact(expense.amount))}</span>
+                  <span class="home-expense-row-amount num">{figure(`−${formatTLExact(expense.amount)}`)}</span>
                 </button>
               )
             })}

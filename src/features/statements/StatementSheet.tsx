@@ -205,7 +205,7 @@ export function StatementSheet({ request }: StatementSheetProps) {
             <div class="statement-interest">
               <p class="statement-interest-title">
                 Bu ekstrede işleyecek faiz:{' '}
-                <strong class="statement-interest-figure num">~{figure(formatTLExact(preview.total))}</strong>
+                <strong class="statement-interest-figure num">{figure(`~${formatTLExact(preview.total)}`)}</strong>
               </p>
               <p class="statement-interest-detail">
                 Akdi {formatTLExact(preview.contractual)} + gecikme {formatTLExact(preview.late)} + vergiler{' '}
