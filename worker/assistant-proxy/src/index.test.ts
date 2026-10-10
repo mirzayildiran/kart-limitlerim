@@ -172,6 +172,8 @@ describe('providers', () => {
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ text: 'Selam', provider: 'groq' })
     expect(fetchMock).toHaveBeenCalledTimes(2)
+    const sent: unknown = JSON.parse(String(fetchMock.mock.calls[1][1]?.body))
+    expect(sent).toMatchObject({ model: 'openai/gpt-oss-120b', reasoning_effort: 'low' })
   })
 
   it('returns 503 unavailable without provider error text when every provider fails', async () => {
