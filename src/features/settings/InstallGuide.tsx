@@ -1,6 +1,7 @@
 import { signal } from '@preact/signals'
 import { Button } from '../../ui/components/controls'
 import { toast } from '../../ui/components/toast'
+import { isNativeApp } from '../../platform/files'
 import './install-guide.css'
 
 /** Chrome on Android fires this once per page load, possibly before Settings mounts, so listen at module load. */
@@ -22,6 +23,7 @@ if (typeof window !== 'undefined') {
 
 function isStandalone(): boolean {
   return (
+    isNativeApp ||
     window.matchMedia('(display-mode: standalone)').matches ||
     (navigator as Navigator & { standalone?: boolean }).standalone === true
   )
