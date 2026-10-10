@@ -7,19 +7,42 @@ Bu belge kodun nasıl düzenlendiğini, verinin nereden nereye aktığını ve i
 | Yol | Sorumluluk |
 |---|---|
 | `src/domain/` | Saf iş mantığı: para, tarih, ekstre dönemi, harcama gücü, faiz, oranlar, düzenli ödemeler. UI ve tarayıcı API'si yok. Her dosyanın `*.test.ts` dosyası var. |
-| `src/data/` | `db.ts` IndexedDB şeması ve işlemleri, `backup.ts` yedek biçimi ve doğrulama, `store.ts` uygulama durumu ve eylemler. |
+| `src/data/` | `db.ts` IndexedDB şeması ve işlemleri, `backup.ts` yedek biçimi, sürüm geçişi ve doğrulama (`backupSchema.ts` kayıt denetimi), `autoBackup*.ts` iOS otomatik yedeği, `store.ts` uygulama durumu ve eylemler. |
 | `src/ocr/` | Ekran görüntüsünden harcama okuma: önişleme, Tesseract motoru, ikinci okuma, banka ayrıştırıcıları, kategori önerisi. |
 | `src/ai/` | Bütçe asistanı sağlayıcı katmanı: aracıyla konuşma sözleşmesi (`protocol.ts`), istek doğrulama, sistem istemi, tarayıcı istemcisi. |
 | `worker/assistant-proxy/` | Cloudflare Worker: yapay zekâ anahtarlarını tutan aracı sunucu. |
-| `src/ui/` | Tasarım sistemi: `tokens.css` (renkler, boşluklar), `base.css`, `components/` (Sheet, Button, MoneyField, LimitStrip, TabBar…), `nav.ts` (sayfa ve pencere durumu), `theme.ts`. |
-| `src/features/` | Ekranlar. `home/`, `accounts/`, `expenses/`, `statements/`, `calendar/`, `recurring/`, `categories/`, `settings/`, `import/`. `SheetHost.tsx` açık pencereyi gösterir. |
-| `scripts/` | `copy-ocr-assets.mjs` (OCR dosyalarını `public/ocr/` içine kopyalar, `predev` ve `prebuild` sırasında çalışır), `check-css.mjs` (renk kontrolü, `lint` içinde), `ocr-smoke.mjs` (Node'da OCR denemesi; test ve CI'da değil). |
+| `src/ui/` | Tasarım sistemi: `tokens.css` (renkler, boşluklar), `base.css`, `components/` (Sheet, Button, MoneyField, AccountPicker, TabBar…), `nav.ts` (sayfa ve pencere durumu), `theme.ts`. |
+| `src/features/` | Ekranlar. `home/`, `accounts/`, `expenses/`, `statements/`, `calendar/`, `recurring/`, `categories/`, `settings/`, `import/`, `assistant/`, `onboarding/`, `lock/`. `SheetHost.tsx` açık pencereyi tembel yükleyerek gösterir. |
+| `src/platform/` | iOS'a özgü yetenekler (Capacitor): dosya, Face ID kilidi, bildirimler, derin bağlantılar, klavye, metin boyutu, dokunsal geri bildirim. Webde hiçbiri bir şey yapmaz. |
+| `src/test/` | Bileşen testlerinin ortak kurulumu (happy-dom, `#app` kökü). |
+| `e2e/` | Playwright uçtan uca testleri ve axe taraması (`playwright.config.ts`). |
+| `scripts/` | `copy-ocr-assets.mjs` (OCR dosyalarını `public/ocr/` içine kopyalar, `predev` ve `prebuild` sırasında çalışır), `check-css.mjs` (renk kontrolü, `lint` içinde), `ocr-smoke.mjs` (Node'da OCR denemesi; test ve CI'da değil), `size-budget.mjs` (ilk yükleme bütçesi), `check-csp.mjs` (derlemede CSP ihlali denetimi), `shots.mjs` (tasarım ve mağaza ekran görüntüleri), `ios-*.mjs` (iOS derleme ve canlı test). |
 | `public/` | İkonlar ve favicon. `public/ocr/` derlemede üretilir ve git'e girmez. |
-| `.github/workflows/` | `ci.yml` (her gönderimde kontrol), `deploy.yml` (`main` dalında GitHub Pages yayını). |
+| `.github/workflows/` | `ci.yml` (her gönderimde kontrol ve uçtan uca testler), `deploy.yml` (`main` dalında GitHub Pages yayını ve asistan Worker'ının kurulumu). |
+| `vite.csp.ts` | Derlenen `index.html`'e Content-Security-Policy ekler; satır içi betik ve stil özetleri derlemede hesaplanır. |
 | `vite.config.ts` | Derleme, PWA manifesti ve önbellek kuralları, test ayarı. |
 | `eslint.config.js` | Lint kuralları (aşağıda kalite kapısı). |
 
 Bağımlılık yönü tek yönlüdür: `features` ve `ui` `data`, `ocr` ve `domain` modüllerini kullanır. `domain` yalnızca kendi modüllerini içe aktarır; UI ya da veri katmanına bağlı değildir. `ocr` yalnızca `domain`'in para, tarih ve kategori tanımlarını kullanır.
+
+## Açılış ve tembel yükleme
+
+Hedef: ilk karede boş ekran görünmesin, ilk paket küçük kalsın.
+
+1. **`#boot` örtüsü:** `index.html` içinde satır içi bir stil ve betik var. Betik `kl:theme`'i okuyup `data-theme`'i ilk boyamadan önce koyar; `#boot` sayfayı uygulamanın açılış zemininde (koyu, iOS açılış ekranıyla aynı) kaplar. `main.tsx` ilk render ile aynı görevde `dismissBoot()` (`src/ui/theme.ts`) çağırır: koyu temada örtü hemen kalkar, açık temada kısa bir geçişle (hareketi azalt açıksa hemen). Satır içi kod CSP'de SHA-256 özetiyle izinlidir (`vite.csp.ts`).
+2. **İlk paket:** yalnızca Özet sayfası, store, domain hesapları, Preact ve sinyaller. Diğer sayfalar (`Harcamalar`, `Takvim`, `Ayarlar`, `Asistan`) `src/lazy.tsx` ile kendi paketlerinde; tüm pencereler `SheetHost` içinde aynı yolla. `ready` olunca boşta `preloadLazy()` hepsini önceden indirir, böylece ilk dokunuş beklemez.
+3. **İsteğe bağlı modüller:** yedek kodu (`backup.ts`, `backupSchema.ts`) ilk dışa/içe aktarmada ya da örnek veri yüklenirken; otomatik yedek (`autoBackup.ts`) yalnızca iOS'ta; örnek veri JSON'u ve OCR motoru ilk kullanımda yüklenir.
+4. **Bütçe:** ilk JS ≤ 40 KB, ilk CSS ≤ 12 KB (gzip). `npm run size` `dist/index.html`'in yüklediği betik, ön yükleme ve stil dosyalarını ölçer; CI'da aşılırsa başarısız olur.
+
+## Platform katmanı
+
+`src/platform/` iPhone uygulamasının yerel yeteneklerini sarar. Her modül `isNativeApp` (`files.ts`, `Capacitor.isNativePlatform()`) ile korunur; webde başlatıcılar hiçbir şey yapmaz ve Capacitor eklentileri dinamik `import()` ile yalnızca gerektiğinde yüklenir. `main.tsx` başlatıcıları sırayla çağırır: `startReminders`, `startAutoBackup`, `startLock`, `startDeepLinks`, `startTextSize`, `startKeyboard`, `startPhoneSetup`.
+
+- `files.ts`: yedeği paylaşma ya da indirme, `Library/` altında özel dosya erişimi (`libraryFiles`).
+- `lock.ts`: Face ID kilidi; `unlock()` `ok`/`cancelled`/`failed` döndürür, kilit ekranı buna göre mesaj gösterir (`features/lock/`). Uygulama etkin değilken içerik örtülür.
+- `reminders.ts`: son ödeme bildirimleri (`domain/reminders.ts` planı). Bildirime dokununca o kartın ekstresi açılır.
+- `deeplinks.ts`: `kartlimitlerim://` bağlantıları ve ana ekran hızlı eylemleri. İzin listesindeki rotalar (`ozet`, `harcamalar`, `takvim`, `ayarlar`), `harcama-ekle` ve `ekstre/<hesap>/<satır>`. Bağlantı en çok 200, hesap kimliği en çok 64 karakter; yalnızca nesnenin kendi anahtarları sayılır. Kilit açılmadan ve veri hazır olmadan hiçbir şey açılmaz.
+- `textSize.ts`, `keyboard.ts`, `haptics.ts`: Dynamic Type, klavye yeniden boyutlandırma ve dokunsal tık.
 
 ## Veri akışı
 
@@ -41,10 +64,9 @@ Tema tercihi tek başına `localStorage` içinde (`kl:theme`) tutulur. Bu, veri 
 
 ## Yedek
 
-- Dışa aktarma: bütün mağazalar okunur ve `{ app: 'kart-limitlerim', schema: 1, exportedAt, data }` biçiminde JSON olarak indirilir. Dosya adı `kart-limitlerim-yedek-YYYY-AA-GG.json`.
-- Bütçe planı yedekte isteğe bağlı `data.budgets` alanıdır; bu alan olmayan eski yedekler boş planla açılır.
-- İçe aktarma: önce `parseBackup` dosyayı doğrular (uygulama adı, şema sürümü, beş listenin varlığı ve her kaydın `id`'si). Doğrulama geçerse kullanıcı onaylar, sonra `restoreBackup` beş mağazayı tek işlemde temizleyip yeniden yazar. Yarım kalan geri yükleme olmaz.
-- Şema sürümü 1 dışındaki yedekler reddedilir. Daha yeni bir sürümden alınmış yedek için uygulamanın güncellenmesi istenir.
+- Biçim: `{ app: 'kart-limitlerim', schema: 2, exportedAt, data }`, `data` altı liste (`accounts`, `expenses`, `categories`, `recurring`, `rules`, `budgets`). Elle dışa aktarma ve iOS otomatik yedeği aynı metni yazar (`serializeBackup`). Dosya adı `kart-limitlerim-yedek-YYYY-AA-GG.json`.
+- Şema geçmişi: 1 = ilk biçim, `budgets` sonradan eklendi ve eski dosyalarda yok. 2 = `budgets` her zaman var, kayıtlar alan alan doğrulanır. Eski dosyalar `migrate()` ile adım adım yükseltilir; daha yeni sürümden alınmış yedek için uygulamanın güncellenmesi istenir.
+- İçe aktarma: dosya boyutu okunmadan önce denetlenir (40 MB), metin 20 milyon karakteri aşamaz, liste başına en çok 100.000 kayıt. `parseBackup` her kaydı `backupSchema.ts` okuyucularıyla bilinen alanlardan yeniden kurar: tutarlar tam sayı kuruş, tarihler geçerli `YYYY-AA-GG`, tür ve durum alanları izin listesinden. Bilinmeyen alanlar atılır; eski sürümlerin yazmadığı alanlar bugünkü varsayılanla dolar; yanlış türde alan hata verir ve mesaj kaydı söyler ("3. harcama, tutar geçersiz"). Doğrulama geçerse kullanıcı onaylar, sonra `restoreBackup` mağazaları tek işlemde temizleyip yeniden yazar. Yarım kalan geri yükleme olmaz.
 - Yedek hiçbir yere gönderilmez; kullanıcı dosyayı kendisi saklar.
 
 ## Veri dayanıklılığı
@@ -59,6 +81,7 @@ Uygulama:
 
 - Web/PWA: açılışta `navigator.storage.persist()` istenir (`store.ts`). Kullanıcı ayrıca elle yedek alır.
 - iOS uygulaması: `src/data/autoBackup.ts` (saf mantık) ve `src/data/autoBackupRuntime.ts` (bağlantı). Her anlamlı değişiklikten 5 sn sonra, uygulama arka plana geçerken de hemen, verinin tamamı normal yedek biçiminde `Library/autobackup/autobackup.json`'a yazılır. Önceki iki kopya `.1` ve `.2` olarak döner. `Library`, WebKit'in web sitesi verisinden ayrıdır ve Dosyalar'da görünmez (`libraryFiles()`, `src/platform/files.ts`).
+- Aynı veriyi tanımak için kayıtlar normalleştirilerek karşılaştırılır (`normalizeSnapshot`); diskten okunan kopya ile canlı veri anahtar sırası ya da varsayılan alanlar yüzünden farklı görünüp kopyaları döndürmez.
 - Kullanıcı verisi olmayan anlık görüntü hiç yazılmaz. Böylece silinmiş ya da boş açılan bir veritabanı iyi kopyaları döngüden atamaz. Diskteki kopyayla aynı veri de yazılmaz.
 - Açılışta veritabanında kullanıcı verisi yoksa ve otomatik yedekte varsa, ana ekran "Önceki verilerin bulundu" der. Geri yükleme normal yolu kullanır (`importBackupText`). "Şimdi değil" o kopyayı bir daha sormaz.
 - "Tüm verileri sil" otomatik kopyaları da siler.
@@ -72,9 +95,9 @@ Uygulama:
 
 Sohbet akışı:
 
-1. `budgetSummary` (`src/domain/insightsSummary.ts`) toplamları, hesap adlarını, ekstre rakamlarını, kategori karşılaştırmasını ve önerileri hazır biçimlenmiş metinler olarak bir özet nesnesine koyar. Tek tek harcama, not, kimlik ve düzenli ödeme adı girmez.
+1. `budgetSummary` (`src/domain/insightsSummary.ts`) toplamları, hesap adlarını, ekstre rakamlarını, kategori karşılaştırmasını, süren taksitlerin toplamını (`installments.ts`) ve önerileri hazır biçimlenmiş metinler olarak bir özet nesnesine koyar. Tek tek harcama, not, kimlik ve düzenli ödeme adı girmez. Adlardaki 4+ haneli rakam dizileri (kart, telefon, IBAN, kimlik) ve e-postalar `scrub` ile maskelenir.
 2. `askAssistant` (`src/ai/client.ts`) özeti ve son 12 mesajı aracıya gönderir (30 sn zaman aşımı). Aracının adresi derleme sırasında `VITE_ASSISTANT_PROXY_URL` ile verilir; yoksa sohbet kapalıdır.
-3. Worker kaynağı (`ALLOWED_ORIGINS`; iOS için `capacitor://localhost`, canlı testte özel ağdaki `http://…:5173` için `LAN_DEV_PORT`), boyutu ve biçimi (`parseAssistantRequest`) denetler, IP başına hız sınırı uygular, sistem istemini (`SYSTEM_PROMPT`) ve özeti ekleyip Gemini, Groq ve OpenRouter'ı bu sırayla dener. İstek içeriği günlüğe yazılmaz.
+3. Worker kaynağı (`ALLOWED_ORIGINS`; iOS için `capacitor://localhost`, canlı testte özel ağdaki `http://…:5173` için `LAN_DEV_PORT`), boyutu ve biçimi (`parseAssistantRequest`) denetler, özeti alan alan yeniden kurar (`parseSummary`: bilinmeyen alan atılır, metinler ve listeler sınırlı), IP başına hız sınırı uygular, sistem istemini (`SYSTEM_PROMPT`) ve özeti boş alanları atarak (`compactSummary`) ekleyip Gemini, Groq ve OpenRouter'ı bu sırayla dener. Sistem istemi bir alan sözlüğü içerir; 26 soruluk ağsız değerlendirme seti (`src/ai/assistant.eval.test.ts`) her sorunun cevabını veren rakamın ve yönergenin istemde olduğunu denetler. İstek içeriği günlüğe yazılmaz.
 4. Model yalnızca özetteki rakamları kullanır; yeni hesap yapmaz. Her yanıtın altına "Tahmindir, finansal tavsiye değildir." ibaresini uygulama ekler.
 
 Sohbet geçmişi yalnızca bellekte tutulur. Worker, `main` dalına her gönderimde `deploy.yml` içindeki `scripts/deploy-assistant.sh` ile kurulur (depo gizli değerleri: `CLOUDFLARE_API_TOKEN`, `GEMINI_API_KEY`, `GROQ_API_KEY`, isteğe bağlı `OPENROUTER_API_KEY`).
@@ -92,12 +115,14 @@ Sohbet geçmişi yalnızca bellekte tutulur. Worker, `main` dalına her gönderi
 | Dosya | İçerik |
 |---|---|
 | `money.ts` | Kuruş dönüşümü, `parseTL`, `formatTL`, `formatTLExact`, `formatInput`. |
-| `dates.ts` | Yerel gün, ISO dönüşümü, gün farkı, ay sınırı, hafta sonu kayması, Türkçe biçimler. |
+| `dates.ts` | Yerel gün, ISO dönüşümü, gün farkı, ay sınırı, Türkçe biçimler. |
+| `holidays.ts` | Resmi tatil tablosu (sabit günler her yıl, dini bayramlar 2026–2028, arifeler yarım gün), `isBusinessDay`, `nextBusinessDay`. |
+| `installments.ts` | Süren taksit planları: bu ayki taksitler ve kalan tutar (tahmini). |
 | `statement.ts` | `lastCut` ve `nextCut`, `viewStatement` (bir kartın bugünkü ekstre görünümü), `rollToCurrentCycle`. Eski döneme ait alanlar yeni kesimde sıfırlanır. |
 | `power.ts` | `spendingPower` (kartlar + KMH + nakit), `byMostAvailable` (boş limite göre sıralama), `statementItems` (asgari ödeme listesi), `outlook` (kesime kadar ve ödemelerden sonra nakit). |
 | `ledger.ts` | `applyDelta` ve `expenseDeltas`: harcamanın hesaba etkisi. |
 | `recurring.ts` | `occurrences`: düzenli ödemenin belirli aralıktaki tahsilat tarihleri. |
-| `rates.ts` | TCMB azami faiz tablosu (1 Ekim 2026), kart kademeleri, KMH ve nakit oranı, KKDF/BSMV, BDDK asgari ödeme kuralı. |
+| `rates.ts` | Oranların tek yeri: TCMB azami faiz tablosu (1 Ekim 2026), dönem borcuna göre kart kademeleri, KMH ve nakit oranı, KKDF/BSMV (`withTaxes`), varsayılan oranlar, BDDK asgari ödeme kuralı (limit 100.000 ₺'ye kadar %20, üstü %40). Kaynaklar dosyanın başında. |
 | `interest.ts` | Faiz hesabı, kart oranı seçimi, günlük maliyet, dönem kapatma, toplam işleyen faiz. |
 | `categories.ts` | Başlangıç kategorileri ve yeni kategori rengi. |
 | `budget.ts` | Ay gidişatı (`monthPace`: bu ay, geçen ayın aynı günleri, tahmini ay sonu) ve kategori hedefi ilerlemesi (`budgetProgress`). |
@@ -133,7 +158,7 @@ Bu üç değer, `interest.test.ts` içindeki üç banka örneğinin beklenen ç�
 Ek hesaplar:
 
 - **Kart oranı:** Kart üzerinde elle girilen oran (`rateOverride`) varsa o kullanılır. Yoksa TCMB kademesi seçilir: ekstre borcu 30.000 ₺ altındaysa %3,25 / %3,55 (akdi / gecikme), 30.000–180.000 ₺ arasındaysa %3,75 / %4,05, 180.000 ₺ üstündeyse %4,25 / %4,55.
-- **Günlük maliyet (kart):** taşınan borç × akdi oran / 100 / 30 × 1,30. Çarpan vergileri (%15 + %15) içerir.
+- **Günlük maliyet (kart):** taşınan borç × akdi oran / 100 / 30 × 1,30. Çarpan vergileri (%15 + %15) içerir ve `withTaxes` ile tek yerden uygulanır.
 - **KMH günlük maliyeti:** kullanılan limit × oran / 100 / 30 × 1,30. Oran, elle girilmemişse nakit çekme oranıdır (%4,25).
 - **Dönem kapatma (`closeCycle`):** kesim geçtiyse eski dönemin faizi `interestHistory`'ye bir kez yazılır. Kullanıcı ekstredeki faizi girdiyse o kullanılır, girmediyse tahmin edilir. Tamamı ödenmiş dönemde kayıt yazılmaz.
 - **Toplam işleyen faiz:** Geçmiş kayıtların toplamı artı her kartın mevcut ekstresinin "girildiği gibi" (`asEntered`) tahmini. Ekstre tutarı bilinmeyen kartlar toplamdan çıkarılır; hiçbiri bilinmiyorsa sonuç yoktur.
@@ -165,10 +190,16 @@ Ekran görüntüsü kaydedilmez. Ayrıştırmanın ham metni (`ParsedTxn.raw`) y
 |---|---|---|
 | Tip denetimi | `npm run typecheck` (`tsc -b`) | CI |
 | Lint | `npm run lint` (ESLint ve `scripts/check-css.mjs`) | CI ve yayın |
-| Test | `npm test` (`vitest run`) | CI ve yayın |
+| Worker tip denetimi | `npx tsc -p worker/assistant-proxy/tsconfig.json` | CI |
+| Ölü kod | `npm run knip` | CI |
+| Birim testleri | `npm run test:unit` (Vitest, node) | CI ve yayın (`npm test`) |
+| Bileşen testleri | `npm run test:components` (Vitest, happy-dom, Testing Library) | CI ve yayın (`npm test`) |
 | Derleme | `npm run build` (`tsc -b` ve `vite build`; önce OCR dosyaları kopyalanır) | CI ve yayın |
+| Paket boyutu | `npm run size` (ilk JS ≤ 40 KB, CSS ≤ 12 KB gzip) | CI |
+| Uçtan uca | `npm run e2e` (Playwright, 390×844, koyu ve açık tema, axe-core) | CI |
+| CSP | `npm run check:csp` (web ve `CAP_NATIVE=1` derlemesi) | CI |
 
-- **CI** (`ci.yml`): `pull_request` ve `main` dalına gönderimde çalışır: `typecheck`, `lint`, `test`, `build`.
+- **CI** (`ci.yml`): `pull_request` ve `main` dalına gönderimde iki iş: `check` (tip, Worker tipi, lint, knip, birim ve bileşen testleri, derleme, boyut) ve `e2e` (Playwright Chromium önbellekli; uçtan uca testler, iki derlemede CSP).
 - **Yayın** (`deploy.yml`): `main` dalına gönderimde ve elle tetiklemede çalışır. Önce `test`, `lint` ve `build`; ardından `dist/` GitHub Pages'e yüklenir. Aynı anda tek yayın çalışır (`concurrency: pages`).
 
 Lint kuralları:
