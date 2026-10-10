@@ -223,7 +223,7 @@ Rollout status: the world is built on the Özet tab (`src/features/home/`) and i
 - Near-black ground, slate surfaces, colour reserved for meaning.
 - Seven neon wallet colours, each owned by one account and repeated wherever that account appears.
 - Neon lime is the single action colour.
-- Cyan line and magenta selected day live only in the runway panel.
+- Cyan line and magenta selected day are the runway panel's own pair; the wallet's cyan and magenta slots are account colours, never runway markers.
 - Money in Schibsted Grotesk; words in Onest; the ₺ sign always drawn by Onest.
 - Pressable surfaces shrink on press; cards glow in their own colour.
 - One load moment with exponential ease-out, off under reduced motion.
@@ -268,13 +268,13 @@ Category colours are derived from each category's stored hue at neon saturation:
 Light swaps the neutrals and semantics (light-ground, light-surface, light-surface-2, light-surface-3, light-line, light-ink, light-muted, light-ok, light-warn, light-crit) and keeps the wallet seven and runway pair unchanged. The runway panel stays a near-black slate in light (#14141f) so the neon line still glows. The light action colour is deep lime (#3f7a00, soft #e9f6d4), the readable-on-white sibling of the dark theme's neon lime.
 
 ### Named Rules
-**The Owned Colour Rule.** Every account owns one wallet colour by creation order, and that colour follows it everywhere: its card, its spread segment, its payment date tile, the tint of its payment row. Never assign colour by balance, rank or bank brand; a colour must never jump when numbers change.
+**The Owned Colour Rule.** Every account owns one wallet colour by creation order, and that colour follows it everywhere: its card, its spread segment, its payment date tile, the tint of its payment row. Never assign colour by balance, rank or bank brand; a colour must never jump when numbers change. Shape tells account colour from category colour: account colour fills cards, spread segments and date tiles; category colour (its hue at neon saturation, violet band shifted out by `displayHue`) appears only as a dot or a thin bar, never as a filled card or tile. A category may share a hue with a wallet slot; it may never share its shape.
 
 **The Dark Ink Rule.** Every wallet colour carries near-black ink and a dark translucent veil, except Electric Blue (slot 2), which carries white ink and a white veil. This keeps small card text at 4.5:1 or better on every neon.
 
 **The Lime Is Action Rule.** Neon lime means "you can act here", "you are here", or, in a limit strip, "this much is still yours to spend". It never decorates, and never charts anything other than free limit.
 
-**The Runway Pair Rule.** Cyan and magenta belong to the runway panel: cyan for the line and recurring events, magenta for the selected day and the kesim. Do not reuse them elsewhere.
+**The Runway Pair Rule.** Inside the runway panel, cyan is the line and recurring events and magenta is the selected day and the kesim (user-pinned, 2026-10-10). Outside the panel neither runway token appears. The wallet seven include a cyan and a magenta slot; those are account colours and are told apart by shape (filled card versus line and dot), the same way the Owned Colour Rule separates categories.
 
 ## Typography
 
@@ -358,7 +358,7 @@ Bright and tactile: they answer the finger.
 Fixed tab bar on Slate Surface with a top hairline; five columns, 11px Onest labels in Mist, the active tab and its icon in neon lime. The centre column is the 56px lime + button, raised 16px and ringed in the ground colour.
 
 ### Wallet (signature)
-A horizontal, snap-scrolling rail of real-proportion cards, one per account, ordered by most available. Each card is filled in its owned wallet colour with two faint concentric circles in the ink colour (10% and 7%), a drawn chip, the account kind and name, the available figure, a 5px track filling in the ink colour, and a date pill (urgent dates invert to ink background, card-colour text). Inactive cards rest at 0.94 scale and grow to full size when active (0.45s exponential). Pressing a card shrinks it to 0.98. Below the rail, 6px dots; the active dot stretches to 18px in Moon Ink. The last slide is a dashed add-card with a lime + medallion.
+A horizontal, snap-scrolling rail of real-proportion cards, one per account, ordered by most available. Each card is filled in its owned wallet colour with two faint concentric circles in the ink colour (10% and 7%), the name and date pill on the top row, a drawn chip under the name on the left (cards and KMH only), the available figure, a 5px track filling in the ink colour, a meta line naming what the figure is and the limit ("Kullanılabilir · 60.000 ₺ limit", "KMH kullanılabilir · …", "Banka bakiyesi", "Nakit"; no kind label above the name), and the date pill (urgent dates invert to ink background, card-colour text). Inactive cards rest at 0.94 scale and grow to full size when active (0.45s exponential). Pressing a card shrinks it to 0.98. Below the rail, 6px dots as a non-interactive position indicator (the cards themselves are the controls); the active dot stretches to 18px in Moon Ink. A snap to a new card gives an 8ms haptic tick where supported. At 360 px the figure steps down to the figure size (clamp 1.5–1.75rem) and the card padding to 16/18px. The last slide is a dashed add-card with a lime + medallion.
 
 ### Spending spread
 A 14px bar under the hero figure, one pill segment per account in its wallet colour, 3px gaps, widths proportional to what each account contributes. Segments scale in from the left, staggered 60ms.
@@ -392,6 +392,6 @@ One load moment per visit: the hero figure rises 10px out of a 6px blur (0.8s), 
 - **Don't** use violet panels or accents, a warm peach ground, or grey stone with an evergreen accent; the user rejected each.
 - **Don't** build themed costume worlds (road signs, boarding passes, transit boards, calendars, banknotes) or anything that reads as a bank app.
 - **Don't** fall back to a grey list of white rows; accounts are coloured cards.
-- **Don't** use cyan or magenta outside the runway panel, or lime for any data other than free limit.
+- **Don't** use the runway cyan or magenta tokens outside the runway panel, fill a card or tile with a category colour, or use lime for any data other than free limit.
 - **Don't** add uppercase or tracked-out labels above headings; headings stand on their own in sentence case.
 - **Don't** let the display face draw the ₺ sign.
