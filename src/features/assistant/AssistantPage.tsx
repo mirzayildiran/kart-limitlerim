@@ -1,6 +1,6 @@
 import { computed } from '@preact/signals'
 import { PROXY_URL } from '../../ai/client'
-import { accounts, categories, expenses, recurring, today } from '../../data/store'
+import { accounts, budgets, categories, expenses, recurring, today } from '../../data/store'
 import { computeInsights } from '../../domain/insights'
 import { budgetSummary } from '../../domain/insightsSummary'
 import type { InsightInput } from '../../domain/insightsTypes'
@@ -9,6 +9,7 @@ import { Button, EmptyState, Pill } from '../../ui/components/controls'
 import { Icon } from '../../ui/components/Icon'
 import { toast } from '../../ui/components/toast'
 import { severityLabel, severityTone, DISCLAIMER } from './assistantModel'
+import { BudgetPlan } from './BudgetPlan'
 import { ChatPanel, resetChat } from './ChatPanel'
 import { ConsentPanel } from './ConsentPanel'
 import { assistantConsent, grantConsent, revokeConsent } from './consent'
@@ -19,6 +20,7 @@ const input = computed<InsightInput>(() => ({
   expenses: expenses.value,
   categories: categories.value,
   recurring: recurring.value,
+  budgets: budgets.value,
   today: today.value,
 }))
 const insights = computed(() => computeInsights(input.value))
@@ -70,6 +72,13 @@ export function AssistantPage() {
           </ul>
         )}
         <p class="assistant-note">Öneriler cihazında hesaplanır, internete bağlanmaz.</p>
+      </section>
+
+      <section class="assistant-section" aria-labelledby="assistant-budget">
+        <h2 class="assistant-section-title" id="assistant-budget">
+          Bütçe planı
+        </h2>
+        <BudgetPlan />
       </section>
 
       <section class="assistant-section" aria-labelledby="assistant-chat">

@@ -12,6 +12,7 @@ const SENT = [
   'Harcama gücü toplamları ve kesime kadar görünüm',
   'Hesap adların, limitler, bakiyeler ve ekstre tutarları',
   'Bu ay ve geçen ay kategori toplamları',
+  'Bütçe planın (kategori hedefleri) ve bu ayki harcama gidişatı',
   'Cihazdaki öneriler',
   'Sohbete yazdığın mesajlar',
 ]
