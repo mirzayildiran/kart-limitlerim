@@ -8,13 +8,13 @@
       {
         "id": "acc-bonus",
         "kind": "card",
-        "name": "Bonus",
+        "name": "Ana Kart",
         "limit": 4000000,
         "available": 3558680,
         "lines": [
           {
             "id": "line-bonus",
-            "label": "Bonus Kart",
+            "label": "Platin",
             "cutDay": 5,
             "dueOffsetDays": 8,
             "subLimit": null,
@@ -32,13 +32,13 @@
       {
         "id": "acc-maximum",
         "kind": "card",
-        "name": "Maximum",
+        "name": "Market Kartı",
         "limit": 2500000,
         "available": 2330400,
         "lines": [
           {
             "id": "line-maximum",
-            "label": "Maximum Kart",
+            "label": "Klasik",
             "cutDay": 18,
             "dueOffsetDays": 10,
             "subLimit": null,
@@ -56,13 +56,13 @@
       {
         "id": "acc-world",
         "kind": "card",
-        "name": "World",
+        "name": "Seyahat Kartı",
         "limit": 6000000,
         "available": 5335900,
         "lines": [
           {
             "id": "line-world",
-            "label": "World Kart",
+            "label": "Altın",
             "cutDay": 22,
             "dueOffsetDays": 10,
             "subLimit": null,
@@ -80,13 +80,13 @@
       {
         "id": "acc-axess",
         "kind": "card",
-        "name": "Axess",
+        "name": "Ek Kart",
         "limit": 1500000,
         "available": 98000,
         "lines": [
           {
             "id": "line-axess",
-            "label": "Axess Kart",
+            "label": "Ek kart",
             "cutDay": 1,
             "dueOffsetDays": 18,
             "subLimit": null,
