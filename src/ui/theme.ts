@@ -53,4 +53,7 @@ export function setTheme(p: ThemePref): void {
 /** Call once at startup (main.tsx). Nothing runs at import time. */
 export function applySavedTheme(): void {
   apply(themePref.value)
+  // index.html fades a dark veil off a light theme at boot. If the animation never runs
+  // (page hidden, animations paused), drop the veil anyway so it can never cover the app.
+  setTimeout(() => document.documentElement.removeAttribute('data-boot'), 700)
 }
