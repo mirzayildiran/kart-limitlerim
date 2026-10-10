@@ -21,12 +21,14 @@ function loadPref(): boolean {
 
 export const remindersOn = signal(isNativeApp && loadPref())
 
-const plugin = () => import('@capacitor/local-notifications').then((m) => m.LocalNotifications)
+// Resolve to the module, never to the plugin itself: Capacitor plugins are proxies that
+// treat any property, including `then`, as a native method, so awaiting one rejects.
+const load = () => import('@capacitor/local-notifications')
 
 /** Turns reminders on or off. Resolves false when iOS permission is denied. */
 export async function setReminders(on: boolean): Promise<boolean> {
   if (on) {
-    const notifications = await plugin()
+    const { LocalNotifications: notifications } = await load()
     const { display } = await notifications.requestPermissions()
     if (display !== 'granted') return false
   }
@@ -40,7 +42,7 @@ export async function setReminders(on: boolean): Promise<boolean> {
 }
 
 async function sync(plan: Reminder[]): Promise<void> {
-  const notifications = await plugin()
+  const { LocalNotifications: notifications } = await load()
   const { notifications: pending } = await notifications.getPending()
   if (pending.length > 0) await notifications.cancel({ notifications: pending.map((n) => ({ id: n.id })) })
   if (plan.length === 0) return

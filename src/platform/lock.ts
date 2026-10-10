@@ -27,13 +27,15 @@ export const shielded = signal(false)
 /** The Face ID sheet itself makes the app inactive; ignore that while it is up. */
 let verifying = false
 
-const plugin = () => import('@capgo/capacitor-native-biometric').then((m) => m.NativeBiometric)
+// Resolve to the module, never to the plugin itself: Capacitor plugins are proxies that
+// treat any property, including `then`, as a native method, so awaiting one rejects.
+const load = () => import('@capgo/capacitor-native-biometric')
 
 async function verify(reason: string): Promise<boolean> {
   if (verifying) return false
   verifying = true
   try {
-    const biometric = await plugin()
+    const { NativeBiometric: biometric } = await load()
     await biometric.verifyIdentity({ reason, useFallback: true })
     return true
   } catch {
@@ -46,14 +48,14 @@ async function verify(reason: string): Promise<boolean> {
 export async function unlock(): Promise<void> {
   // With no passcode or Face ID left on the phone there is nothing to verify against;
   // stay usable rather than locking the user out of their own data.
-  const { isAvailable } = await (await plugin()).isAvailable({ useFallback: true }).catch(() => ({ isAvailable: false }))
+  const { isAvailable } = await (await load()).NativeBiometric.isAvailable({ useFallback: true }).catch(() => ({ isAvailable: false }))
   if (!isAvailable || (await verify('Bakiyelerini görmek için kilidi aç'))) locked.value = false
 }
 
 /** Turning the lock on asks for Face ID once, so a user cannot lock themselves out unknowingly. */
 export async function setLock(on: boolean): Promise<'ok' | 'unavailable' | 'cancelled'> {
   if (on) {
-    const biometric = await plugin()
+    const { NativeBiometric: biometric } = await load()
     const { isAvailable } = await biometric.isAvailable({ useFallback: true })
     if (!isAvailable) return 'unavailable'
     if (!(await verify('Uygulama kilidini açmak için doğrula'))) return 'cancelled'

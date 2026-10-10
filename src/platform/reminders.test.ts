@@ -8,6 +8,13 @@ const notif = vi.hoisted(() => ({
   cancel: vi.fn(),
   schedule: vi.fn(),
 }))
+// Real Capacitor plugins are proxies that answer `then` too, so awaiting one rejects.
+// Non-enumerable, so resetting the mocks leaves it alone.
+Object.defineProperty(notif, 'then', {
+  value: () => {
+    throw new Error('plugin awaited as a promise')
+  },
+})
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: { isNativePlatform: () => true },
