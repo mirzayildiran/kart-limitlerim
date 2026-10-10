@@ -147,6 +147,7 @@ describe('buildTimeline', () => {
     expect(cuts).toContain('2026-10-15 Örnek Bank Ana kesim')
     expect(cuts).toContain('2026-10-25 Örnek Bank Sanal kesim')
     expect(cuts).toContain('2026-11-03 Demo Kart kesim')
+    expect(timeline.find((e) => e.title === 'Demo Kart kesim')?.detail).toBe('Ekstre kesimi')
   })
 
   it('shows unpaid statement due dates with their minimum as the amount, and paid ones not at all', () => {
