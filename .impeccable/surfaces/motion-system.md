@@ -22,7 +22,7 @@ Mode: Operate. Kullanıcı isteği (2026-10-10): "sayfalar arası ve tıklamalar
 |---|---|---|
 | `--dur-tap` | 120ms | basma geri bildirimi |
 | `--dur-state` | 200ms | renk/durum değişimi |
-| `--dur-page` | 300ms | sekme girişi (çıkış 180ms: `--dur-page-out`) |
+| `--dur-page` | 300ms | sekme girişi (çıkış 130ms: `--dur-page-out`; giriş `--dur-page-gap` 50ms gecikmeli, iki sayfanın yazısı üst üste binmesin) |
 | `--dur-sheet` | 380ms | pencere girişi |
 | `--dur-sheet-out` | 220ms | pencere çıkışı (çıkış girişten hızlı) |
 | `--press` | 0.97 | büyük yüzeyler için basma ölçeği (kart, satır: 0.985) |

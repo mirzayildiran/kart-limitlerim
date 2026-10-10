@@ -9,10 +9,12 @@
   align-items: center;
   justify-content: center;
   gap: var(--s-2);
-  transition: background 0.15s, transform 0.1s;
+  transition: background var(--dur-state) var(--ease), transform var(--dur-tap) var(--ease-out-expo);
 }
+/* Press: quick shrink, then the release springs back with the expo curve (base rule above). */
 .btn:active {
-  transform: scale(0.98);
+  transform: scale(var(--press));
+  transition-timing-function: var(--ease);
 }
 .btn:disabled {
   opacity: 0.45;
@@ -130,7 +132,7 @@
   background: var(--line-strong);
   position: relative;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--dur-state) var(--ease);
 }
 .switch input::after {
   content: '';
@@ -142,7 +144,7 @@
   border-radius: 50%;
   background: #fff; /* allow-color */
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); /* allow-color */
-  transition: transform 0.18s var(--ease);
+  transition: transform var(--dur-state) var(--ease);
 }
 .switch input:checked {
   background: var(--accent);
@@ -189,6 +191,15 @@
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--muted);
+  transition:
+    background var(--dur-state) var(--ease),
+    border-color var(--dur-state) var(--ease),
+    color var(--dur-state) var(--ease),
+    transform var(--dur-tap) var(--ease-out-expo);
+}
+.choice-item:active span {
+  transform: scale(var(--press));
+  transition-timing-function: var(--ease);
 }
 .choice-item input:checked + span {
   background: var(--accent);
@@ -286,15 +297,50 @@
   padding: 6px 10px;
   border-radius: var(--r-sm);
 }
+/* Enter: 12px up while fading in (240ms expo). Exit (.is-leaving): fade and 8px down (160ms). */
+.toast {
+  animation: toast-fade-in 240ms var(--ease-out-expo) both;
+}
+.toast.is-leaving {
+  pointer-events: none;
+  animation: toast-fade-out 160ms var(--ease-in) both;
+}
 @media (prefers-reduced-motion: no-preference) {
   .toast {
-    animation: toast-in 0.2s var(--ease);
+    animation-name: toast-in;
   }
-  @keyframes toast-in {
-    from {
-      transform: translateY(10px);
-      opacity: 0;
-    }
+  .toast.is-leaving {
+    animation-name: toast-out;
+  }
+}
+@keyframes toast-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes toast-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes toast-in {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+@keyframes toast-out {
+  to {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: .btn and chips keep their colour change but do not scale. */
+@media (prefers-reduced-motion: reduce) {
+  .btn:active,
+  .choice-item:active span {
+    transform: none;
   }
 }
 

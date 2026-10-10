@@ -47,3 +47,113 @@
   color: var(--muted);
   line-height: 1.45;
 }
+
+/*
+ * Tab switch (View Transitions, see ui/nav.ts). The page slides in the direction of tab order.
+ * The root and the tab bar stay still; the active tab icon glides (tabbar.css, tab-active).
+ */
+.app-content {
+  view-transition-name: page;
+}
+
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-group(tabbar) {
+  animation: none;
+}
+
+::view-transition-group(tab-active) {
+  animation-duration: var(--dur-page);
+  animation-timing-function: var(--ease-out-expo);
+}
+
+:root[data-nav='forward']::view-transition-old(page) {
+  animation: vt-page-out-forward var(--dur-page-out) var(--ease-in) both;
+}
+
+:root[data-nav='forward']::view-transition-new(page) {
+  animation: vt-page-in-forward var(--dur-page) var(--ease-out-expo) var(--dur-page-gap) both;
+}
+
+:root[data-nav='back']::view-transition-old(page) {
+  animation: vt-page-out-back var(--dur-page-out) var(--ease-in) both;
+}
+
+:root[data-nav='back']::view-transition-new(page) {
+  animation: vt-page-in-back var(--dur-page) var(--ease-out-expo) var(--dur-page-gap) both;
+}
+
+@keyframes vt-page-out-forward {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+}
+
+@keyframes vt-page-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes vt-page-out-back {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+@keyframes vt-page-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes vt-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Reduced motion: a 120ms cross-fade, and the active icon jumps instead of gliding. Same selector weight as above, so it comes last. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-nav]::view-transition-old(page) {
+    animation: vt-fade-out var(--dur-tap) linear both;
+  }
+  :root[data-nav]::view-transition-new(page) {
+    animation: vt-fade-in var(--dur-tap) linear both;
+  }
+  ::view-transition-group(tab-active) {
+    animation-duration: 0s;
+  }
+}
