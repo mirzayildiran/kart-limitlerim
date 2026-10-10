@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact'
-import { useId } from 'preact/hooks'
+import { useEffect, useId, useRef } from 'preact/hooks'
 import { formatTL } from '../../domain/money'
 import type { Account, Kurus } from '../../domain/types'
 import { Icon } from './Icon'
@@ -36,6 +36,13 @@ export function AccountPicker({ label, accounts, colors, value, onChange, error,
   const id = useId()
   const descId = error || hint ? `${id}-d` : undefined
   const hasSelection = accounts.some((a) => a.id === value)
+  const rail = useRef<HTMLDivElement>(null)
+
+  // Keep the chosen account in view: an edited expense may point at the sixth card.
+  useEffect(() => {
+    const el = rail.current?.querySelector<HTMLElement>('[aria-checked="true"]')
+    el?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [value])
 
   return (
     <div class="account-picker">
@@ -44,6 +51,7 @@ export function AccountPicker({ label, accounts, colors, value, onChange, error,
       </span>
       <div
         class="account-picker-rail"
+        ref={rail}
         role="radiogroup"
         aria-labelledby={`${id}-l`}
         aria-describedby={descId}

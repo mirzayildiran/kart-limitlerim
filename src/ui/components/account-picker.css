@@ -91,8 +91,9 @@
   background: var(--c);
 }
 
+/* On the filled chip the swatch would read as a pale box on the fill: the name and the check carry the state. */
 .account-picker-chip.is-selected .account-picker-swatch {
-  background: var(--c-veil);
+  display: none;
 }
 
 .account-picker-free {
