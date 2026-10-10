@@ -1,36 +1,51 @@
+/* Uygulama gibi kullan: same heading and container language as the other Ayarlar sections. */
+
 .install-guide {
   display: flex;
   flex-direction: column;
-  gap: var(--s-3);
-  padding: var(--s-4);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  gap: var(--s-2);
 }
 
 .install-guide-title {
-  margin: 0;
+  margin: var(--s-6) 0 0;
+  padding: 0 var(--s-1);
   font-size: var(--text-lg);
   font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+.install-guide-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
 }
 
 .install-guide-group {
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
+  padding: var(--s-4);
+}
+
+.install-guide-group + .install-guide-group {
+  border-top: 1px solid var(--line);
 }
 
 .install-guide-platform {
   margin: 0;
-  font-size: var(--text-sm);
+  font-size: var(--text-md);
   font-weight: 600;
-  color: var(--muted);
+  color: var(--ink);
 }
 
 .install-guide-steps {
   margin: 0;
   padding-left: var(--s-5);
-  font-size: var(--text-sm);
+  font-size: var(--text-md);
+  line-height: 1.45;
   color: var(--ink);
-  line-height: 1.5;
 }

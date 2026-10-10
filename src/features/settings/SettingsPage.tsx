@@ -3,20 +3,12 @@ import { useRef, useState } from 'preact/hooks'
 import { activeCategories, categories, exportBackupText, importBackupText, resetAllData } from '../../data/store'
 import { displayHue } from '../../domain/categories'
 import { BackupError, parseBackup } from '../../data/backup'
-import { CURRENT_RATES, MINIMUM_RULE } from '../../domain/rates'
 import { go, openSheet, route } from '../../ui/nav'
 import { Button, Choice, ConfirmButton } from '../../ui/components/controls'
 import { Icon } from '../../ui/components/Icon'
 import { toast } from '../../ui/components/toast'
 import { setTheme, themePref, type ThemePref } from '../../ui/theme'
-import {
-  backupFileName,
-  cardRateLines,
-  cashRateLine,
-  minimumLine,
-  sourceLine,
-  taxLine,
-} from './settingsModel'
+import { backupFileName, rateRows, sourceLines } from './settingsModel'
 import { InstallGuide } from './InstallGuide'
 import './settings-page.css'
 
@@ -37,10 +29,9 @@ function Section({ title, id, children }: { title: string; id: string; children:
 function AppearanceSection() {
   return (
     <Section title="Görünüm" id="settings-appearance">
-      <div class="settings-card settings-pad">
+      <div class="settings-card settings-pad settings-theme">
         <Choice<ThemePref>
           legend="Tema"
-          hideLegend
           look="segment"
           value={themePref.value}
           onChange={setTheme}
@@ -74,18 +65,23 @@ function CategoriesSection() {
         </button>
       </div>
       {archived.length > 0 && (
-        <details class="settings-archived">
-          <summary class="settings-archived-summary">Arşivdekiler ({archived.length})</summary>
-          <div class="settings-card">
-            {archived.map((c) => (
-              <button key={c.id} type="button" class="settings-row settings-row-tap" onClick={() => open(c.id)}>
-                <span class="settings-dot cat-color" style={{ '--h': displayHue(c.hue) }} aria-hidden="true" />
-                <span class="settings-row-label settings-muted">{c.name}</span>
-                <Icon name="chevron" size={18} class="settings-chev" />
-              </button>
-            ))}
-          </div>
-        </details>
+        <div class="settings-card settings-archived">
+          <details>
+            <summary class="settings-row settings-row-tap settings-archived-summary">
+              <span class="settings-row-label">Arşivdekiler ({archived.length})</span>
+              <Icon name="chevron" size={18} class="settings-chev" />
+            </summary>
+            <div class="settings-archived-list">
+              {archived.map((c) => (
+                <button key={c.id} type="button" class="settings-row settings-row-tap" onClick={() => open(c.id)}>
+                  <span class="settings-dot cat-color" style={{ '--h': displayHue(c.hue) }} aria-hidden="true" />
+                  <span class="settings-row-label settings-muted">{c.name}</span>
+                  <Icon name="chevron" size={18} class="settings-chev" />
+                </button>
+              ))}
+            </div>
+          </details>
+        </div>
       )}
     </Section>
   )
@@ -145,14 +141,16 @@ function BackupSection() {
     <Section title="Yedek" id="settings-backup">
       <div class="settings-card settings-pad settings-stack">
         <p class="settings-text">Verilerin yalnızca bu cihazda. Telefon değiştirirken yedeği indirip yeni cihazda geri yükle.</p>
-        <Button block onClick={download}>
-          <Icon name="download" size={18} />
-          Yedeği indir
-        </Button>
-        <Button block onClick={() => fileRef.current?.click()}>
-          <Icon name="upload" size={18} />
-          Yedekten geri yükle
-        </Button>
+        <div class="settings-actions">
+          <Button block onClick={download}>
+            <Icon name="download" size={18} />
+            Yedeği indir
+          </Button>
+          <Button block onClick={() => fileRef.current?.click()}>
+            <Icon name="upload" size={18} />
+            Yedekten geri yükle
+          </Button>
+        </div>
         <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={onPick} />
 
         {error && (
@@ -176,25 +174,26 @@ function BackupSection() {
 }
 
 function RatesSection() {
-  const lines = [
-    ...cardRateLines(CURRENT_RATES),
-    cashRateLine(CURRENT_RATES),
-    taxLine(),
-    minimumLine(MINIMUM_RULE),
-  ]
+  const rows = rateRows()
   return (
-    <Section title="Faiz ve asgari ödeme kuralları" id="settings-rates">
-      <div class="settings-card settings-pad settings-stack">
-        <ul class="settings-rate-list">
-          {lines.map((line) => (
-            <li key={line} class="settings-rate-item">
-              {line}
-            </li>
+    <Section title="Faiz nasıl tahmin ediliyor" id="settings-rates">
+      <div class="settings-card">
+        <dl class="settings-rates">
+          {rows.map((row) => (
+            <div key={row.label} class="settings-rate">
+              <dt class="settings-rate-label">{row.label}</dt>
+              <dd class="settings-rate-value num">{row.value}</dd>
+            </div>
           ))}
-        </ul>
-        <p class="settings-note">{sourceLine(CURRENT_RATES.source, CURRENT_RATES.effective)}</p>
-        <p class="settings-note">{sourceLine(MINIMUM_RULE.source, MINIMUM_RULE.effective)}</p>
-        <p class="settings-note">Bankan daha düşük oran uyguluyorsa kart ayarlarından kendi oranını girebilirsin.</p>
+        </dl>
+      </div>
+      <div class="settings-captions">
+        {sourceLines().map((line) => (
+          <p key={line} class="settings-caption">
+            {line}
+          </p>
+        ))}
+        <p class="settings-caption">Bankan daha düşük oran uyguluyorsa kart ayarlarından kendi oranını girebilirsin.</p>
       </div>
     </Section>
   )
@@ -203,9 +202,12 @@ function RatesSection() {
 function PrivacySection() {
   return (
     <Section title="Gizlilik" id="settings-privacy">
-      <div class="settings-card settings-pad settings-stack">
-        <p class="settings-text">Hesap yok, sunucu yok. Verilerin bu cihazda kalır.</p>
-        <p class="settings-text">Ekran görüntüsü içe aktarma cihazda okunur ve hiçbir yerde saklanmaz.</p>
+      <div class="settings-card settings-pad settings-privacy">
+        <Icon name="info" size={20} class="settings-privacy-icon" />
+        <div class="settings-stack">
+          <p class="settings-text">Hesap yok, sunucu yok. Verilerin bu cihazda kalır.</p>
+          <p class="settings-text">Ekran görüntüsü içe aktarma cihazda okunur ve hiçbir yerde saklanmaz.</p>
+        </div>
       </div>
     </Section>
   )
@@ -223,8 +225,9 @@ function DangerSection() {
   }
   return (
     <Section title="Tehlikeli bölge" id="settings-danger">
-      <div class="settings-card settings-pad">
+      <div class="settings-card settings-pad settings-stack">
         <ConfirmButton label="Tüm verileri sil" confirmLabel="Geri alınamaz. Silmek için tekrar dokun" onConfirm={eraseAll} />
+        <p class="settings-caption">Bu işlem geri alınamaz.</p>
       </div>
     </Section>
   )
@@ -238,12 +241,12 @@ export function SettingsPage() {
       <header class="settings-header">
         <h1>Ayarlar</h1>
       </header>
-      <InstallGuide />
       <AppearanceSection />
       <CategoriesSection />
       <BackupSection />
       <RatesSection />
       <PrivacySection />
+      <InstallGuide />
       <DangerSection />
       <footer class="settings-foot">Kart Limitlerim · sürüm {APP_VERSION}</footer>
     </div>
