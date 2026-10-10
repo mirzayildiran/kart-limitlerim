@@ -191,7 +191,7 @@
 
 /* Category colour from its hue (0–359), readable in both themes. */
 .cat-color {
-  --cat: hsl(var(--h) 68% 50%);
+  --cat: hsl(var(--h) 72% 40%);
 }
 
 :root[data-theme='dark'] .cat-color {

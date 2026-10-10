@@ -75,6 +75,29 @@ export function accountTotals(expenses: Expense[]): Map<string, Kurus> {
 }
 
 /**
+ * Faceted breakdowns. Each breakdown applies the OTHER filter only, so a category row
+ * shows what it holds under the selected account, and an account tile shows what it
+ * holds under the selected category. A selected filter never narrows its own row set.
+ */
+export function facetTotals(
+  expenses: Expense[],
+  filter: { categoryId?: string; accountId?: string } = {},
+): { byCategory: Map<string, Kurus>; byAccount: Map<string, Kurus> } {
+  return {
+    byCategory: categoryTotals(filterExpenses(expenses, { accountId: filter.accountId })),
+    byAccount: accountTotals(filterExpenses(expenses, { categoryId: filter.categoryId })),
+  }
+}
+
+/**
+ * A breakdown row is unavailable when it holds nothing under the other filter.
+ * A selected row is never unavailable, so it stays clickable and can be cleared.
+ */
+export function isFacetDisabled(amount: Kurus, selected: boolean): boolean {
+  return !selected && amount === 0
+}
+
+/**
  * Compute available before/after when adding/editing an expense.
  * Takes the old expense (null when creating), new expense, account, and current available.
  */
