@@ -234,3 +234,14 @@
 [data-slot='7'] {
   --c: var(--w7);
 }
+
+/* Night island: the splash, lock and shield screens stay on the launch ground in both themes. */
+:root {
+  --night-ground: #0a0a11;
+  --night-surface: #14141e;
+  --night-ink: #f5f5fa;
+  --night-muted: #a3a3b9;
+  --night-action: #c6ff2e;
+  --night-action-ink: #0a0a11;
+  --night-crit: #ff5c7a;
+}
