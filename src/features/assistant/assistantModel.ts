@@ -28,7 +28,7 @@ export function severityLabel(s: InsightSeverity): string {
 /** Services that may receive the chat. Shown on the consent screen. */
 export const PROVIDERS: { name: string; note: string }[] = [
   { name: 'Google Gemini', note: 'Ücretsiz katman; gönderilen metni ürün geliştirmek için kullanabilir.' },
-  { name: 'Groq', note: 'Ücretsiz katman; açık kaynak Llama modelini çalıştırır.' },
+  { name: 'Groq', note: 'Ücretsiz katman; açık ağırlıklı gpt-oss modelini çalıştırır.' },
   { name: 'OpenRouter', note: 'İsteği ücretsiz bir açık modele iletir.' },
 ]
 
