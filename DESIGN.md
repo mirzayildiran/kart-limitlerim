@@ -353,6 +353,14 @@ Bright and tactile: they answer the finger.
 - **Style:** raised slate, hairline border, 12px radius, 48px tall, 16px text. Money inputs set the value in the display face at 22px with a faint ₺ suffix.
 - **Focus:** border turns lime with a 3px Lime Moss halo.
 - **Error:** border in neon rose, message below in rose.
+- **Hero money field:** the first field of an entry sheet (Harcama ekle) sets its value in the display face at 2.5rem/800, tabular; the empty "0" placeholder is Dusk Faint so it never reads as a value; out of focus the value shows Turkish separators.
+- **Hints and placeholders:** Mist (muted), never Dusk Faint; Dusk Faint is for decorative glyphs only.
+
+### Pickers and disclosure
+- **AccountPicker:** horizontal snap rail of compact account chips (min 120×56, 16px radius), radiogroup with arrow keys. Unselected: slate chip with a 14×10 rounded-rect swatch in the wallet colour (the card shape in miniature, never a dot). Selected: filled with the wallet colour, wallet ink, a check; the swatch hides. The selected chip scrolls into view; a trailing edge fade shows when more cards wait.
+- **CategoryPicker:** wrapping chips ≥44px with the category dot. Selected: Lime Moss wash, 1px lime border, check. A trailing "Yeni" chip with a drawn plus opens the inline new-category form.
+- **Disclosure:** a full-width 44px row with a chevron that turns 90°; replaces native details markers.
+- **Choice segment:** options ≥44px, labels never wrap; in dark the selected option sits on slate-surface-3 with a line-strong inner ring and ink text, the rest in Mist.
 
 ### Navigation
 Fixed tab bar on Slate Surface with a top hairline; five columns, 11px Onest labels in Mist, the active tab and its icon in neon lime. The centre column is the 56px lime + button, raised 16px and ringed in the ground colour.
