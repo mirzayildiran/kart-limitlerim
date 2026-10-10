@@ -101,6 +101,49 @@ describe('origin and CORS', () => {
     expect(res.status).toBe(403)
   })
 
+  it('accepts the Capacitor iOS origin when it is listed', async () => {
+    stubFetch(() => geminiReply('Selam'))
+    const res = await worker.fetch(
+      post(nextIp(), validBody(), 'capacitor://localhost'),
+      env({ ALLOWED_ORIGINS: `${ALLOWED},capacitor://localhost` }),
+    )
+    expect(res.status).toBe(200)
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('capacitor://localhost')
+  })
+
+  it.each(['http://192.168.1.23:5173', 'http://10.0.0.5:5173', 'http://172.16.4.2:5173', 'http://172.31.255.255:5173'])(
+    'accepts the private LAN dev origin %s when LAN_DEV_PORT matches',
+    async (origin) => {
+      stubFetch(() => geminiReply('Selam'))
+      const res = await worker.fetch(post(nextIp(), validBody(), origin), env({ LAN_DEV_PORT: '5173' }))
+      expect(res.status).toBe(200)
+      expect(res.headers.get('Access-Control-Allow-Origin')).toBe(origin)
+    },
+  )
+
+  it.each([
+    'http://192.168.1.23:8080',
+    'http://192.168.1.23',
+    'https://192.168.1.23:5173',
+    'http://172.32.0.1:5173',
+    'http://172.15.0.1:5173',
+    'http://11.0.0.1:5173',
+    'http://8.8.8.8:5173',
+    'http://192.168.1.300:5173',
+    'http://192.168.1.23.evil.example:5173',
+    'http://evil.example:5173',
+  ])('rejects %s even with LAN_DEV_PORT set', async (origin) => {
+    const fetchMock = stubFetch(() => geminiReply('unused'))
+    const res = await worker.fetch(post(nextIp(), validBody(), origin), env({ LAN_DEV_PORT: '5173' }))
+    expect(res.status).toBe(403)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects private LAN origins when LAN_DEV_PORT is not set', async () => {
+    const res = await worker.fetch(post(nextIp(), validBody(), 'http://192.168.1.23:5173'), env())
+    expect(res.status).toBe(403)
+  })
+
   it('answers a preflight from an allowed origin with 204 and CORS headers', async () => {
     const req = new Request('https://worker.example/chat', { method: 'OPTIONS', headers: { Origin: ORIGIN } })
     const res = await worker.fetch(req, env())
