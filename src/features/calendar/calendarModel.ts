@@ -108,7 +108,7 @@ export function buildTimeline(
         iso: toIso(cut),
         accountId: card.id,
         title: card.lines.length > 1 ? `${card.name} ${line.label} kesim` : `${card.name} kesim`,
-        detail: null,
+        detail: 'Ekstre kesimi',
         amount: null,
         estimated: false,
         soon: false,

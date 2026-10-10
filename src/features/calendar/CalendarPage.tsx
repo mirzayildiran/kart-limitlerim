@@ -31,6 +31,11 @@ const ICON: Record<TimelineEvent['kind'], IconName> = { cut: 'card', due: 'alert
 /** Signed amount text: "~" when the figure is an estimate, then the figure with its ₺. */
 const amountText = (amount: number, estimated: boolean) => `${estimated ? '~' : ''}${formatTL(amount)}`
 
+/** "n gün geçti" for a date already past (days < 0); nothing otherwise. Shared by agenda and pending rows. */
+function OverduePill({ days }: { days: number }) {
+  return days < 0 ? <Pill tone="crit">{-days} gün geçti</Pill> : null
+}
+
 /** One agenda row: wallet-coloured medallion, text, amount, and a pill for due dates. */
 function EventRow({ e, now, slot, onOpen }: { e: TimelineEvent; now: Date; slot: number; onOpen: () => void }) {
   const left = daysBetween(e.date, now)
@@ -49,10 +54,13 @@ function EventRow({ e, now, slot, onOpen }: { e: TimelineEvent; now: Date; slot:
           {e.amount != null && (
             <span class="calendar-row-amount num">{figure(amountText(e.amount, e.estimated))}</span>
           )}
-          {isDue && left < 0 && <Pill tone="crit">{-left} gün geçti</Pill>}
+          {isDue && <OverduePill days={left} />}
           {isDue && left >= 0 && left <= SOON_DAYS && (
             <Pill tone="warn">{left === 0 ? 'Bugün son gün' : `${left} gün kaldı`}</Pill>
           )}
+        </span>
+        <span class="calendar-row-chevron" aria-hidden="true">
+          <Icon name="chevron" size={16} />
         </span>
       </button>
     </li>
@@ -104,13 +112,26 @@ export function CalendarPage() {
     }
   }
 
+  // Puts handledThrough back to what it was before the skip.
+  const undoSkip = async (id: string, previous: RecurringPayment['handledThrough']) => {
+    const r = findPayment(id)
+    if (!r) return
+    try {
+      await saveRecurring({ ...r, handledThrough: previous })
+      toast(`${r.name} geri alındı`)
+    } catch {
+      toast('Geri alınamadı. Tekrar dene.')
+    }
+  }
+
   const handleSkip = async (item: PendingOccurrence) => {
     const r = findPayment(item.recurringId)
     if (!r) return
+    const previous = r.handledThrough
     setBusy(`${item.recurringId}:${item.iso}`)
     try {
       await saveRecurring({ ...r, handledThrough: item.iso })
-      toast(`${r.name} atlandı`)
+      toast(`${r.name} atlandı`, { label: 'Geri al', run: () => undoSkip(r.id, previous) })
     } catch {
       toast('Ödeme atlanamadı. Tekrar dene.')
     } finally {
@@ -143,8 +164,11 @@ export function CalendarPage() {
                   <div class="calendar-pending-top">
                     <div class="calendar-row-text">
                       <span class="calendar-row-title">{p.name}</span>
-                      <span class="calendar-row-detail">
-                        {formatShort(p.date)} · {accountName(all, p.accountId)}
+                      <span class="calendar-row-detail-line">
+                        <span class="calendar-row-detail">
+                          {formatShort(p.date)} · {accountName(all, p.accountId)}
+                        </span>
+                        <OverduePill days={daysBetween(p.date, now)} />
                       </span>
                     </div>
                     <span class="calendar-row-amount num">{figure(formatTL(p.amount))}</span>
@@ -164,7 +188,7 @@ export function CalendarPage() {
                       disabled={!isOldest || busy !== null}
                       onClick={() => handleAdd(p)}
                     >
-                      Ekle
+                      Harcamaya ekle
                     </Button>
                   </div>
                   {!isOldest && <p class="calendar-hint">Önce daha eski ödemeyi işle.</p>}
@@ -180,26 +204,25 @@ export function CalendarPage() {
           <h2 class="calendar-section-title" id="calendar-timeline-title">
             Önümüzdeki {TIMELINE_DAYS} gün
           </h2>
-          {days.length > 0 && (
-            <span class="calendar-summary-total">
-              <span class="calendar-summary-figure num">{figure(amountText(summary.total, summary.estimated))}</span>{' '}
-              çıkacak
-            </span>
-          )}
         </div>
         {days.length === 0 ? (
           <p class="calendar-empty">Önümüzdeki {TIMELINE_DAYS} günde ödeme ya da kesim yok.</p>
         ) : (
           <>
+            <p class="calendar-summary">
+              <span class="calendar-summary-figure num">{figure(amountText(summary.total, summary.estimated))}</span>
+              <span class="calendar-summary-label">çıkacak</span>
+            </p>
             <p class="calendar-caption">
               {summary.payments} ödeme · {summary.cuts} kesim
               {summary.unknown > 0 && ` · ${summary.unknown} ödemenin tutarı girilmedi`}
+              {summary.estimated && ' · asgari tutar tahmini'}
             </p>
             {/* One slate container for the whole agenda; each day is a labelled section inside it. */}
             <div class="calendar-list-box">
               {days.map((day) => {
                 const total = dayTotal(day)
-                const hasAmount = day.events.some((e) => e.amount != null)
+                const amounts = day.events.filter((e) => e.amount != null).length
                 const headId = `calendar-day-${day.iso}`
                 return (
                   <section key={day.iso} class="calendar-day" aria-labelledby={headId}>
@@ -207,7 +230,7 @@ export function CalendarPage() {
                       <h3 id={headId} class={`calendar-day-title${day.label === 'Bugün' ? ' is-today' : ''}`}>
                         {day.label}
                       </h3>
-                      {hasAmount && (
+                      {amounts >= 2 && (
                         <span class="calendar-day-total num">{figure(amountText(total.total, total.estimated))}</span>
                       )}
                     </div>
@@ -257,6 +280,9 @@ export function CalendarPage() {
                     </span>
                     <span class="calendar-row-end">
                       <span class="calendar-row-amount num">{figure(formatTL(r.amount))}</span>
+                    </span>
+                    <span class="calendar-row-chevron" aria-hidden="true">
+                      <Icon name="chevron" size={16} />
                     </span>
                   </button>
                 </li>
