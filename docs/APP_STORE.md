@@ -136,7 +136,7 @@ Figures are estimates, not financial advice; your bank statement is authoritativ
 5. Ekran görüntüsünden aktarma: "Görüntü telefondan çıkmaz"
 6. Bütçe asistanı: "Kategori hedefleri ve öneriler"
 
-Görüntüler örnek verilerle çekilmelidir; gerçek kart ya da kişi bilgisi olmamalıdır. `scripts/shots.mjs` zaten `scripts/fixtures/demo-backup.json` ile çekim yapıyor. Mağaza boyutları için bkz. Yapılacaklar.
+Görüntüler örnek verilerle çekilmelidir; gerçek kart ya da kişi bilgisi olmamalıdır. `scripts/shots.mjs` zaten `src/data/demo-backup.json` ile çekim yapıyor. Mağaza boyutları için bkz. Yapılacaklar.
 
 ## Yaş derecelendirmesi anketi
 
@@ -189,17 +189,18 @@ Uygulama yalnızca işletim sisteminin HTTPS'ini kullanır, kendi şifrelemesi y
 Kart Limitlerim is a personal budget tracker for credit cards, overdraft accounts and cash in Turkey. The UI is in Turkish.
 
 - No account or sign-in. All data is stored on the device. The app does not connect to any bank, does not access financial accounts and does not move money; the user enters card limits and expenses manually or imports them from their own screenshots. Interest figures are labelled as estimates, not financial advice.
-- To try it with sample data: [see "Demo data" below; fill in once the in-app sample-data button exists].
+- To try it with sample data: on first launch tap "Örnek verilerle dene" (try with sample data) on the home screen. Seven sample accounts with expenses and recurring payments are loaded, dated relative to today. Remove them with Ayarlar (Settings) → Tehlikeli bölge → "Tüm verileri sil".
 - To add data manually: on first launch the home screen ("Özet") shows "Kart ekle" (add card). Enter a name, limit, statement day and due day. Then tap the + button to add an expense. The home screen shows spending power.
 - Screenshot import: tap + → "Ekran görüntüsünden ekle", then pick a screenshot of a banking app's transaction list. Text recognition runs on the device; the image is not uploaded.
 - Due-date reminders (local notifications): Ayarlar (Settings) → Hatırlatmalar. Off by default.
 - Budget assistant chat (optional, off by default): Ayarlar (Settings) → Bütçe asistanı → "Asistanı aç" (when there are suggestions, the "Bütçe asistanı" row on the home screen opens it too). Before anything is sent, a consent screen lists the exact data that will be sent, what is never sent, and the third-party AI services (Google Gemini, Groq, OpenRouter) via our proxy on Cloudflare Workers. Tap "Anladım, sohbeti aç" to consent; consent can be withdrawn in Settings at any time. The quick question "Bütçe planıma uyuyor muyum?" is a good test.
-- Native features: local due-date notifications, haptic feedback, share sheet for backups, on-device text recognition for camera/photos, full offline use.
+- Native features: Face ID lock, local due-date notifications, haptic feedback, share sheet for backups, on-device text recognition for camera/photos, full offline use.
+- Privacy policy inside the app: Ayarlar (Settings) → Gizlilik → "Gizlilik politikası", and the link on the chat consent screen.
 ```
 
 **İletişim:** Ad, telefon ve e-posta App Store Connect'te geliştirici hesabından girilir. Bu dosyaya yazılmaz.
 
-**Demo verisi:** Uygulamada henüz "örnek verilerle dene" düğmesi yok (bkz. Yapılacaklar). İnceleyici boş bir uygulamayla karşılaşır. Elle veri girmek mümkün ama inceleme süresini uzatır ve 4.2 açısından zayıf bir ilk izlenim bırakır.
+**Demo verisi:** Boş ana ekranda "Örnek verilerle dene" düğmesi `src/data/demo-backup.json`'u tarihleri bugüne kaydırarak yükler (`src/data/demo.ts`). Aynı veri `scripts/shots.mjs` çekimlerinde de kullanılıyor.
 
 ## Apple kurallarına karşı durum
 
@@ -213,8 +214,8 @@ Kart Limitlerim is a personal budget tracker for credit cards, overdraft account
 | Açık izin, göndermeden önce | ✅ Sohbet varsayılan kapalı; "Anladım, sohbeti aç" düğmesine basılmadan istek yok. |
 | İzin geri alınabiliyor | ✅ Ayarlar'dan ve asistan ekranından; gönderim hemen durur. |
 | Aracı sunucu bildiriliyor | ✅ Onay metninde Cloudflare aracı sunucusu geçiyor. |
-| Servislerin veriyi saklayıp eğitimde kullanabileceği | ⚠️ Yalnızca Gemini notunda yazıyor. Groq ve OpenRouter notlarında yok; Google'daki insan incelemesi hiç geçmiyor. Gizlilik sayfasında hepsi var. Bkz. Yapılacaklar. |
-| Gizlilik politikasına uygulama içinden erişim (5.1.1(i)) | ❌ Onay ekranı "Ayrıntılar uygulamanın gizlilik politikasında" diyor ama bağlantı yok; Ayarlar → Gizlilik'te de bağlantı yok. 5.1.1(i): "within the app in an easily accessible manner". Bkz. Yapılacaklar. |
+| Servislerin veriyi saklayıp eğitimde kullanabileceği | ✅ Üç servisin notu da metnin saklanabileceğini söylüyor; Gemini notunda insan incelemesi var (`assistantModel.ts`). |
+| Gizlilik politikasına uygulama içinden erişim (5.1.1(i)) | ✅ Ayarlar → Gizlilik → "Gizlilik politikası" ve onay ekranındaki bağlantı. iOS'ta Safari'de açılması beklenir (`target="_blank"`); cihazda doğrulanmalı. |
 
 ### 4.2: Asgari işlevsellik
 
@@ -223,9 +224,9 @@ Kart Limitlerim is a personal budget tracker for credit cards, overdraft account
 | Öğe | Durum |
 |---|---|
 | Kendi işlevi olan uygulama, web sitesi kopyası değil | ✅ Hesaplamalar, takvim, faiz tahmini ve OCR cihazda; uygulama paketlenmiş `dist` ile tamamen çevrimdışı çalışır (canlı test için kullanılan `server.url` mağaza derlemesinde yok). |
-| Yerel özellikler | ✅ Yerel son ödeme bildirimleri, dokunsal geri bildirim (Taptic Engine), paylaşım menüsü ve dosya sistemi ile yedek, kamera ve fotoğraflardan cihazda metin tanıma. |
-| Face ID kilidi | ⏳ Planlı, henüz yok. Şart değil ama "app-like" algısını güçlendirir. |
-| İlk açılış deneyimi | ⚠️ Uygulama boş açılıyor ve demo verisi yok. İnceleyici hemen değer göremeyebilir. Bkz. Yapılacaklar. |
+| Yerel özellikler | ✅ Face ID kilidi, yerel son ödeme bildirimleri, dokunsal geri bildirim (Taptic Engine), paylaşım menüsü ve dosya sistemi ile yedek, kamera ve fotoğraflardan cihazda metin tanıma. |
+| Face ID kilidi | ✅ Var; uygulama değiştiricide bakiyeler gizli (`src/platform/lock.ts`). |
+| İlk açılış deneyimi | ✅ Boş ana ekranda "Örnek verilerle dene"; inceleyici tek dokunuşla dolu bir uygulama görür. |
 | Web sürümüyle aynı arayüz | ⚠️ Aynı tasarım dili bilerek kullanılıyor (PRODUCT.md). Yerel özellikler ve çevrimdışı çalışma bunu dengeliyor; inceleme notlarında yerel özellikler ayrıca sayıldı. |
 
 ### Diğer riskli maddeler
@@ -239,11 +240,11 @@ Kart Limitlerim is a personal budget tracker for credit cards, overdraft account
 Kod ya da ayar gerektiren maddeler. Koordinatör ilgili oturuma dağıtır.
 
 1. **[iOS derlemesi, engelleyici] Mağaza derlemesinde sohbet adresi.** `ios:build` (`CAP_NATIVE=1 npm run build && cap sync ios`) `VITE_ASSISTANT_PROXY_URL` vermiyor; derlenen uygulamada sohbet "kurulu değil" der. Çözüm: `ios:build` adresi depo değişkeninden ya da `.env.production`'dan almalı (adres gizli değil: `https://kart-limitlerim-asistan.kart-limitlerim-7e48db.workers.dev`). Ayrıca `765f849` (Worker süre bütçesi ve OpenRouter yedeği) başvurudan önce `main`'e alınmalı.
-2. **[Ayarlar ve asistan ekranı, engelleyici, 5.1.1(i)] Uygulama içinden gizlilik politikası bağlantısı.** Ayarlar → Gizlilik bölümüne ve onay ekranındaki "gizlilik politikasında" ifadesine bağlantı eklenmeli. `privacy.html` paketlenmiş `dist` içinde de bulunduğu için uygulama içinde çevrimdışı açılabilir; istenirse yayındaki adres de kullanılabilir.
-3. **[Asistan ekranı, 5.1.2(i)] Onay ekranındaki servis notları.** Groq ve OpenRouter notları da ücretsiz katmanların metni saklayabileceğini ve eğitimde kullanabileceğini söylemeli. Gemini notuna insan incelemesi eklenmeli. `src/features/assistant/assistantModel.ts` içindeki `PROVIDERS`. Öneri: Gemini: "Ücretsiz katman; gönderilen metni saklayabilir, ürün geliştirmek için kullanabilir ve inceleyiciler okuyabilir." Groq: "Ücretsiz katman; gönderilen metni kendi koşullarına göre saklayabilir." OpenRouter: "İsteği ücretsiz bir açık modele iletir; model sağlayıcısı metni saklayabilir ve eğitimde kullanabilir."
-4. **[Uygulama, 4.2 ve inceleme] Örnek verilerle deneme.** İlk açılışta ya da Ayarlar'da "Örnek verilerle dene" düğmesi; `scripts/fixtures/demo-backup.json` içeriğini bugüne göre kaydırarak yükler (`scripts/shots.mjs` bu kaydırmayı zaten yapıyor). Sonra inceleme notlarındaki "To try it with sample data" satırı doldurulur.
+2. ✅ **Uygulama içinden gizlilik politikası bağlantısı** (5.1.1(i)): Ayarlar → Gizlilik ve onay ekranı. iOS'ta bağlantının Safari'de açıldığı cihazda doğrulanmalı.
+3. ✅ **Onay ekranındaki servis notları** (5.1.2(i)): `assistantModel.ts` `PROVIDERS`.
+4. ✅ **Örnek verilerle deneme** (4.2): boş ana ekranda düğme; `src/data/demo.ts`.
 5. **[iOS] `PrivacyInfo.xcprivacy`.** `ios/App/App/` altında yok. Apple, gerekçe isteyen API'ler (UserDefaults, dosya zaman damgası vb.) için bunu istiyor; Capacitor eklentileri (filesystem, local-notifications, haptics) bu API'leri kullanabilir. Xcode → Product → Archive sonrası "Generate Privacy Report" ile kontrol edilip eklenmeli. İzleme yok (`NSPrivacyTracking = false`), toplanan veri türleri yukarıdaki App Privacy tablosuyla aynı.
 6. **[iOS] Yalnızca iPhone.** `TARGETED_DEVICE_FAMILY` projede açıkça ayarlı değil. iPad de hedeflenirse iPad ekran görüntüleri ve iPad yerleşimi gerekir. Mağaza için `TARGETED_DEVICE_FAMILY = 1` yapılmalı.
 7. **[Ekran görüntüleri] Mağaza boyutlarında çekim.** `scripts/shots.mjs` şu an tasarım incelemesi için 2x çekiyor. 6.9" için 440 × 956 görüntü alanı ve 3x ölçek (1320 × 2868), 6.5" için 428 × 926 ve 3x (1284 × 2778) gerekir. Durum çubuğu ve çentik alanı olmadan, örnek verilerle, açık temada. İstenirse iPhone simülatöründen de çekilebilir.
 8. **[Hesap ayarı] Yaş 18+, yalnızca Türkiye.** App Store Connect'te en düşük yaş elle 18+ ve ülke olarak yalnızca Türkiye seçilmeli (gerekçeler yukarıda).
-9. **[İsteğe bağlı, 4.2] Face ID kilidi.** Yol haritasında planlı. Başvuru için şart değil.
+9. ✅ **Face ID kilidi:** `src/platform/lock.ts`.
