@@ -174,9 +174,57 @@ describe('unlock', () => {
     const lock = await load({ lockOn: true })
     expect(lock.locked.value).toBe(true)
 
-    await lock.unlock()
+    await expect(lock.unlock()).resolves.toBe('ok')
 
     expect(lock.locked.value).toBe(false)
     expect(biometric.verifyIdentity).not.toHaveBeenCalled()
+  })
+
+  it('returns ok and unlocks when Face ID succeeds', async () => {
+    const lock = await load({ lockOn: true })
+
+    await expect(lock.unlock()).resolves.toBe('ok')
+    expect(lock.locked.value).toBe(false)
+    expect(lock.unlockResult.value).toBe('ok')
+  })
+
+  it.each(['16', '15', '11'])('returns cancelled and stays locked when the prompt is closed (code %s)', async (code) => {
+    biometric.verifyIdentity.mockRejectedValue(Object.assign(new Error('canceled'), { code }))
+    const lock = await load({ lockOn: true })
+
+    await expect(lock.unlock()).resolves.toBe('cancelled')
+    expect(lock.locked.value).toBe(true)
+    expect(lock.unlockResult.value).toBe('cancelled')
+  })
+
+  it.each([
+    ['not recognised', { code: '10' }],
+    ['locked out', { code: '2' }],
+    ['an error without a code', {}],
+  ])('returns failed and stays locked when %s', async (_, extra) => {
+    biometric.verifyIdentity.mockRejectedValue(Object.assign(new Error('nope'), extra))
+    const lock = await load({ lockOn: true })
+
+    await expect(lock.unlock()).resolves.toBe('failed')
+    expect(lock.locked.value).toBe(true)
+    expect(lock.unlockResult.value).toBe('failed')
+  })
+
+  it('clears the last result when the app locks again', async () => {
+    const lock = await startedWithLock()
+    expect(lock.unlockResult.value).toBe('ok')
+
+    fire('pause')
+    expect(lock.unlockResult.value).toBeNull()
+  })
+})
+
+describe('verifyErrorResult', () => {
+  it('accepts numeric codes as well as strings', async () => {
+    const { verifyErrorResult } = await load()
+    expect(verifyErrorResult({ code: 16 })).toBe('cancelled')
+    expect(verifyErrorResult({ code: 10 })).toBe('failed')
+    expect(verifyErrorResult(null)).toBe('failed')
+    expect(verifyErrorResult('boom')).toBe('failed')
   })
 })
