@@ -19,6 +19,8 @@ applySavedTheme()
 startReminders()
 startLock()
 
+// Same task as the render, so no frame is painted between the boot screen and the app.
+document.getElementById('boot')?.remove()
 render(<App />, document.getElementById('app')!)
 
 // Separate root so the lock covers the app without the app knowing about it.
