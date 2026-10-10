@@ -45,3 +45,7 @@ FINISH: dual-agent critique on captures, fix round, finish reviewer verdict, DES
 - Filters are faceted: tiles and rows narrow to the other filter, and options whose intersection is empty are disabled (`aria-disabled`, 0.4 opacity, exempt as inactive controls); the empty-filter text names the filters ("Eğlence ve Axess için harcama yok").
 - The status line reads "Ekim toplamı · N harcama" or the filter names; a filter tap gives an 8 ms haptic tick where supported.
 - Section titles "Hesaba göre" (the product's word is hesap) and "Tüm harcamalar"; "Dokunarak süz" caption beside "Kategoriler".
+
+## Finish record (2026-10-10)
+
+Dual-agent critique 24/40 (A) + clean measurement (B: contrast 111/111, no target under 44 px) → fix round → finish reviewer `fix` → second round (ring documented, self-lit glow, figure face, toned day bands, haptic) → `disposition: ship` (covers the scored fixes).
