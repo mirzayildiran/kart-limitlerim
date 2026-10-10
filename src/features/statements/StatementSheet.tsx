@@ -9,6 +9,7 @@ import { saveAccount, today, accountById } from '../../data/store'
 import { formatLong, toIso } from '../../domain/dates'
 import { formatTLExact } from '../../domain/money'
 import { viewStatement, rollToCurrentCycle } from '../../domain/statement'
+import { figure } from '../../ui/components/Amount'
 import {
   initStatementFormState,
   validateStatementForm,
@@ -202,7 +203,10 @@ export function StatementSheet({ request }: StatementSheetProps) {
           }
           return (
             <div class="statement-interest">
-              <p class="statement-interest-title">Bu ekstrede işleyecek faiz: ~{formatTLExact(preview.total)}</p>
+              <p class="statement-interest-title">
+                Bu ekstrede işleyecek faiz:{' '}
+                <strong class="statement-interest-figure num">~{figure(formatTLExact(preview.total))}</strong>
+              </p>
               <p class="statement-interest-detail">
                 Akdi {formatTLExact(preview.contractual)} + gecikme {formatTLExact(preview.late)} + vergiler{' '}
                 {formatTLExact(preview.taxes)} · aylık %{preview.rate}

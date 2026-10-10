@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks'
 import { toIso } from '../../domain/dates'
 import type { RecurringPayment } from '../../domain/types'
 import {
+  accounts,
   activeCategories,
   cards,
   kmhAccounts,
@@ -12,9 +13,12 @@ import {
   saveRecurring,
   today,
 } from '../../data/store'
+import { accountColors } from '../../ui/accountColor'
 import { closeSheet } from '../../ui/nav'
 import type { SheetRequest } from '../../ui/nav'
 import { Button, Choice, ConfirmButton, MoneyField, Switch, TextField } from '../../ui/components/controls'
+import { AccountPicker } from '../../ui/components/AccountPicker'
+import { CategoryPicker } from '../../ui/components/CategoryPicker'
 import { Sheet } from '../../ui/components/Sheet'
 import { toast } from '../../ui/components/toast'
 import {
@@ -70,8 +74,9 @@ export function RecurringSheet({ request }: RecurringSheetProps) {
   const errors = validateDraft(draft)
   const shown = attempted ? errors : {}
 
-  const accountOptions = [...cards.value, ...kmhAccounts.value, ...liquidAccounts.value].map((a) => ({ value: a.id, label: a.name }))
-  const categoryOptions = activeCategories.value.map((c) => ({ value: c.id, label: c.name }))
+  // Pre-sorted store signals: cards, then KMH, then liquid; most available first.
+  const accountList = [...cards.value, ...kmhAccounts.value, ...liquidAccounts.value]
+  const colors = accountColors(accounts.value)
 
   const preview = buildRecurring(draft, {
     id: existing?.id ?? 'preview',
@@ -146,29 +151,30 @@ export function RecurringSheet({ request }: RecurringSheetProps) {
           error={shown.amount}
         />
 
-        <div class="recurring-choice">
-          {accountOptions.length === 0 ? (
+        {accountList.length === 0 ? (
+          <div class="recurring-account-empty">
+            <span class="field-label">Hangi hesaptan</span>
             <p class="recurring-empty">Önce bir kart ya da hesap ekle.</p>
-          ) : (
-            <Choice<string>
-              legend="Hangi hesaptan"
-              options={accountOptions}
-              value={draft.accountId}
-              onChange={(v) => patch({ accountId: v })}
-            />
-          )}
-          {shown.account && <p class="field-error" role="alert">{shown.account}</p>}
-        </div>
-
-        <div class="recurring-choice">
-          <Choice<string>
-            legend="Kategori"
-            options={categoryOptions}
-            value={draft.categoryId}
-            onChange={(v) => patch({ categoryId: v })}
+          </div>
+        ) : (
+          <AccountPicker
+            label="Hangi hesaptan"
+            accounts={accountList}
+            colors={colors}
+            value={draft.accountId}
+            onChange={(v) => patch({ accountId: v })}
+            error={shown.account ?? null}
           />
-          {shown.category && <p class="field-error" role="alert">{shown.category}</p>}
-        </div>
+        )}
+
+        {/* No "Yeni" chip here: a recurring payment picks an existing category. */}
+        <CategoryPicker
+          label="Kategori"
+          categories={activeCategories.value}
+          value={draft.categoryId}
+          onChange={(v) => patch({ categoryId: v })}
+          error={shown.category ?? null}
+        />
 
         <div class="recurring-row">
           <TextField
