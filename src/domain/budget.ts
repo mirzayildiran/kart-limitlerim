@@ -8,7 +8,7 @@ import type { Category, CategoryBudget, Expense, Kurus } from './types'
  */
 
 /** Days from the start of the month before a pace check counts as meaningful. */
-const PACE_MIN_DAYS = 7
+export const PACE_MIN_DAYS = 7
 
 export interface MonthPace {
   /** Spent this month, day 1 through today. */
