@@ -30,19 +30,31 @@
   color: var(--muted);
 }
 
-.budget-plan-list {
+/* Targets: one slate container with hairline rows, the same pattern as the suggestions list */
+.budget-plan-slate {
   display: flex;
   flex-direction: column;
-  gap: var(--s-2);
   margin: 0;
   padding: 0;
   list-style: none;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
 }
 
-.budget-plan-row {
+.budget-plan-item {
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
+  min-width: 0;
+  padding: var(--s-4);
+}
+
+.budget-plan-item + .budget-plan-item {
+  border-top: 1px solid var(--line);
 }
 
 .budget-plan-head {
@@ -118,7 +130,7 @@
   gap: var(--s-2);
 }
 
-.budget-plan-row > .budget-plan-actions {
+.budget-plan-item > .budget-plan-actions {
   justify-content: flex-start;
 }
 

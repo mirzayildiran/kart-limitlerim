@@ -63,6 +63,11 @@
   overflow-wrap: anywhere;
 }
 
+/* " · asistanda N öneri" moves to the next line as one piece, never leaving "N öneri" alone */
+.home-status-count {
+  white-space: nowrap;
+}
+
 .home-status-chevron {
   flex: 0 0 auto;
   display: flex;
