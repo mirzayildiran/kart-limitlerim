@@ -53,12 +53,12 @@ Karar (2026-10-10): Telefonda çalışan model yerine ücretsiz bulut API'leri k
 
 - [x] Kurala dayalı öneriler (yapay zekasız): kesime kadar nakit açığı, yaklaşan ve geciken asgari ödemeler, limiti azalan kart, KMH günlük faizi, asgari ödeme faizi, kategori artışları, "bugün hangi kartla öde". Rakamlar yalnızca `src/domain/` hesaplarından gelir (`src/domain/insights.ts`).
 - [x] Sohbet ekranı (`#/asistan`): model uygulamanın hesapladığı özeti (`src/domain/insightsSummary.ts`) okur, açıklar ve tartışır. Model hesap yapmaz. Sohbet geçmişi yalnızca bellekte tutulur.
-- [x] Sağlayıcı katmanı: aracı sunucu sırayla Gemini, Groq ve OpenRouter'ı dener (`src/ai/`, `worker/assistant-proxy/`). CORS ve IP başına hız sınırı var.
+- [x] Sağlayıcı katmanı: aracı sunucu sırayla Gemini (`gemini-flash-latest`), Groq ve OpenRouter'ı dener (`src/ai/`, `worker/assistant-proxy/`). CORS, IP başına dakikalık (Workers Rate Limiting) ve saatlik hız sınırı var. Gemini yolu gerçek anahtarla uçtan uca denendi.
 - [x] Gizlilik: varsayılan kapalı. Onay ekranı gönderilecek alanları, gönderilmeyenleri, servisleri ve özetin tam hâlini gösterir. PRODUCT.md ilkesi ve `docs/PRIVACY.md` güncellendi.
 - [x] Her yanıtta "Tahmindir, finansal tavsiye değildir." ibaresi (uygulama ekler, modele bırakılmaz).
-- [ ] Aracı sunucuyu yayına alma: Worker'ı kur, anahtarları `wrangler secret` ile ekle, depo değişkeni `ASSISTANT_PROXY_URL`'i tanımla. Değişken yoksa uygulama sohbetsiz derlenir.
+- [x] Aracı sunucunun otomatik kurulumu: `deploy.yml` her `main` gönderiminde Worker'ı kurar ve adresini derlemeye verir (`scripts/deploy-assistant.sh`).
+- [ ] Depo gizli değerlerini tanımla: `CLOUDFLARE_API_TOKEN`, `GEMINI_API_KEY`, `GROQ_API_KEY` (bkz. `worker/assistant-proxy/README.md`). Tanımlanmadıkça site sohbetsiz yayınlanır.
 - [ ] Ana ekrandan asistana giriş (şu an Ayarlar → Bütçe asistanı). Tasarım çalışmasıyla birlikte yerleştirilecek.
-- [ ] Cloudflare WAF hız sınırı kuralı (Worker içindeki sayaç yalnızca isolate başına).
 
 ## Aşama 5 — İleri özellikler
 
