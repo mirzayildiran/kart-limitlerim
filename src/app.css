@@ -12,8 +12,8 @@
   max-width: var(--max-w);
   width: 100%;
   margin: 0 auto;
-  padding-left: var(--gutter);
-  padding-right: var(--gutter);
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+  padding-right: max(var(--gutter), env(safe-area-inset-right));
   padding-top: calc(env(safe-area-inset-top) + 12px);
   padding-bottom: calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom));
   box-sizing: border-box;
