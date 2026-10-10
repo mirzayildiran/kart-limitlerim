@@ -232,6 +232,7 @@
 }
 
 .expenses-category-amount {
+  font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--muted);
@@ -281,8 +282,11 @@
 
 /* Selected tile: outline in ink, check in the tile's own ink at the top right. */
 .expenses-account.is-active {
+  /* Ring outside the fill: an inset ring disappears on the yellow and orange slots. */
   outline: 2px solid var(--ink);
   outline-offset: 2px;
+  /* Self-lit: the chosen card glows in its own colour, as on Özet. */
+  box-shadow: 0 10px 24px -12px var(--c);
 }
 
 .expenses-account-check {
@@ -346,6 +350,9 @@
   gap: var(--s-3);
   min-height: 36px;
   padding: 0 var(--s-4);
+  /* A toned band gives the list its structure, so it never reads as a stack of white rows. */
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
 }
 
 .expenses-day + .expenses-day .expenses-day-head {
