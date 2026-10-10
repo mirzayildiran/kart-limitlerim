@@ -7,7 +7,10 @@ const notif = vi.hoisted(() => ({
   getPending: vi.fn(),
   cancel: vi.fn(),
   schedule: vi.fn(),
+  addListener: vi.fn(),
 }))
+
+const links = vi.hoisted(() => ({ handleDeepLink: vi.fn() }))
 // Real Capacitor plugins are proxies that answer `then` too, so awaiting one rejects.
 // Non-enumerable, so resetting the mocks leaves it alone.
 Object.defineProperty(notif, 'then', {
@@ -22,6 +25,12 @@ vi.mock('@capacitor/core', () => ({
 
 vi.mock('@capacitor/local-notifications', () => ({
   LocalNotifications: notif,
+}))
+
+// Deep links pull in navigation and the lock; only the hand-off from a tapped reminder matters here.
+vi.mock('./deeplinks', () => ({
+  handleDeepLink: links.handleDeepLink,
+  statementLink: (accountId: string, lineIndex: number) => `kartlimitlerim://ekstre/${accountId}/${lineIndex}`,
 }))
 
 // The real store opens IndexedDB on import; plain signals are enough for the reminder sync.
@@ -82,6 +91,7 @@ beforeEach(() => {
   })
 
   for (const fn of Object.values(notif)) fn.mockReset()
+  links.handleDeepLink.mockReset()
   notif.requestPermissions.mockResolvedValue({ display: 'granted' })
   notif.getPending.mockResolvedValue({ notifications: [] })
   notif.cancel.mockResolvedValue(undefined)
@@ -133,8 +143,21 @@ describe('startReminders', () => {
         title: r.title,
         body: r.body,
         schedule: { at: r.at, allowWhileIdle: true },
+        extra: { url: `kartlimitlerim://ekstre/${r.accountId}/${r.lineIndex}` },
       })),
     })
+  })
+})
+
+describe('tapping a reminder', () => {
+  it("opens the card line's statement through the deep link handler", async () => {
+    const { mod } = await load()
+    mod.startReminders()
+    await vi.waitFor(() => expect(notif.addListener).toHaveBeenCalledWith('localNotificationActionPerformed', expect.any(Function)))
+
+    const onTap = notif.addListener.mock.calls[0][1] as (e: unknown) => void
+    onTap({ actionId: 'tap', notification: { id: 1, extra: { url: 'kartlimitlerim://ekstre/c1/0' } } })
+    expect(links.handleDeepLink).toHaveBeenCalledWith('kartlimitlerim://ekstre/c1/0')
   })
 })
 
