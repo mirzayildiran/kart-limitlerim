@@ -36,3 +36,6 @@ legacy/
 # Cloudflare Worker yerel anahtarları ve wrangler önbelleği
 .dev.vars
 .wrangler/
+
+# Impeccable launcher binary, downloaded on first run
+.claude/skills/impeccable/scripts/bin/
