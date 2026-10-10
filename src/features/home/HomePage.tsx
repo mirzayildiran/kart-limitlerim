@@ -1,7 +1,7 @@
 import { computed } from '@preact/signals'
 import type { JSX } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { cycleKeyOf, formatShort } from '../../domain/dates'
+import { cycleKeyOf, formatLong, formatShort } from '../../domain/dates'
 import { displayHue } from '../../domain/categories'
 import { formatTL, formatTLExact, spokenTL } from '../../domain/money'
 import { byMostAvailable } from '../../domain/power'
@@ -26,6 +26,7 @@ import { Button, Pill } from '../../ui/components/controls'
 import { Amount, figure } from '../../ui/components/Amount'
 import { Icon } from '../../ui/components/Icon'
 import { toast } from '../../ui/components/toast'
+import { acceptRestore, dismissRestore, restoreOffer } from '../../data/autoBackupRuntime'
 import { computeInsights } from '../../domain/insights'
 import { assistantInput } from '../assistant/assistantModel'
 import { RecurringDueBanner } from './RecurringDueBanner'
@@ -354,6 +355,42 @@ function renderStatementsSection(colors: Map<string, number>): JSX.Element | nul
 
 export function HomePage() {
   const accountsValue = accounts.value
+
+  // Empty, but the iOS app's automatic backup still holds data (e.g. iOS cleared the web storage).
+  const offer = restoreOffer.value
+  if (accountsValue.length === 0 && offer) {
+    const restore = async () => {
+      try {
+        await acceptRestore()
+        toast('Verilerin geri yüklendi')
+      } catch {
+        toast('Geri yükleme tamamlanamadı. Tekrar dene.')
+      }
+    }
+    const { accounts: savedAccounts, expenses: savedExpenses } = offer.data
+    return (
+      <div class="home-page">
+        {renderTopbar(undefined, assistantCount.value)}
+        <section class="home-welcome" aria-labelledby="home-restore-title">
+          <h2 id="home-restore-title" class="home-welcome-title">
+            Önceki verilerin bulundu
+          </h2>
+          <p class="home-welcome-text">
+            Bu telefondaki otomatik yedekte {savedAccounts.length} hesap ve {savedExpenses.length} harcama var (son kayıt{' '}
+            {formatLong(new Date(offer.exportedAt))}). Geri yükleyelim mi?
+          </p>
+          <div class="home-welcome-actions">
+            <Button variant="primary" block onClick={restore}>
+              Geri yükle
+            </Button>
+            <Button variant="ghost" block onClick={dismissRestore}>
+              Şimdi değil
+            </Button>
+          </div>
+        </section>
+      </div>
+    )
+  }
 
   // Empty state: no accounts at all
   if (accountsValue.length === 0) {
