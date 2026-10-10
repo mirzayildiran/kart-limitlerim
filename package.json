@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc -b",
-    "lint": "eslint . && node scripts/check-css.mjs",
+    "lint": "eslint . --max-warnings 0 && node scripts/check-css.mjs",
     "shots": "node scripts/shots.mjs",
     "ios:dev": "node scripts/ios-dev.mjs",
     "ios:build": "CAP_NATIVE=1 npm run build && cap sync ios",
@@ -21,7 +21,8 @@
     "test:components": "vitest run --project components",
     "e2e:build": "VITE_ASSISTANT_PROXY_URL=https://asistan.e2e.test vite build",
     "e2e": "npm run e2e:build && playwright test",
-    "size": "node scripts/size-budget.mjs"
+    "size": "node scripts/size-budget.mjs",
+    "knip": "knip --no-progress"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
@@ -52,6 +53,7 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "fake-indexeddb": "^6.2.5",
     "happy-dom": "^20.14.6",
+    "knip": "^5.88.1",
     "playwright-core": "^1.64.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.71.1",

@@ -27,14 +27,3 @@ export function expenseDeltas(before: Expense | null, after: Expense | null): Ma
   for (const [id, d] of deltas) if (d === 0) deltas.delete(id)
   return deltas
 }
-
-/** Read the account's spendable figure regardless of kind. */
-export function freeAmount(a: Account): Kurus {
-  switch (a.kind) {
-    case 'card':
-    case 'kmh':
-      return a.available
-    default:
-      return a.balance
-  }
-}

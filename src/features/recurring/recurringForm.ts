@@ -20,7 +20,7 @@ export interface RecurringDraft {
   active: boolean
 }
 
-export interface RecurringErrors {
+interface RecurringErrors {
   name?: string
   amount?: string
   account?: string

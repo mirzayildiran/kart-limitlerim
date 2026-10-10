@@ -42,7 +42,7 @@ import {
 } from './importModel'
 import './import-sheet.css'
 
-export interface ImportSheetProps {
+interface ImportSheetProps {
   request: Extract<SheetRequest, { type: 'import' }>
 }
 

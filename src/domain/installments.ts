@@ -8,7 +8,7 @@ import type { Account, Expense, Kurus } from './types'
  * Estimate: one installment per calendar month from the purchase month on; the last one absorbs
  * the rounding. The bank's statement is what counts.
  */
-export interface InstallmentPlans {
+interface InstallmentPlans {
   /** Plans with at least one installment left this month or later. */
   plans: number
   /** Sum of this month's installments across those plans. */

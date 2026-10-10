@@ -7,25 +7,25 @@ import type { OcrWord } from './types'
  */
 
 /** Left strip of the image that holds the date column, as a share of the width. */
-export const DATE_COLUMN_SHARE = 0.17
+const DATE_COLUMN_SHARE = 0.17
 /** Whitelist for the second pass: digits, date punctuation, Turkish letters. */
 export const DATE_WHITELIST =
   '0123456789:/.ABCDEFGHIİJKLMNOÖPRSŞTUÜVYZabcçdefgğhıijklmnoöprsştuüvyz'
 /** Second pass runs only when the first pass already found this many amount-like words. */
-export const MIN_AMOUNTS_FOR_SECOND_PASS = 3
+const MIN_AMOUNTS_FOR_SECOND_PASS = 3
 /** A second-pass word is dropped when it overlaps a first-pass word above this IoU. */
-export const MERGE_IOU = 0.3
+const MERGE_IOU = 0.3
 
 const AMOUNT_PATTERN = /\d+[.,]\d{2}/
 
-export interface Rect {
+interface Rect {
   left: number
   top: number
   width: number
   height: number
 }
 
-export interface Box {
+interface Box {
   x0: number
   y0: number
   x1: number

@@ -9,7 +9,7 @@ import type { Account, Kurus, RecurringPayment } from './types'
  * shown as markers but do not change it (paying a minimum moves cash, not limit).
  */
 
-export type RunwayEventKind = 'recurring' | 'due' | 'cut'
+type RunwayEventKind = 'recurring' | 'due' | 'cut'
 
 export interface RunwayEvent {
   kind: RunwayEventKind

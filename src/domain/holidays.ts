@@ -17,7 +17,7 @@ import type { IsoDate } from './types'
  * Outside the listed years only the fixed days and weekends are known.
  */
 
-export interface Holiday {
+interface Holiday {
   date: IsoDate
   name: string
   /** Half-day holiday (afternoon off); still a business day for payments. */

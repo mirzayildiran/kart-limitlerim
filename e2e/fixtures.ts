@@ -28,12 +28,6 @@ export async function startWithDemo(page: Page) {
   await expect(page.getByRole('heading', { name: 'Harcama gücün' })).toBeVisible()
 }
 
-/** Bottom tab bar. */
-export async function goTab(page: Page, name: 'Özet' | 'Harcamalar' | 'Takvim' | 'Ayarlar') {
-  await page.getByRole('navigation', { name: 'Ana menü' }).getByRole('link', { name }).or(
-    page.getByRole('navigation', { name: 'Ana menü' }).getByRole('button', { name }),
-  ).first().click()
-}
 
 /** WCAG 2.1 AA scan of what is on screen; fails with the rule ids and targets. */
 export async function expectNoA11yViolations(page: Page, label: string) {

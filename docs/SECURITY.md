@@ -17,6 +17,10 @@ Yayın öncesi denetim, 2026-10-10. Dal: `claude/security-pass`. Bulgular önem 
 1. **İstemci doğrulaması (bulgu 2'nin kalanı):** Gerekirse Turnstile ya da App Attest. Alan doğrulaması yapıldı.
 2. **iOS'ta CSP doğrulaması:** WKWebView'da `capacitor://localhost` için `'self'` ve Capacitor köprüsü (bulgu 3). Chromium'da doğrulandı, cihazda denenmedi.
 
+## Bağımlılık denetimi (npm audit, 2026-10-10)
+
+- `@capacitor/cli` → `xcode@3.0.1` → `uuid@7.0.3`: orta önemde (GHSA-w5hq-g745-h8pq, `v3/v5/v6`'da `buf` verilince sınır denetimi yok). Yalnızca geliştirme aracı (`cap sync`), uygulamaya girmez; `xcode` yalnızca `uuid.v4` kullanır. Düzeltmesi `uuid` için major sürüm atlaması (7 → 11) ya da `@capacitor/cli` sürüm düşürme olduğundan yapılmadı. `@capacitor/cli` yeni bir `xcode` ile çıkınca güncellenecek.
+
 ## Bulgular
 
 | # | Önem | Bulgu | Durum |

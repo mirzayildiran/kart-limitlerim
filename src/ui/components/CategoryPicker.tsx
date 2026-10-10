@@ -5,7 +5,7 @@ import { Icon } from './Icon'
 import { rovingRadioKey } from './roving'
 import './category-picker.css'
 
-export interface CategoryPickerProps {
+interface CategoryPickerProps {
   /** Visible label above the chips, e.g. "Kategori". */
   label: string
   /** Categories to offer, in order (usually `activeCategories.value`). */

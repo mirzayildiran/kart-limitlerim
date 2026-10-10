@@ -8,7 +8,7 @@ import type { AccountKind, Expense } from '../domain/types'
 
 export type Route = 'home' | 'expenses' | 'calendar' | 'settings' | 'assistant'
 
-export const ROUTES: Record<Route, string> = {
+const ROUTES: Record<Route, string> = {
   home: '#/',
   expenses: '#/harcamalar',
   calendar: '#/takvim',

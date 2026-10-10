@@ -4,9 +4,9 @@ import { isNativeApp } from '../../platform/files'
 import { openSheet, sheet } from '../../ui/nav'
 
 /** Meta-store flag: the reminders / Face ID offer has been shown on this device. */
-export const PHONE_SETUP_FLAG = 'onboarding.phoneSetup'
+const PHONE_SETUP_FLAG = 'onboarding.phoneSetup'
 
-export interface PromptState {
+interface PromptState {
   native: boolean
   seen: boolean
   /** The device already had cards when the app opened (an existing user, not a first run). */

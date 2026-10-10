@@ -3,13 +3,13 @@ import type { OcrPage, OcrWord } from './types'
 /** Synthetic screenshots: invented merchants and names only. Coordinates imitate real OCR output. */
 
 export const TODAY = new Date(2026, 9, 10)
-export const PAGE_WIDTH = 1000
+const PAGE_WIDTH = 1000
 const CHAR_W = 12
 const GAP = 10
 const WORD_H = 20
 
 /** One OCR line. `x` is the left edge; `right` places the line's right edge instead. */
-export interface Ln {
+interface Ln {
   t: string
   y: number
   x?: number
@@ -17,7 +17,7 @@ export interface Ln {
   conf?: number
 }
 
-export function wordsOf(ln: Ln): OcrWord[] {
+function wordsOf(ln: Ln): OcrWord[] {
   const parts = ln.t.split(' ')
   const widths = parts.map((p) => [...p].length * CHAR_W)
   const total = widths.reduce((a, b) => a + b, 0) + GAP * (parts.length - 1)

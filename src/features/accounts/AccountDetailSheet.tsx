@@ -237,7 +237,7 @@ function KmhContent({ account }: { account: KmhAccount }): JSX.Element {
   )
 }
 
-export interface AccountDetailSheetProps {
+interface AccountDetailSheetProps {
   request: Extract<SheetRequest, { type: 'accountDetail' }>
 }
 
