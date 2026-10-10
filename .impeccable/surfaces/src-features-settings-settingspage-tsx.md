@@ -17,7 +17,7 @@ THESIS: A calm settings page that still belongs to the wallet world: slate group
 
 OWN-WORLD: Özet's world unchanged. Lime only for actions ("Kategori ekle", primary buttons; the segmented control's selected option sits on slate per DESIGN.md Choice); rose only for the destructive action; category colour as dots.
 
-STORY: Görünüm → Kategoriler → Yedek → Faiz nasıl tahmin ediliyor → Gizlilik → Uygulama gibi kullan (only when not installed) → Tehlikeli bölge → version line.
+STORY: Görünüm → Kategoriler → Yedek → Faiz nasıl tahmin ediliyor → Bütçe asistanı → Gizlilik → Uygulama gibi kullan (only when not installed) → Tehlikeli bölge → version line.
 
 FIRST VIEWPORT (360×780): title; Görünüm; Kategoriler starting.
 
@@ -42,3 +42,7 @@ FINISH: critique on captures, fix round, finish reviewer verdict, DESIGN.md Roll
 - The restore confirmation is part of the backup group, separated by a hairline, not a nested box (craft floor: nested cards).
 - STORY gains "Bütçe asistanı" between "Faiz nasıl tahmin ediliyor" and "Gizlilik" (merged from the assistant branch; product decision recorded in PRODUCT.md, 2026-10-10): one group with a sentence and a secondary "Asistanı aç" button. The header caption drops "sunucu yok" because the optional chat sends a summary through the project's proxy; the Gizlilik group states that exception in full.
 - The restore error sits in the backup group under a hairline like the confirmation, not as a nested box; "Vazgeç" is a slate secondary button (lime marks forward action only).
+
+## Finish record (2026-10-10)
+
+Dual-agent critique 27/40 (A) + clean measurement (B) → fix round → finish reviewer `fix` → three scoring rounds (adaptations recorded, segments measured 92×44, nested boxes removed, privacy caption made true after the assistant merge, figure separators) → `disposition: ship` (covers the scored fixes; GROUND verified at token level only).
