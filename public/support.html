@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Destek · Kart Limitlerim</title>
+<meta name="description" content="Kart Limitlerim destek sayfası. Support for Kart Limitlerim.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f5f8;
+    --surface: #ffffff;
+    --ink: #12121a;
+    --muted: #5f5f72;
+    --line: #e3e3ea;
+    --accent: #3f7a00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --bg: #0e0e14;
+      --surface: #17171f;
+      --ink: #ededf3;
+      --muted: #a6a6bc;
+      --line: #2a2a36;
+      --accent: #9fd65a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+  nav.lang { display: flex; gap: 16px; margin-bottom: 24px; font-size: 15px; }
+  a { color: var(--accent); }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 32px 0 8px; }
+  h3 { font-size: 16px; margin: 20px 0 4px; }
+  p { margin: 0 0 12px; }
+  .meta { color: var(--muted); margin: 0 0 24px; font-size: 15px; }
+  section.page { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px 20px; }
+  section.page + section.page { margin-top: 32px; }
+  .contact { border-left: 3px solid var(--accent); padding-left: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="lang" aria-label="Dil / Language">
+    <a href="#tr" hreflang="tr">Türkçe</a>
+    <a href="#en" hreflang="en">English</a>
+    <a href="privacy.html">Gizlilik / Privacy</a>
+  </nav>
+
+  <section class="page" id="tr" lang="tr">
+    <h1>Destek</h1>
+    <p class="meta">Kart Limitlerim</p>
+
+    <p>Kart Limitlerim, kredi kartlarındaki, KMH'deki ve nakitteki kullanılabilir tutarı tek rakamda gösterir ve bir sonraki kesime kadar elinde ne kalacağını tahmin eder. Verilerin yalnızca cihazında durur; hesap açman gerekmez.</p>
+
+    <div class="contact">
+      <h2>İletişim</h2>
+      <p>Hata bildirmek, soru sormak ya da öneride bulunmak için <a href="https://github.com/mirzayildiran/kart-limitlerim/issues" rel="noopener">GitHub Issues</a> sayfasında yeni bir konu aç. Konular herkese açıktır: kart limiti, harcama, ekran görüntüsü ya da kişisel bilgi paylaşma. Hatayı anlatırken uygulama sürümünü (Ayarlar) ve iPhone modelini yazman yeterli.</p>
+    </div>
+
+    <h2>Sık sorulanlar</h2>
+
+    <h3>Verilerim nerede?</h3>
+    <p>Yalnızca bu cihazda. Uygulamanın sunucusu ya da hesabı yoktur. Ayrıntılar <a href="privacy.html#tr">gizlilik politikasında</a>.</p>
+
+    <h3>Telefon değiştirirken verilerimi nasıl taşırım?</h3>
+    <p>Eski cihazda Ayarlar → Yedek → <strong>Yedeği indir</strong>. Dosyayı yeni cihaza aktar, orada Ayarlar → <strong>Yedekten geri yükle</strong>. Geri yükleme o cihazdaki verilerin yerine geçer.</p>
+
+    <h3>Web sürümündeki verilerim uygulamada neden görünmüyor?</h3>
+    <p>Web sürümü ile iPhone uygulaması ayrı depolar kullanır. Web sürümünde yedeği indir, uygulamada yedekten geri yükle.</p>
+
+    <h3>Ekran görüntüsü aktarma bir satırı yanlış okudu.</h3>
+    <p>Aktarma ekranında her satırı kaydetmeden önce düzeltebilir ya da seçimini kaldırabilirsin. Kaydedilmiş bir harcamayı Harcamalar ekranından düzenleyebilirsin. Tanınan bankalar: Ziraat Dinamik, Ziraat Bankkart, Akbank, İş Bankası, Garanti; diğerleri için genel okuyucu çalışır.</p>
+
+    <h3>Faiz ve asgari ödeme tutarları neden bankamınkinden farklı?</h3>
+    <p>Uygulamadaki tutarlar TCMB ve BDDK kurallarına göre yapılan tahminlerdir. Banka ekstresi esastır. Kartının oranını Hesap ayrıntısında elle girebilirsin.</p>
+
+    <h3>Son ödeme hatırlatmaları gelmiyor.</h3>
+    <p>Ayarlar'da hatırlatmaların açık olduğunu ve iPhone Ayarlar → Bildirimler → Limitlerim'de bildirimlere izin verildiğini kontrol et.</p>
+
+    <h3>Bütçe asistanı sohbeti yanıt vermiyor.</h3>
+    <p>Sohbet internet ister ve ücretsiz yapay zekâ servislerini kullanır; yoğun saatlerde kısa süre yanıt veremeyebilir. Birkaç dakika sonra yeniden dene. Öneriler bölümü internetsiz çalışmaya devam eder. Sohbetin hangi bilgileri gönderdiğini onay ekranında görebilir, onayını Ayarlar'dan geri alabilirsin.</p>
+
+    <h3>Bütün verilerimi nasıl silerim?</h3>
+    <p>Ayarlar → Tehlikeli bölge → <strong>Tüm verileri sil</strong>. Uygulamayı silmek de bütün verilerini siler.</p>
+  </section>
+
+  <section class="page" id="en" lang="en">
+    <h1>Support</h1>
+    <p class="meta">Kart Limitlerim</p>
+
+    <p>Kart Limitlerim shows what you can actually spend across your credit cards, overdraft account (KMH) and cash as a single figure, and estimates what will be left until your next statement date. Your data stays on your device; no account is needed. The app is in Turkish.</p>
+
+    <div class="contact">
+      <h2>Contact</h2>
+      <p>To report a bug, ask a question or suggest something, open a new issue on <a href="https://github.com/mirzayildiran/kart-limitlerim/issues" rel="noopener">GitHub Issues</a>. Issues are public: do not share card limits, expenses, screenshots or personal details. The app version (Settings) and your iPhone model are enough.</p>
+    </div>
+
+    <h2>Frequently asked questions</h2>
+
+    <h3>Where is my data?</h3>
+    <p>Only on this device. The app has no server and no accounts. See the <a href="privacy.html#en">privacy policy</a> for details.</p>
+
+    <h3>How do I move my data to a new phone?</h3>
+    <p>On the old device: Settings → Backup → <strong>Download backup</strong>. Move the file to the new device and choose Settings → <strong>Restore from backup</strong> there. Restoring replaces the data on that device.</p>
+
+    <h3>Screenshot import misread a row.</h3>
+    <p>On the import screen you can correct or deselect every row before saving. Saved expenses can be edited on the Expenses screen.</p>
+
+    <h3>Why do interest and minimum payment amounts differ from my bank's?</h3>
+    <p>They are estimates based on Turkish central bank (TCMB) and banking authority (BDDK) rules. Your bank statement is authoritative. You can enter your card's own rates in the account details.</p>
+
+    <h3>Due-date reminders do not arrive.</h3>
+    <p>Check that reminders are on in the app's Settings and that notifications are allowed in iPhone Settings → Notifications → Limitlerim.</p>
+
+    <h3>The budget assistant chat does not answer.</h3>
+    <p>The chat needs an internet connection and uses free AI services, which can be briefly unavailable at busy times. Try again in a few minutes. Suggestions keep working offline. The consent screen shows what the chat sends, and you can withdraw consent in Settings.</p>
+
+    <h3>How do I delete all my data?</h3>
+    <p>Settings → Danger zone → <strong>Delete all data</strong>. Deleting the app also erases all its data.</p>
+  </section>
+</main>
+</body>
+</html>
