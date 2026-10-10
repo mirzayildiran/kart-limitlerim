@@ -6,42 +6,61 @@
 :root {
   color-scheme: light;
 
-  /* Ground and surfaces: sage-tinted neutrals, biased toward the accent */
-  --bg: #eef1ec;
+  /* Ground and surfaces */
+  --bg: #f5f5f8;
   --surface: #ffffff;
-  --surface-2: #f4f6f2;
-  --surface-3: #e8ece6;
-  --line: #dce2da;
-  --line-strong: #c7cfc6;
+  --surface-2: #f8f8fb;
+  --surface-3: #ebebf1;
+  --line: #e3e3ea;
+  --line-strong: #cdcdd8;
 
   /* Text */
-  --ink: #121a15;
-  --muted: #59645d;
-  --faint: #8a948d;
+  --ink: #12121a;
+  --muted: #5f5f72;
+  --faint: #8e8ea0;
 
-  /* Accent: "free limit" green */
-  --accent: #0b7a56;
-  --accent-strong: #08623f;
+  /* Accent: the action colour (neon lime in dark, deep lime in light) */
+  --accent: #3f7a00;
+  --accent-strong: #2f5c00;
   --accent-ink: #ffffff;
-  --accent-soft: #dcefe5;
-  --accent-tint: #c3e4d3;
+  --accent-soft: #e9f6d4;
+  --accent-tint: #d3eda9;
 
-  /* Money sources */
-  --cash: #2d5f8e;
-  --cash-soft: #dfe8f1;
-  --kmh: #6b5aa6;
-  --kmh-soft: #e9e5f4;
+  /* Runway panel on Özet: slate in both themes */
+  --hero-bg: #14141f;
+  --hero-ink: #f5f5fa;
+  --hero-muted: #a6a6bc;
+  --hero-line: rgb(255 255 255 / 0.14);
+  --hero-track: rgb(255 255 255 / 0.07);
+  --hero-curve: #2ef2ff;
+  --hero-sun: #ff4fd8;
+
+  /* Wallet palette: each account owns one vivid colour (see accountColor). */
+  --w1: #ff6a1a;
+  --w2: #2557f0;
+  --w3: #e52fd8;
+  --w4: #14d98a;
+  --w5: #ff2e6e;
+  --w6: #ffe14d;
+  --w7: #00cfff;
+  --w-ink: #ffffff;
+  --w-dark-ink: #0a0a11;
+
+  --kmh: #6b55b0;
 
   /* Semantic */
-  --ok: #0b7a56;
-  --warn: #a35f0e;
-  --warn-soft: #f7ead4;
-  --warn-bar: #cf8a2c;
-  --crit: #b4372a;
-  --crit-soft: #f6dfd9;
+  --ok: #0d7c55;
+  --ok-soft: #dff5ea;
+  --warn: #9a5a0c;
+  --warn-soft: #f3f1e8;
+  --warn-line: #e3d29c;
+  --warn-bar: #d38b2a;
+  --crit: #b3372a;
+  --crit-soft: #f7e0da;
 
-  --shadow-1: 0 1px 2px rgb(18 26 21 / 0.05), 0 4px 14px rgb(18 26 21 / 0.05);
-  --shadow-2: 0 8px 28px rgb(18 26 21 / 0.14);
+  --shadow-1: 0 1px 2px rgb(18 18 26 / 0.05), 0 8px 20px -8px rgb(18 18 26 / 0.1);
+  --shadow-2: 0 10px 30px -6px rgb(18 18 26 / 0.2);
+  --shadow-hero: 0 20px 40px -18px rgb(18 18 26 / 0.5);
   --scrim: rgb(10 16 13 / 0.45);
 
   /* Type */
@@ -54,7 +73,7 @@
   --text-lg: 1.125rem;  /* 18 */
   --text-xl: 1.375rem;  /* 22 */
   --text-2xl: 1.75rem;  /* 28 */
-  --text-hero: clamp(2.75rem, 13vw, 4rem);
+  --text-hero: clamp(3rem, 15vw, 4.25rem);
 
   /* Space (4px grid) */
   --s-1: 4px;
@@ -69,6 +88,7 @@
   --r-md: 12px;
   --r-lg: 16px;
   --r-xl: 22px;
+  --r-2xl: 28px;
   --r-pill: 999px;
 
   --gutter: 16px;
@@ -76,69 +96,141 @@
   --tabbar-h: 64px;
   --tap: 44px;
 
+  /* Motion (see .impeccable/surfaces/motion-system.md). Transform and opacity only. */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  --dur-tap: 120ms;
+  --dur-state: 200ms;
+  --dur-page: 300ms;
+  --dur-page-out: 130ms;
+  --dur-page-gap: 50ms;
+  --dur-sheet: 380ms;
+  --dur-sheet-out: 220ms;
+
+  /* Press scale: 0.97 for buttons and large surfaces, 0.985 for rows and cards. */
+  --press: 0.97;
+  --press-row: 0.985;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --bg: #0b100e;
-    --surface: #131a17;
-    --surface-2: #19221e;
-    --surface-3: #212c27;
-    --line: #25312b;
-    --line-strong: #334039;
-    --ink: #e4ebe6;
-    --muted: #9ba9a1;
-    --faint: #6c7a73;
-    --accent: #46c699;
-    --accent-strong: #6fd6b0;
-    --accent-ink: #04130d;
-    --accent-soft: #15332a;
-    --accent-tint: #1d4a3b;
-    --cash: #8ab8e4;
-    --cash-soft: #172636;
-    --kmh: #b3a6e8;
-    --kmh-soft: #241f3a;
-    --ok: #46c699;
-    --warn: #e7ae5c;
-    --warn-soft: #362812;
-    --warn-bar: #d99a40;
-    --crit: #f0907c;
-    --crit-soft: #3a1c16;
+    --bg: #0a0a11;
+    --surface: #14141e;
+    --surface-2: #1a1a26;
+    --surface-3: #242433;
+    --line: #232333;
+    --line-strong: #353549;
+    --ink: #f5f5fa;
+    --muted: #a3a3b9;
+    --faint: #6d6d84;
+    --accent: #c6ff2e;
+    --accent-strong: #d8ff6b;
+    --accent-ink: #0a0a11;
+    --accent-soft: #1e2a08;
+    --accent-tint: #2d400d;
+    --hero-bg: #14141e;
+    --hero-ink: #f5f5fa;
+    --hero-muted: #a3a3b9;
+    --hero-line: rgb(255 255 255 / 0.12);
+    --hero-track: rgb(255 255 255 / 0.06);
+    --hero-curve: #2ef2ff;
+    --hero-sun: #ff4fd8;
+    --kmh: #b48bff;
+    --ok: #19e68c;
+    --ok-soft: #0c2a1d;
+    --warn: #ffc24d;
+    --warn-soft: #2e2309;
+    --warn-line: #4a3a12;
+    --warn-bar: #ffb020;
+    --crit: #ff5c7a;
+    --crit-soft: #36101c;
     --shadow-1: none;
     --shadow-2: 0 10px 30px rgb(0 0 0 / 0.5);
+    --shadow-hero: none;
     --scrim: rgb(0 0 0 / 0.6);
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #0b100e;
-  --surface: #131a17;
-  --surface-2: #19221e;
-  --surface-3: #212c27;
-  --line: #25312b;
-  --line-strong: #334039;
-  --ink: #e4ebe6;
-  --muted: #9ba9a1;
-  --faint: #6c7a73;
-  --accent: #46c699;
-  --accent-strong: #6fd6b0;
-  --accent-ink: #04130d;
-  --accent-soft: #15332a;
-  --accent-tint: #1d4a3b;
-  --cash: #8ab8e4;
-  --cash-soft: #172636;
-  --kmh: #b3a6e8;
-  --kmh-soft: #241f3a;
-  --ok: #46c699;
-  --warn: #e7ae5c;
-  --warn-soft: #362812;
-  --warn-bar: #d99a40;
-  --crit: #f0907c;
-  --crit-soft: #3a1c16;
+  --bg: #0a0a11;
+  --surface: #14141e;
+  --surface-2: #1a1a26;
+  --surface-3: #242433;
+  --line: #232333;
+  --line-strong: #353549;
+  --ink: #f5f5fa;
+  --muted: #a3a3b9;
+  --faint: #6d6d84;
+  --accent: #c6ff2e;
+  --accent-strong: #d8ff6b;
+  --accent-ink: #0a0a11;
+  --accent-soft: #1e2a08;
+  --accent-tint: #2d400d;
+  --hero-bg: #14141e;
+  --hero-ink: #f5f5fa;
+  --hero-muted: #a3a3b9;
+  --hero-line: rgb(255 255 255 / 0.12);
+  --hero-track: rgb(255 255 255 / 0.06);
+  --hero-curve: #2ef2ff;
+  --hero-sun: #ff4fd8;
+  --kmh: #b48bff;
+  --ok: #19e68c;
+  --ok-soft: #0c2a1d;
+  --warn: #ffc24d;
+  --warn-soft: #2e2309;
+  --warn-line: #4a3a12;
+  --warn-bar: #ffb020;
+  --crit: #ff5c7a;
+  --crit-soft: #36101c;
   --shadow-1: none;
   --shadow-2: 0 10px 30px rgb(0 0 0 / 0.5);
+  --shadow-hero: none;
   --scrim: rgb(0 0 0 / 0.6);
+}
+
+/* Category colour from its hue (0–359), readable in both themes. */
+.cat-color {
+  --cat: hsl(var(--h) 72% 40%);
+}
+
+:root[data-theme='dark'] .cat-color {
+  --cat: hsl(var(--h) 95% 62%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cat-color {
+    --cat: hsl(var(--h) 95% 62%);
+  }
+}
+
+/* Wallet colour slot of an account (see ui/accountColor.ts): --c, the ink that reads on it
+   (dark on every neon except electric blue, for 4.5:1 small text), and a veil for tracks and chips. */
+[data-slot] {
+  --c: var(--w1);
+  --c-ink: var(--w-dark-ink);
+  --c-veil: rgb(0 0 0 / 0.14); /* allow-color */
+}
+[data-slot='2'] {
+  --c: var(--w2);
+  --c-ink: var(--w-ink);
+  --c-veil: rgb(255 255 255 / 0.24); /* allow-color */
+}
+[data-slot='3'] {
+  --c: var(--w3);
+}
+[data-slot='4'] {
+  --c: var(--w4);
+}
+[data-slot='5'] {
+  --c: var(--w5);
+}
+[data-slot='6'] {
+  --c: var(--w6);
+}
+[data-slot='7'] {
+  --c: var(--w7);
 }

@@ -144,3 +144,10 @@ export interface MerchantRule {
   categoryId: string
   hits: number
 }
+
+/** Monthly spending target for one category (the user's budget plan). */
+export interface CategoryBudget {
+  categoryId: string
+  /** Target for one calendar month, kuruş, > 0. */
+  monthly: Kurus
+}

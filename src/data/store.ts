@@ -3,7 +3,8 @@ import { nextHue } from '../domain/categories'
 import { startOfDay } from '../domain/dates'
 import { closeCycle } from '../domain/interest'
 import { byMostAvailable, isCard, isKmh, isLiquid, outlook, spendingPower, statementItems } from '../domain/power'
-import type { Account, Category, Expense, MerchantRule, RecurringPayment } from '../domain/types'
+import { runway } from '../domain/runway'
+import type { Account, Category, CategoryBudget, Expense, Kurus, MerchantRule, RecurringPayment } from '../domain/types'
 import { makeBackup, parseBackup, restoreBackup } from './backup'
 import * as repo from './db'
 
@@ -20,6 +21,8 @@ export const expenses = signal<Expense[]>([])
 export const categories = signal<Category[]>([])
 export const recurring = signal<RecurringPayment[]>([])
 export const rules = signal<MerchantRule[]>([])
+/** The user's monthly spending targets, at most one per category. */
+export const budgets = signal<CategoryBudget[]>([])
 
 /** Re-evaluated on focus so date-based views roll over at midnight. */
 export const today = signal(startOfDay(new Date()))
@@ -30,6 +33,7 @@ export const liquidAccounts = computed(() => byMostAvailable(accounts.value.filt
 export const power = computed(() => spendingPower(accounts.value))
 export const statements = computed(() => statementItems(accounts.value, today.value))
 export const forecast = computed(() => outlook(accounts.value, recurring.value, today.value))
+export const runwayDays = computed(() => runway(accounts.value, recurring.value, today.value))
 export const activeCategories = computed(() =>
   categories.value.filter((c) => !c.archived).sort((a, b) => a.order - b.order),
 )
@@ -54,6 +58,7 @@ function hydrate(s: repo.Snapshot) {
   categories.value = s.categories
   recurring.value = s.recurring
   rules.value = s.rules
+  budgets.value = s.budgets
 }
 
 export async function init(): Promise<void> {
@@ -174,6 +179,25 @@ export async function saveRule(r: MerchantRule): Promise<void> {
   rules.value = upsert(rules.value, r)
 }
 
+// ---- budgets ----
+/**
+ * Set a category's monthly target. `null` or a value of 0 or less removes it.
+ * Amounts are rounded to whole kuruş so the stored value always loads back.
+ */
+export async function saveBudget(categoryId: string, monthly: Kurus | null): Promise<void> {
+  const amount = monthly === null ? 0 : Math.round(monthly)
+  let next: CategoryBudget[]
+  if (!(amount > 0)) {
+    next = budgets.value.filter((b) => b.categoryId !== categoryId)
+  } else if (budgets.value.some((b) => b.categoryId === categoryId)) {
+    next = budgets.value.map((b) => (b.categoryId === categoryId ? { categoryId, monthly: amount } : b))
+  } else {
+    next = [...budgets.value, { categoryId, monthly: amount }]
+  }
+  await repo.putBudgets(requireDb(), next)
+  budgets.value = next
+}
+
 // ---- backup ----
 export async function exportBackupText(): Promise<string> {
   return JSON.stringify(makeBackup(await repo.loadAll(requireDb())), null, 2)
@@ -192,6 +216,11 @@ export async function removeCategory(id: string): Promise<void> {
   if (used) throw new Error('Bu kategoriyle kayıtlı harcamalar var; arşivleyebilirsin.')
   await repo.deleteCategory(requireDb(), id)
   categories.value = categories.value.filter((c) => c.id !== id)
+  if (budgets.value.some((b) => b.categoryId === id)) {
+    const next = budgets.value.filter((b) => b.categoryId !== id)
+    await repo.putBudgets(requireDb(), next)
+    budgets.value = next
+  }
 }
 
 /** Erase everything on this device and start over with the default categories. */

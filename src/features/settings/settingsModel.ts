@@ -39,33 +39,65 @@ export function formatLongDate(iso: IsoDate): string {
   return `${d} ${TR_MONTHS[m - 1]} ${y}`
 }
 
-/** One line per card tier, e.g. "30.000 ₺ altı: akdi %3,25 · gecikme %3,55". */
-export function cardRateLines(table: RateTable = CURRENT_RATES): string[] {
-  return table.cardTiers.map((t, i) => {
+export interface RateRow {
+  /** What the figures apply to, e.g. "Limit 30.000 ₺ altı". */
+  label: string
+  /** The figures, one line each, e.g. ["akdi %3,25", "gecikme %3,55"]. */
+  lines: string[]
+}
+
+export interface RateGroups {
+  /** Card tiers, then cash and KMH: the interest rates. */
+  interest: RateRow[]
+  /** KKDF + BSMV and the minimum-payment rule. */
+  charges: RateRow[]
+}
+
+/**
+ * Rows of the "Faiz nasıl tahmin ediliyor" list, in two groups: the interest rates (one per
+ * card tier, then cash and KMH) and the charges on top (taxes, minimum payment).
+ */
+export function rateGroups(
+  table: RateTable = CURRENT_RATES,
+  taxes: { kkdf: number; bsmv: number } = INTEREST_TAXES,
+  rule: MinimumRule = MINIMUM_RULE,
+): RateGroups {
+  const cards = table.cardTiers.map((t, i): RateRow => {
     const lower = i > 0 ? table.cardTiers[i - 1].upTo : null
-    let range: string
-    if (t.upTo === null) range = lower === null ? 'Tüm limitler' : `${formatTL(lower)} üzeri`
-    else if (lower === null) range = `${formatTL(t.upTo)} altı`
-    else range = `${formatTL(lower)} – ${formatTL(t.upTo)} arası`
-    return `${range}: akdi %${formatPercent(t.contractual)} · gecikme %${formatPercent(t.late)}`
+    let label: string
+    if (t.upTo === null) label = lower === null ? 'Tüm limitler' : `Limit ${formatTL(lower)} üzeri`
+    else if (lower === null) label = `Limit ${formatTL(t.upTo)} altı`
+    else label = `Limit ${formatTL(lower)} – ${formatTL(t.upTo)}`
+    return { label, lines: [`akdi %${formatPercent(t.contractual)}`, `gecikme %${formatPercent(t.late)}`] }
   })
-}
-
-export function cashRateLine(table: RateTable = CURRENT_RATES): string {
-  return `Nakit çekim ve KMH: akdi %${formatPercent(table.cash.contractual)} · gecikme %${formatPercent(table.cash.late)}`
-}
-
-export function taxLine(taxes: { kkdf: number; bsmv: number } = INTEREST_TAXES): string {
-  return `KKDF %${formatPercent(taxes.kkdf * 100)} + BSMV %${formatPercent(taxes.bsmv * 100)}`
-}
-
-export function minimumLine(rule: MinimumRule = MINIMUM_RULE): string {
-  return `Asgari ödeme: limit ${formatTL(rule.threshold)}'ye kadar %${formatPercent(rule.lowRatio * 100)}, üstü %${formatPercent(rule.highRatio * 100)}`
+  return {
+    interest: [
+      ...cards,
+      {
+        label: 'Nakit çekim ve KMH',
+        lines: [`akdi %${formatPercent(table.cash.contractual)}`, `gecikme %${formatPercent(table.cash.late)}`],
+      },
+    ],
+    charges: [
+      { label: 'KKDF + BSMV', lines: [`%${formatPercent(taxes.kkdf * 100)} + %${formatPercent(taxes.bsmv * 100)}`] },
+      {
+        label: 'Asgari ödeme',
+        lines: [
+          `%${formatPercent(rule.lowRatio * 100)} · limit ${formatTL(rule.threshold)} üstü %${formatPercent(rule.highRatio * 100)}`,
+        ],
+      },
+    ],
+  }
 }
 
 /** "Kaynak: TCMB …, 1 Ekim 2026 itibarıyla geçerli" */
 export function sourceLine(source: string, effective: IsoDate): string {
   return `Kaynak: ${source}, ${formatLongDate(effective)} itibarıyla geçerli`
+}
+
+/** Source captions under the rate list: the card and cash table, then the minimum-payment rule. */
+export function sourceLines(table: RateTable = CURRENT_RATES, rule: MinimumRule = MINIMUM_RULE): string[] {
+  return [sourceLine(table.source, table.effective), sourceLine(rule.source, rule.effective)]
 }
 
 export const CATEGORY_NAME_MAX = 24

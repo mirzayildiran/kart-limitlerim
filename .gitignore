@@ -25,3 +25,10 @@ legacy/
 *.export.json
 .env
 .env.*
+
+# Tasarım incelemesi ekran görüntüleri (npm run shots ile yeniden üretilir)
+.impeccable/review/shots/
+
+# Cloudflare Worker yerel anahtarları ve wrangler önbelleği
+.dev.vars
+.wrangler/

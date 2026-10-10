@@ -1,5 +1,6 @@
 import type { ComponentChildren } from 'preact'
 import { useEffect, useId, useRef } from 'preact/hooks'
+import { sheetClosing } from '../nav'
 import { Icon } from './Icon'
 import './sheet.css'
 
@@ -31,7 +32,7 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
       panel.current?.querySelector<HTMLElement>('input, select, textarea, button:not([data-close])')
     first?.focus({ preventScroll: true })
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape' && !sheetClosing.value) onClose()
     }
     document.addEventListener('keydown', onKey)
     return () => {
@@ -42,14 +43,19 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
   }, [open])
 
   if (!open) return null
+  // While the exit plays, taps and Escape do nothing: the sheet is already going away.
+  const closing = sheetClosing.value
+  const close = () => {
+    if (!sheetClosing.value) onClose()
+  }
   return (
-    <div class="sheet-scrim" role="presentation">
-      <button type="button" class="sheet-backdrop" aria-label="Kapat" tabIndex={-1} onClick={onClose} />
+    <div class={closing ? 'sheet-scrim is-closing' : 'sheet-scrim'} role="presentation">
+      <button type="button" class="sheet-backdrop" aria-label="Kapat" tabIndex={-1} onClick={close} />
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={panel}>
         <div class="sheet-grab" aria-hidden="true" />
         <header class="sheet-head">
           <h2 id={titleId}>{title}</h2>
-          <button class="sheet-close" type="button" data-close onClick={onClose} aria-label="Kapat">
+          <button class="sheet-close" type="button" data-close onClick={close} aria-label="Kapat">
             <Icon name="close" size={20} />
           </button>
         </header>

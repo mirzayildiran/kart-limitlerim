@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Kart Limitlerim — Sıcak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#f6efe6;--card:#fff;--ink:#2b2420;--ink2:#6f635a;--ink3:#7a6e65;--line:#efe6db;--act:#ff5a1f;--warn:#b5481c;--warnbg:#fbe7dc}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden}
+body{background:var(--ground);color:var(--ink);font-family:"Figtree",system-ui,sans-serif;font-size:15px;line-height:1.35;position:relative}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.wrap{padding:0 16px}
+.status{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-weight:600;font-size:15px}
+header{padding:6px 20px 14px}
+header h1{font-size:15px;font-weight:700;color:var(--ink2)}
+header p{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-top:2px}
+.card{background:var(--card);border-radius:20px;padding:18px 20px;margin-bottom:10px}
+.lbl{font-size:14px;color:var(--ink2);font-weight:500}
+.hero .big{font-size:44px;font-weight:800;letter-spacing:-.02em;margin:2px 0 12px;line-height:1.05}
+.big small{font-size:26px;font-weight:700;margin-left:2px}
+.split{display:flex;gap:8px}
+.split div{flex:1;background:var(--ground);border-radius:12px;padding:8px 10px}
+.split span{display:block;font-size:12px;color:var(--ink2)}
+.split b{font-size:15px;font-weight:700}
+.row2{display:flex;gap:10px;margin-bottom:10px}
+.row2 .card{flex:1;margin:0;padding:16px}
+.mid{font-size:24px;font-weight:800;letter-spacing:-.01em;margin:4px 0 4px}
+.mid small{font-size:16px}
+.sub{font-size:12.5px;color:var(--ink3);line-height:1.3}
+.warncard{background:var(--warnbg)}
+.warncard .lbl,.warncard .mid{color:var(--warn)}
+.warncard .sub{color:#9a5a3c}
+.head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.head h2{font-size:17px;font-weight:700}
+.link{color:var(--act);font-weight:700;font-size:14px;text-decoration:none}
+.ev{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.ev:first-of-type{border-top:0}
+.date{width:42px;text-align:center;flex:none}
+.date b{display:block;font-size:18px;font-weight:800;line-height:1}
+.date span{font-size:11px;color:var(--ink3);font-weight:600;text-transform:uppercase}
+.ev .t{flex:1;font-weight:600;font-size:15px}
+.ev .t small{display:block;font-weight:400;font-size:12.5px;color:var(--ink3)}
+.ev .a{font-weight:700}
+.kart{padding:10px 0;border-top:1px solid var(--line)}
+.kart:first-of-type{border-top:0;padding-top:2px}
+.kart .top{display:flex;justify-content:space-between;font-size:15px}
+.kart .top span{font-weight:600}
+.kart .top em{font-style:normal;color:var(--ink3);font-size:13px}
+.bar{height:8px;border-radius:6px;background:var(--ground);margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:6px}
+nav{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:flex-start;padding:10px 8px 0}
+nav a{flex:1;text-align:center;font-size:11.5px;font-weight:600;color:var(--ink3);text-decoration:none}
+nav a svg{display:block;margin:0 auto 3px;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav a.on{color:var(--act)}
+nav .plus{flex:none;width:56px;height:56px;border-radius:50%;background:var(--act);display:flex;align-items:center;justify-content:center;margin-top:-22px;border:4px solid var(--ground)}
+nav .plus svg{stroke:#fff;stroke-width:2.6;margin:0}
+</style>
+</head>
+<body>
+<div class="status num"><span>9:41</span><span>●●● ▮</span></div>
+<header>
+  <h1>Kart Limitlerim</h1>
+  <p>10 Ekim Cumartesi</p>
+</header>
+<div class="wrap">
+  <section class="card hero">
+    <div class="lbl">Şu an harcayabileceğin</div>
+    <div class="big num">80.220<small> ₺</small></div>
+    <div class="split num">
+      <div><span>Kartlar</span><b>57.100 ₺</b></div>
+      <div><span>KMH</span><b>13.500 ₺</b></div>
+      <div><span>Nakit</span><b>9.620 ₺</b></div>
+    </div>
+  </section>
+
+  <div class="row2">
+    <section class="card">
+      <div class="lbl">Kesime kadar</div>
+      <div class="mid num">62.120<small> ₺</small></div>
+      <div class="sub">18 Eki · 8 gün kaldı<br>Düzenli ödemeler düşüldü</div>
+    </section>
+    <section class="card warncard">
+      <div class="lbl">Ödemelerden sonra nakit</div>
+      <div class="mid num">−4.520<small> ₺</small></div>
+      <div class="sub">Asgariler için 4.520 ₺ eksik</div>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="head"><h2>Yaklaşan ödemeler</h2><a class="link" href="#">Takvimde gör</a></div>
+    <div class="ev num"><div class="date"><b>12</b><span>Eki</span></div><div class="t">Spotify<small>Abonelik</small></div><div class="a">99,99 ₺</div></div>
+    <div class="ev num"><div class="date"><b>13</b><span>Eki</span></div><div class="t">Garanti Bonus<small>Son ödeme · asgari</small></div><div class="a">1.960 ₺</div></div>
+    <div class="ev num"><div class="date"><b>15</b><span>Eki</span></div><div class="t">Kira<small>Düzenli ödeme</small></div><div class="a">18.000 ₺</div></div>
+  </section>
+
+  <section class="card">
+    <div class="head"><h2>Kartların</h2></div>
+    <div class="kart num"><div class="top"><span>Garanti Bonus</span><em>31.200 / 45.000 ₺</em></div><div class="bar"><i style="width:69%"></i></div></div>
+    <div class="kart num"><div class="top"><span>Akbank Axess</span><em>21.800 / 60.000 ₺</em></div><div class="bar"><i style="width:36%"></i></div></div>
+    <div class="kart num"><div class="top"><span>İş Maximum</span><em>4.100 / 25.000 ₺</em></div><div class="bar"><i style="width:16%"></i></div></div>
+  </section>
+</div>
+
+<nav>
+  <a class="on" href="#"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>Özet</a>
+  <a href="#"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Harcamalar</a>
+  <a class="plus" href="#" aria-label="Ekle"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></a>
+  <a href="#"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Takvim</a>
+  <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Ayarlar</a>
+</nav>
+</body>
+</html>

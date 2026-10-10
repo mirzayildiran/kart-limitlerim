@@ -1,7 +1,7 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 import { DEFAULT_CATEGORIES } from '../domain/categories'
 import { applyDelta, expenseDeltas } from '../domain/ledger'
-import type { Account, Category, Expense, MerchantRule, RecurringPayment } from '../domain/types'
+import type { Account, Category, CategoryBudget, Expense, MerchantRule, RecurringPayment } from '../domain/types'
 
 /** Everything lives on the device. No network, no account. */
 
@@ -47,17 +47,38 @@ export interface Snapshot {
   categories: Category[]
   recurring: RecurringPayment[]
   rules: MerchantRule[]
+  budgets: CategoryBudget[]
+}
+
+/**
+ * Keep only well-formed budget entries: a non-empty categoryId and a whole
+ * kuruş amount above zero. When a category appears more than once, the last
+ * entry wins. Anything that is not an array yields an empty list.
+ */
+export function cleanBudgets(raw: unknown): CategoryBudget[] {
+  if (!Array.isArray(raw)) return []
+  const byCategory = new Map<string, CategoryBudget>()
+  for (const item of raw) {
+    if (typeof item !== 'object' || item === null) continue
+    const { categoryId, monthly } = item as { categoryId?: unknown; monthly?: unknown }
+    if (typeof categoryId !== 'string' || categoryId === '') continue
+    if (typeof monthly !== 'number' || !Number.isInteger(monthly) || monthly <= 0) continue
+    byCategory.delete(categoryId)
+    byCategory.set(categoryId, { categoryId, monthly })
+  }
+  return [...byCategory.values()]
 }
 
 export async function loadAll(db: Db): Promise<Snapshot> {
-  const [accounts, expenses, categories, recurring, rules] = await Promise.all([
+  const [accounts, expenses, categories, recurring, rules, budgets] = await Promise.all([
     db.getAll('accounts'),
     db.getAll('expenses'),
     db.getAll('categories'),
     db.getAll('recurring'),
     db.getAll('rules'),
+    getMeta<unknown>(db, 'budgets'),
   ])
-  return { accounts, expenses, categories, recurring, rules }
+  return { accounts, expenses, categories, recurring, rules, budgets: cleanBudgets(budgets) }
 }
 
 export const putAccount = (db: Db, a: Account) => db.put('accounts', a).then(() => a)
@@ -65,6 +86,7 @@ export const putCategory = (db: Db, c: Category) => db.put('categories', c).then
 export const putRecurring = (db: Db, r: RecurringPayment) => db.put('recurring', r).then(() => r)
 export const putRule = (db: Db, r: MerchantRule) => db.put('rules', r).then(() => r)
 export const deleteRecurring = (db: Db, id: string) => db.delete('recurring', id)
+export const putBudgets = (db: Db, list: CategoryBudget[]) => setMeta(db, 'budgets', list)
 
 /** Delete an account. Its expenses stay, labelled as from a removed account. */
 export const deleteAccount = (db: Db, id: string) => db.delete('accounts', id)

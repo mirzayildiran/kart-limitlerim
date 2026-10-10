@@ -1,10 +1,10 @@
 # Gizlilik politikası
 
-Kart Limitlerim bir bütçe uygulamasıdır. Verilerinizi toplamaz, bir sunucuya göndermez. Bu belge uygulamanın veriyi nasıl sakladığını ve sizin neleri kontrol ettiğinizi anlatır.
+Kart Limitlerim bir bütçe uygulamasıdır. Verilerinizi toplamaz, bir sunucuya göndermez. Tek istisna, sizin açıkça açtığınız bütçe asistanı sohbetidir (aşağıda). Bu belge uygulamanın veriyi nasıl sakladığını ve sizin neleri kontrol ettiğinizi anlatır.
 
 ## Verileriniz nerede durur
 
-- Bütün veriler yalnızca kullandığınız cihazın tarayıcı deposunda (IndexedDB) tutulur. Hesaplar, kartlar, harcamalar, kategoriler, düzenli ödemeler ve kurallar bu depodadır.
+- Bütün veriler yalnızca kullandığınız cihazın tarayıcı deposunda (IndexedDB) tutulur. Hesaplar, kartlar, harcamalar, kategoriler, bütçe planı, düzenli ödemeler ve kurallar bu depodadır.
 - Hesap açmanız gerekmez. Uygulamanın sunucusu, kullanıcı tablosu ya da giriş sistemi yoktur.
 - Uygulama analiz, izleme ya da reklam kodu içermez. Kullanım bilgisi toplanmaz.
 - Banka şifresi, internet bankacılığı bilgisi, kart numarası veya CVV hiçbir zaman istenmez ve girilmemelidir.
@@ -14,6 +14,17 @@ Kart Limitlerim bir bütçe uygulamasıdır. Verilerinizi toplamaz, bir sunucuya
 - Seçtiğiniz ekran görüntüsü cihazınızın içinde, tarayıcıda okunur. Görüntü hiçbir sunucuya gönderilmez.
 - Görüntü kaydedilmez. Okunduktan sonra yalnızca onayladığınız harcama satırları veritabanına yazılır.
 - Okuma için gereken dil dosyaları uygulamanın kendi adresinden bir kez indirilir ve tarayıcı önbelleğinde saklanır. Bu indirme sırasında yalnızca uygulamanın kendi sunucusuna istek gider; üçüncü taraf sunucusu kullanılmaz.
+
+## Bütçe asistanı
+
+- **Öneriler** (kesime kadar nakit, yaklaşan asgari ödemeler, kategori artışları, "hangi kartla öde") tamamen cihazda hesaplanır. İnternet gerekmez, hiçbir şey gönderilmez.
+- **Sohbet** varsayılan olarak kapalıdır. Açmadan önce hangi bilgilerin hangi servislere gideceğini gösteren bir onay ekranı çıkar; onay vermeden hiçbir şey gönderilmez.
+- Sohbet açıksa her mesajda şunlar gönderilir: cihazda hesaplanan bir **özet** (harcama gücü toplamları, kesime kadar görünüm, hesap adlarınız ve limit/bakiye/ekstre tutarları, kategori toplamları, bütçe planınız ve bu ayki harcama gidişatı, cihazdaki öneriler) ve yazdığınız mesajlar. Tek tek harcamalar, notlar, düzenli ödeme adları ve yedek dosyası **gönderilmez**. Gönderilen özetin tam hâlini onay ekranında görebilirsiniz.
+- Özet önce projenin Cloudflare Workers üzerindeki aracı sunucusuna gider. Aracı yalnızca yapay zekâ servislerinin anahtarlarını tutar; istekleri kaydetmez ve günlüğe yazmaz. Kötüye kullanımı önlemek için IP adresiniz yalnızca bellekte, en çok bir saat boyunca istek saymak için kullanılır.
+- Aracı isteği sırasıyla şu ücretsiz yapay zekâ servislerinden birine iletir: Google Gemini, Groq, OpenRouter. Bu servislerin ücretsiz katmanları gönderilen metni kendi koşullarına göre saklayabilir ve modellerini geliştirmek için kullanabilir. Bu nedenle sohbete kimlik, kart numarası ya da şifre yazmayın.
+- Sohbet geçmişi yalnızca açık olan ekranda, bellekte tutulur; kaydedilmez.
+- Onayınızı Ayarlar'dan ya da asistan ekranından istediğiniz an geri alabilirsiniz. Geri aldığınızda gönderim hemen durur. Onay bilgisi tarayıcının yerel deposunda (`localStorage`) tutulur.
+- Yanıtlar tahmindir, finansal tavsiye değildir. Rakamların kaynağı uygulamanın kendi hesaplarıdır; banka ekstresi esastır.
 
 ## Yedek dosyaları
 
@@ -30,7 +41,7 @@ Kart Limitlerim bir bütçe uygulamasıdır. Verilerinizi toplamaz, bir sunucuya
 
 ## KVKK
 
-Uygulama kişisel veri toplamadığı ve bir sunucuda işlemediği için, 6698 sayılı KVKK kapsamında sunucuda işlenen bir kişisel veri bulunmamaktadır.
+Uygulama kişisel veri toplamaz ve kendi sunucusunda saklamaz. Bütçe asistanı sohbetini açarsanız, onay ekranında gösterilen özet ve mesajlarınız yanıt üretmek için yukarıda adı geçen servislere aktarılır (6698 sayılı KVKK kapsamında açık rızanızla ve yurt dışına aktarım dahil). Sohbeti açmazsanız hiçbir kişisel veri cihaz dışına çıkmaz.
 
 ## Değişiklikler
 
