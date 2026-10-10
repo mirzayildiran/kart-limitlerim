@@ -10,6 +10,7 @@ import { applySavedTheme } from './ui/theme'
 import { App } from './app.tsx'
 import { startReminders } from './platform/reminders'
 import { startLock } from './platform/lock'
+import { startDeepLinks } from './platform/deeplinks'
 import { LockScreen } from './features/lock/LockScreen'
 
 // Initialize data store (don't await before first render)
@@ -18,6 +19,7 @@ init().catch(() => {})
 applySavedTheme()
 startReminders()
 startLock()
+startDeepLinks()
 
 render(<App />, document.getElementById('app')!)
 
