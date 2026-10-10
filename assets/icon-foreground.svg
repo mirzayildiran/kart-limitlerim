@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Adaptive icon foreground: the mark only, scaled into the central safe zone. -->
+  <g transform="translate(512 512) scale(0.66) translate(-512 -512)">
+  <!-- Three cards fanned from a common pivot: electric blue at the back, orange, lime in front. -->
+  <g transform="translate(500 600)">
+    <g transform="rotate(-30) translate(10 -60)">
+      <rect x="-300" y="-190" width="600" height="380" rx="64" fill="#2557f0"/>
+    </g>
+    <g transform="rotate(-10) translate(10 -30)">
+      <rect x="-300" y="-190" width="600" height="380" rx="64" fill="#ff6a1a"/>
+    </g>
+    <g transform="rotate(10) translate(20 0)">
+      <rect x="-300" y="-190" width="600" height="380" rx="64" fill="#c6ff2e"/>
+      <rect x="-232" y="-122" width="124" height="96" rx="22" fill="#0a0a11" opacity="0.2"/>
+      <rect x="-232" y="84" width="360" height="42" rx="21" fill="#0a0a11"/>
+    </g>
+  </g>
+  </g>
+</svg>
