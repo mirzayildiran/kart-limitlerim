@@ -39,7 +39,7 @@ const DEFAULT_RATE_LIMIT = 30
 const RATE_WINDOW_MS = 60 * 60 * 1000
 const RATE_MAP_PRUNE_AT = 5_000
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent'
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
