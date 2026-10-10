@@ -237,14 +237,17 @@ Kart Limitlerim is a personal budget tracker for credit cards, overdraft account
 
 ## Yapılacaklar
 
-Kod ya da ayar gerektiren maddeler. Koordinatör ilgili oturuma dağıtır.
+Kod ya da ayar gerektiren maddeler. Durum 2026-10-10 (bulut oturumu) itibarıyla.
 
-1. **[iOS derlemesi, engelleyici] Mağaza derlemesinde sohbet adresi.** `ios:build` (`CAP_NATIVE=1 npm run build && cap sync ios`) `VITE_ASSISTANT_PROXY_URL` vermiyor; derlenen uygulamada sohbet "kurulu değil" der. Çözüm: `ios:build` adresi depo değişkeninden ya da `.env.production`'dan almalı (adres gizli değil: `https://kart-limitlerim-asistan.kart-limitlerim-7e48db.workers.dev`). Ayrıca `765f849` (Worker süre bütçesi ve OpenRouter yedeği) başvurudan önce `main`'e alınmalı.
+1. ✅ **Mağaza derlemesinde sohbet adresi.** `CAP_NATIVE=1` derlemesinde `vite.config.ts` adresi varsayılan olarak koyuyor; `765f849` (Worker süre bütçesi ve OpenRouter yedeği) `main`'de. Cihazda gerçek bir sohbet isteğinin 200 döndüğü doğrulanmalı.
 2. ✅ **Uygulama içinden gizlilik politikası bağlantısı** (5.1.1(i)): Ayarlar → Gizlilik ve onay ekranı. iOS'ta bağlantının Safari'de açıldığı cihazda doğrulanmalı.
-3. ✅ **Onay ekranındaki servis notları** (5.1.2(i)): `assistantModel.ts` `PROVIDERS`.
+3. ✅ **Onay ekranındaki servis notları** (5.1.2(i)): `assistantModel.ts` `PROVIDERS`. Onay ekranı süren taksitlerin toplamının gönderildiğini ve adlardaki uzun rakamların maskelendiğini de söylüyor.
 4. ✅ **Örnek verilerle deneme** (4.2): boş ana ekranda düğme; `src/data/demo.ts`.
-5. **[iOS] `PrivacyInfo.xcprivacy`.** `ios/App/App/` altında yok. Apple, gerekçe isteyen API'ler (UserDefaults, dosya zaman damgası vb.) için bunu istiyor; Capacitor eklentileri (filesystem, local-notifications, haptics) bu API'leri kullanabilir. Xcode → Product → Archive sonrası "Generate Privacy Report" ile kontrol edilip eklenmeli. İzleme yok (`NSPrivacyTracking = false`), toplanan veri türleri yukarıdaki App Privacy tablosuyla aynı.
-6. **[iOS] Yalnızca iPhone.** `TARGETED_DEVICE_FAMILY` projede açıkça ayarlı değil. iPad de hedeflenirse iPad ekran görüntüleri ve iPad yerleşimi gerekir. Mağaza için `TARGETED_DEVICE_FAMILY = 1` yapılmalı.
-7. **[Ekran görüntüleri] Mağaza boyutlarında çekim.** `scripts/shots.mjs` şu an tasarım incelemesi için 2x çekiyor. 6.9" için 440 × 956 görüntü alanı ve 3x ölçek (1320 × 2868), 6.5" için 428 × 926 ve 3x (1284 × 2778) gerekir. Durum çubuğu ve çentik alanı olmadan, örnek verilerle, açık temada. İstenirse iPhone simülatöründen de çekilebilir.
+5. ✅ **`PrivacyInfo.xcprivacy`** `ios/App/App/` altında. Archive sonrası "Generate Privacy Report" ile eklentilerin gerekçe isteyen API'leri yeniden kontrol edilmeli.
+6. ✅ **Yalnızca iPhone:** `TARGETED_DEVICE_FAMILY = 1` (Debug ve Release).
+7. ✅ **Mağaza boyutlarında ekran görüntüleri:** `node scripts/shots.mjs --store` → `store/screenshots/6.9/` (1320 × 2868) ve `6.5/` (1284 × 2778), örnek verilerle.
 8. **[Hesap ayarı] Yaş 18+, yalnızca Türkiye.** App Store Connect'te en düşük yaş elle 18+ ve ülke olarak yalnızca Türkiye seçilmeli (gerekçeler yukarıda).
 9. ✅ **Face ID kilidi:** `src/platform/lock.ts`.
+10. **[iOS, cihazda] CSP doğrulaması.** WKWebView'da `capacitor://localhost` için `'self'` eşleşmesi ve Capacitor köprüsü. Chromium'da iki derlemede ihlal yok (`npm run check:csp`, CI'da). Safari Web Inspector'da konsolda "Refused to" satırı olmamalı (`docs/SECURITY.md`, bulgu 3).
+11. **[iOS, cihazda] Resmi tatil kayması.** Son ödemesi bir bayrama denk gelen bir kartla bildirim saatinin ve takvimdeki tarihin iş gününe kaydığı görülmeli (`src/domain/holidays.ts`). 2028 dini bayram tarihleri Diyanet'in o yılın takvimiyle yeniden karşılaştırılmalı.
+12. **[Sürüm] 0.2.0.** `CHANGELOG.md` taslağı hazır; yayın günü `package.json` sürümü 0.2.0 yapılıp `npm run ios:release` çalıştırılmalı.

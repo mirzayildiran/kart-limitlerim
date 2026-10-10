@@ -2,35 +2,41 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler ve sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) ile verilir.
 
-## [Unreleased]
+## [0.2.0] - Taslak (yayımlanmadı)
+
+`package.json` sürümü yayın günü 0.2.0'a çekilecek (`npm run ios:release` sürüm damgasını oradan alır).
 
 ### Added
 
+- İlk açılış ekranı ("Cüzdanını kuralım"): kart ekle, örnek verilerle dene, yedekten geri yükle. iPhone'da ilk karttan sonra bir kerelik ön izin penceresi (hatırlatıcılar ve Face ID).
+- iPhone'da otomatik yerel yedek: her değişiklikten sonra son üç kopya uygulamanın özel klasörüne yazılır. Veritabanı boş açılır ve yedekte veri varsa ana ekran "Önceki verilerin bulundu" önerisini ilk açılış içeriğinin önüne koyar.
+- iPhone: Face ID kilidi (açıldı / kapatıldı / tanınmadı mesajları), son ödeme bildirimleri ve dokununca ekstre, ana ekran hızlı eylemleri ve `kartlimitlerim://` bağlantıları, Dynamic Type, klavye uyumu.
+- Erişilebilirlik tercihleri: büyük metin, hareketi azalt, kontrastı artır.
+- Son ödeme tarihi hafta sonuna ya da resmi tatile denk gelirse bir sonraki iş gününe kayar. 2026–2028 resmi tatil tablosu (dini bayramlar ve arifeler dahil; kaynak 2429 sayılı Kanun ve Diyanet). Arife yarım gün olduğu için kaydırmaz.
 - Yedek dosyasında şema sürümü 2 ve eski dosyalar için 1→2 geçişi (`migrate`). Her kayıt alan alan doğrulanır, bilinmeyen alanlar atılır; hata mesajı bozuk kaydı söyler ("3. harcama, tutar geçersiz"). Dosya boyutu okunmadan önce denetlenir. Otomatik yedek ve "Yedeği dışa aktar" aynı biçimi yazar.
-- Asistan Worker'ı özeti alan alan yeniden kurar; serbest metin kısa ad ve öneri alanlarıyla sınırlı.
-- Uçtan uca testler (Playwright, 390×844, koyu ve açık tema): örnek veri, harcama ve kart ekleme, Takvim'den ödeme işaretleme, yedek dışa aktar → sil → geri yükle, asistan onay ekranı (Worker taklit edilir) ve her ana sayfada axe-core taraması. `npm run e2e`.
-- Bileşen testleri (happy-dom, Testing Library): pencere odak tuzağı ve Escape, kilit ekranı mesajları, ilk açılış ve geri yükleme önerisi, tutar alanı, harcama formu doğrulaması. `npm run test:components`.
-- CI: bileşen testleri, uçtan uca testler (Playwright Chromium önbellekli), iki derlemede CSP denetimi ve ilk yükleme bütçesi (JS ≤ 40 KB, CSS ≤ 12 KB gzip; `npm run size`).
-- `npm run check:csp`: derlenmiş uygulamada Content-Security-Policy ihlali denetimi (web ve `CAP_NATIVE=1`).
+- Asistan özetine süren taksitlerin toplamı (bu ayki ve kalan).
+- Güvenlik: derlenen sayfada Content-Security-Policy; asistan onayı kodda zorunlu ve onay geri alınınca istek iptal; derin bağlantıda prototip anahtarı ve uzunluk sınırı; Worker özeti alan alan yeniden kurar. Denetim raporu `docs/SECURITY.md`.
+- Testler: bileşen testleri (happy-dom, Testing Library: pencere odak tuzağı ve Escape, kilit ekranı, ilk açılış ve geri yükleme önerisi, tutar alanı, harcama formu), uçtan uca testler (Playwright, 390×844, koyu ve açık tema: örnek veri, harcama ve kart ekleme, Takvim'den ödeme, yedek dışa aktar → sil → geri yükle, asistan onay ekranı, axe-core taraması), tablo tabanlı finans testleri (ay sonu, şubat ve artık yıl, yıl geçişi, tatiller, oran dilimleri, faiz), 26 soruluk ağsız asistan değerlendirme seti.
+- CI: Worker tip denetimi, knip, birim ve bileşen testleri, uçtan uca testler (Playwright Chromium önbellekli), iki derlemede CSP denetimi (`npm run check:csp`), ilk yükleme bütçesi (JS ≤ 40 KB, CSS ≤ 12 KB gzip; `npm run size`).
 
 ### Changed
 
-- Kod sağlığı: kullanılmayan `LimitStrip` bileşeni ve iki fonksiyon silindi, 57 gereksiz dışa aktarım kaldırıldı; `npm run knip` CI'da. Lint uyarı sınırı 0.
-
-- Asistan: sistem istemi kısaldı ve alan sözlüğü eklendi; özet modele boş alanları atılarak gider. Örnek veride sistem metni 4.546'dan 4.006 karaktere indi. Özete süren taksitlerin toplamı eklendi; hesap ve kategori adlarındaki kart/telefon/kimlik numarası benzeri rakam dizileri ve e-postalar maskelenir. 26 soruluk ağsız değerlendirme seti (`src/ai/assistant.eval.test.ts`).
-
-- Yedek kodu (biçim, doğrulama, otomatik yedek) ilk pakette değil, ilk kullanımda yüklenir: ilk JS 40,0 KB'tan 37,5 KB'a (gzip) indi.
+- Açılış: açılış örtüsü HTML'de (`#boot`), sayfalar ve pencereler tembel yüklenir. Yedek kodu da ilk kullanımda yüklenir; ilk JS 40,0 KB'tan 37,5 KB'a (gzip) indi.
+- Asistan: sistem istemi kısaldı ve alan sözlüğü eklendi; özet modele boş alanları atılarak gider (örnek veride 4.546 → 4.006 karakter). Hesap ve kategori adlarındaki kart, telefon, IBAN ya da kimlik numarasına benzeyen rakam dizileri ve e-postalar gönderilmeden maskelenir.
+- Kod sağlığı: kullanılmayan `LimitStrip` bileşeni ve iki fonksiyon silindi, 57 gereksiz dışa aktarım kaldırıldı. Lint uyarı sınırı 0.
 
 ### Fixed
 
-- Alan ipuçları ve ekran görüntüsü gizlilik notu açık temada 3,2:1, koyu temada 3,6:1 kontrastla yazılıyordu (axe). Artık `--muted` (AA).
-- Ekstre penceresinde oran "aylık %3.25" diye noktalı yazılıyordu; "%3,25".
-
-- Son ödeme tarihi resmi tatile denk gelince bir sonraki iş gününe kayıyor (önceden yalnızca hafta sonu). 2026–2028 için resmi tatil tablosu (dini bayramlar ve arifeler dahil, kaynak: 2429 sayılı Kanun ve Diyanet); arife yarım gün olduğu için tarih kaydırılmaz.
-- KMH'de yalnızca gecikme oranı girilince akdi oran kart oranıyla (%3,25) dolduruluyordu; artık nakit/KMH azami oranı (%4,25). Kart için en düşük dilim kullanılır.
-- Harcama ekranındaki faiz uyarısı faiz dilimini tek harcamanın tutarına göre seçiyordu; artık kartta kullanılan tutar artı harcamaya (dönem borcu tahmini) göre seçiyor.
-- Ayarlar'daki faiz tablosu dilimleri "Limit" diye etiketliyordu; TCMB dilimleri ve uygulamanın hesabı dönem borcuna göre. Etiket "Dönem borcu" oldu.
+- KMH'de yalnızca gecikme oranı girilince akdi oran kart oranıyla (%3,25) dolduruluyordu; artık nakit/KMH azami oranı (%4,25).
+- Harcama ekranındaki faiz uyarısı faiz dilimini tek harcamanın tutarına göre seçiyordu; artık kartta kullanılan tutar artı harcamaya (dönem borcu tahmini) göre.
+- Ayarlar'daki faiz tablosu dilimleri "Limit" diye etiketliyordu; TCMB dilimleri dönem borcuna göredir. Etiket "Dönem borcu" oldu.
 - KKDF ve BSMV çarpanı (1,30) dört yerde elle yazılıydı; tek yerden (`src/domain/rates.ts`) hesaplanıyor.
+- Ekstre penceresinde oran "aylık %3.25" diye noktalı yazılıyordu; "%3,25".
+- Alan ipuçları ve ekran görüntüsü gizlilik notu açık temada 3,2:1, koyu temada 3,6:1 kontrastla yazılıyordu (axe); artık `--muted` (AA).
+
+### Security
+
+- `npm audit`: `@capacitor/cli` → `xcode` → `uuid@7` (orta, yalnızca geliştirme aracı) bilinçli olarak açık bırakıldı; ayrıntı `docs/SECURITY.md`.
 
 ## [1.0.0] - 2026-10-10
 
