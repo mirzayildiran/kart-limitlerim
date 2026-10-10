@@ -21,6 +21,7 @@
 }
 
 .wallet-slide {
+  container-type: inline-size;
   flex: 0 0 min(80%, 340px);
   scroll-snap-align: start;
   transform: scale(0.94);
@@ -41,7 +42,8 @@
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  aspect-ratio: 1.586;
+  /* Card proportions as a minimum (85.6 × 54 mm), not a fixed height: large text grows the card instead of being cut. */
+  min-height: calc(100cqi / 1.586);
   padding: 16px 18px;
   overflow: hidden;
   background: var(--c);
@@ -82,9 +84,10 @@
 
 .wallet-card-top {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: var(--s-2);
+  gap: var(--s-1) var(--s-2);
 }
 
 .wallet-card-date {
@@ -116,6 +119,8 @@
 }
 
 .wallet-card-name {
+  /* At least a few letters before the date chip wraps under the name (large text). */
+  flex: 1 1 6em;
   min-width: 0;
   font-family: var(--font-display);
   font-size: var(--text-lg);
@@ -247,5 +252,23 @@
   .wallet-card-fill {
     animation: none;
     transition: none;
+  }
+}
+
+/* Increase Contrast: no decorative circles behind the figures, heavier small type, a firm veil. */
+@media (prefers-contrast: more) {
+  .wallet-card-art {
+    display: none;
+  }
+
+  .wallet-card-caption,
+  .wallet-card-meta,
+  .wallet-card-kind {
+    font-weight: 600;
+  }
+
+  .wallet-card-date {
+    background: var(--c-ink);
+    color: var(--c);
   }
 }
