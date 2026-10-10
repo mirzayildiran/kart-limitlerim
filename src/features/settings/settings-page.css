@@ -7,6 +7,9 @@
 }
 
 .settings-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
   padding: var(--s-2) var(--s-1) 0;
 }
 
@@ -144,17 +147,11 @@
   border-top: 1px solid var(--line);
 }
 
-/* Backup: two secondary buttons side by side from 440px, stacked below. */
+/* Backup: the two secondary buttons stack at every width. */
 .settings-actions {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: var(--s-3);
-}
-
-@media (min-width: 440px) {
-  .settings-actions {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
 }
 
 .settings-confirm {
@@ -172,6 +169,13 @@
   padding: var(--s-3);
   border-radius: var(--r-md);
   background: var(--crit-soft);
+}
+
+/* Lead line above the interest table: the same ink and size as running text, aligned with the titles. */
+.settings-lead {
+  padding: 0 var(--s-1);
+  font-size: var(--text-md);
+  color: var(--ink);
 }
 
 /* Interest: label left, figures right and tabular; the label wraps before the figures do. */
@@ -192,6 +196,11 @@
   border-top: 1px solid var(--line);
 }
 
+/* The charges group sits after a hairline with 8px more air above its first row. */
+.settings-rates-charges {
+  padding-top: var(--s-2);
+}
+
 .settings-rate-label {
   margin: 0;
   font-size: var(--text-md);
@@ -203,6 +212,11 @@
   font-size: var(--text-md);
   font-weight: 600;
   color: var(--ink);
+  text-align: right;
+}
+
+.settings-rate-line {
+  display: block;
   white-space: nowrap;
 }
 
@@ -213,22 +227,19 @@
   padding: 0 var(--s-1);
 }
 
-/* Privacy: a drawn note icon beside the two sentences. */
-.settings-privacy {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--s-3);
+/* Danger zone: a status note on the rose wash, no border. Only the button text takes the critical colour.
+   Declared after .settings-pad so the 12px / 16px note padding wins. */
+.settings-danger {
+  padding: var(--s-3) var(--s-4);
+  border: 0;
+  border-radius: var(--r-lg);
+  background: var(--crit-soft);
+  box-shadow: none;
 }
 
-.settings-privacy-icon {
-  flex: none;
-  margin-top: 2px;
-  color: var(--muted);
-}
-
-.settings-privacy .settings-stack {
-  flex: 1;
-  min-width: 0;
+.settings-danger .btn-danger,
+.settings-danger .btn-danger.is-armed {
+  background: transparent;
 }
 
 .settings-foot {
