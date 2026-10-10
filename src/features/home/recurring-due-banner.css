@@ -1,44 +1,59 @@
 .recurring-due-banner {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: var(--s-3);
-  padding: var(--s-4);
+  width: 100%;
+  min-height: var(--tap);
+  margin-top: calc(var(--s-3) * -1);
+  padding: var(--s-3) var(--s-4);
   background: var(--warn-soft);
   border-radius: var(--r-lg);
   color: var(--ink);
+  text-align: left;
+  transition: transform 0.12s var(--ease);
+}
+
+.recurring-due-banner:active {
+  transform: scale(0.985);
+}
+
+.recurring-due-banner-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--warn);
+}
+
+.recurring-due-banner-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .recurring-due-banner-title {
-  margin: 0;
   font-size: var(--text-md);
   font-weight: 600;
+  line-height: 1.3;
 }
 
-.recurring-due-banner-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.recurring-due-banner-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--s-3);
+.recurring-due-banner-sub {
   font-size: var(--text-sm);
+  color: var(--muted);
 }
 
-.recurring-due-banner-name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.recurring-due-banner-amount {
+.recurring-due-banner-chevron {
   flex: 0 0 auto;
-  font-weight: 600;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recurring-due-banner {
+    transition: none;
+  }
 }

@@ -1,0 +1,918 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-10T00:35:54+00:00",
+  "title": "Design System: Kart Limitlerim",
+  "extensions": {
+    "colorMeta": {
+      "lime-action": {
+        "role": "primary",
+        "displayName": "Neon Lime",
+        "canonical": "#c6ff2e",
+        "tonalRamp": [
+          "#070e00",
+          "#1d2a00",
+          "#364a00",
+          "#516c00",
+          "#6f9013",
+          "#8db61d",
+          "#abde1b",
+          "#daff98"
+        ],
+        "cssVar": "--accent (dark theme)"
+      },
+      "lime-action-bright": {
+        "role": "primary",
+        "displayName": "Bright Lime",
+        "canonical": "#d8ff6b",
+        "tonalRamp": [
+          "#080e00",
+          "#202a00",
+          "#3a4901",
+          "#566b06",
+          "#748f19",
+          "#94b425",
+          "#b5db42",
+          "#ddff87"
+        ],
+        "cssVar": "--accent-strong (dark theme)"
+      },
+      "lime-soft": {
+        "role": "primary",
+        "displayName": "Lime Moss",
+        "canonical": "#1e2a08",
+        "tonalRamp": [
+          "#060f00",
+          "#1e2a08",
+          "#3a4826",
+          "#596744",
+          "#798964",
+          "#9cac86",
+          "#bfd0a9",
+          "#e4f6ce"
+        ],
+        "cssVar": "--accent-soft (dark theme)"
+      },
+      "lime-tint": {
+        "role": "primary",
+        "displayName": "Lime Shade",
+        "canonical": "#2d400d",
+        "tonalRamp": [
+          "#050f00",
+          "#1b2b00",
+          "#364918",
+          "#546a38",
+          "#758b58",
+          "#97af7a",
+          "#bbd39d",
+          "#e0f9c1"
+        ],
+        "cssVar": "--accent-tint (dark theme)"
+      },
+      "runway-cyan": {
+        "role": "secondary",
+        "displayName": "Runway Cyan",
+        "canonical": "#2ef2ff",
+        "tonalRamp": [
+          "#000f11",
+          "#012b2e",
+          "#064c50",
+          "#116e75",
+          "#06949d",
+          "#10bbc5",
+          "#39e2ee",
+          "#c2fbff"
+        ],
+        "cssVar": "--hero-curve"
+      },
+      "runway-magenta": {
+        "role": "secondary",
+        "displayName": "Runway Magenta",
+        "canonical": "#ff4fd8",
+        "tonalRamp": [
+          "#1d0016",
+          "#450038",
+          "#74005f",
+          "#a50689",
+          "#d81fb4",
+          "#fb5cd6",
+          "#fcabe4",
+          "#ffe6f6"
+        ],
+        "cssVar": "--hero-sun"
+      },
+      "wallet-orange": {
+        "role": "tertiary",
+        "displayName": "Ember Orange",
+        "canonical": "#ff6a1a",
+        "tonalRamp": [
+          "#200000",
+          "#431400",
+          "#702801",
+          "#a03e07",
+          "#d15819",
+          "#f97c45",
+          "#feb698",
+          "#feeae2"
+        ],
+        "cssVar": "--w1"
+      },
+      "wallet-electric-blue": {
+        "role": "tertiary",
+        "displayName": "Electric Blue",
+        "canonical": "#2557f0",
+        "tonalRamp": [
+          "#000037",
+          "#000479",
+          "#0021b8",
+          "#164de0",
+          "#3d77fe",
+          "#78a3fc",
+          "#b0c9fd",
+          "#e7effe"
+        ],
+        "cssVar": "--w2"
+      },
+      "wallet-magenta": {
+        "role": "tertiary",
+        "displayName": "Neon Magenta",
+        "canonical": "#e52fd8",
+        "tonalRamp": [
+          "#1c001a",
+          "#42023e",
+          "#6e0a68",
+          "#9e1695",
+          "#d410c8",
+          "#fd4cef",
+          "#fda7f2",
+          "#ffe5fb"
+        ],
+        "cssVar": "--w3"
+      },
+      "wallet-green": {
+        "role": "tertiary",
+        "displayName": "Signal Green",
+        "canonical": "#14d98a",
+        "tonalRamp": [
+          "#001005",
+          "#012e19",
+          "#074f30",
+          "#127349",
+          "#0a9b61",
+          "#14c37c",
+          "#3beb9b",
+          "#c7fedc"
+        ],
+        "cssVar": "--w4"
+      },
+      "wallet-hot-pink": {
+        "role": "tertiary",
+        "displayName": "Hot Pink",
+        "canonical": "#ff2e6e",
+        "tonalRamp": [
+          "#220005",
+          "#4b0119",
+          "#7c0830",
+          "#b11548",
+          "#ed0c60",
+          "#fc708c",
+          "#fcb2bc",
+          "#ffe8ea"
+        ],
+        "cssVar": "--w5"
+      },
+      "wallet-yellow": {
+        "role": "tertiary",
+        "displayName": "Sodium Yellow",
+        "canonical": "#ffe14d",
+        "tonalRamp": [
+          "#100b00",
+          "#2c2500",
+          "#4d4202",
+          "#716108",
+          "#96821b",
+          "#bda527",
+          "#e6c92a",
+          "#fff0a9"
+        ],
+        "cssVar": "--w6"
+      },
+      "wallet-cyan": {
+        "role": "tertiary",
+        "displayName": "Pool Cyan",
+        "canonical": "#00cfff",
+        "tonalRamp": [
+          "#000e16",
+          "#002a36",
+          "#024a5d",
+          "#096c86",
+          "#1e90b0",
+          "#2bb6dd",
+          "#69daff",
+          "#d8f4ff"
+        ],
+        "cssVar": "--w7"
+      },
+      "wallet-ink": {
+        "role": "tertiary",
+        "displayName": "Wallet White Ink",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ],
+        "cssVar": "--w-ink"
+      },
+      "wallet-dark-ink": {
+        "role": "tertiary",
+        "displayName": "Wallet Dark Ink",
+        "canonical": "#0a0a11",
+        "tonalRamp": [
+          "#0a0a11",
+          "#24242c",
+          "#41414a",
+          "#60606a",
+          "#81818b",
+          "#a4a4ae",
+          "#c8c8d3",
+          "#ededf9"
+        ],
+        "cssVar": "--w-dark-ink"
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "#0a0a11",
+        "tonalRamp": [
+          "#0a0a11",
+          "#24242c",
+          "#41414a",
+          "#60606a",
+          "#81818b",
+          "#a4a4ae",
+          "#c8c8d3",
+          "#ededf9"
+        ],
+        "cssVar": "--bg (dark theme)"
+      },
+      "slate-surface": {
+        "role": "neutral",
+        "displayName": "Slate Surface",
+        "canonical": "#14141e",
+        "tonalRamp": [
+          "#0a0a13",
+          "#24242f",
+          "#40414d",
+          "#60606d",
+          "#81818e",
+          "#a3a4b2",
+          "#c7c8d6",
+          "#ecedfc"
+        ],
+        "cssVar": "--surface (dark theme)"
+      },
+      "slate-surface-2": {
+        "role": "neutral",
+        "displayName": "Raised Slate",
+        "canonical": "#1a1a26",
+        "tonalRamp": [
+          "#0a0a15",
+          "#242430",
+          "#40414e",
+          "#5f606e",
+          "#808190",
+          "#a3a3b4",
+          "#c7c7d8",
+          "#ecedfe"
+        ],
+        "cssVar": "--surface-2 (dark theme)"
+      },
+      "slate-surface-3": {
+        "role": "neutral",
+        "displayName": "Deep Slate",
+        "canonical": "#242433",
+        "tonalRamp": [
+          "#0a0916",
+          "#232332",
+          "#404051",
+          "#5f5f71",
+          "#808093",
+          "#a2a3b6",
+          "#c6c7db",
+          "#ecedfe"
+        ],
+        "cssVar": "--surface-3 (dark theme)"
+      },
+      "night-line": {
+        "role": "neutral",
+        "displayName": "Night Line",
+        "canonical": "#232333",
+        "tonalRamp": [
+          "#0a0917",
+          "#232333",
+          "#404052",
+          "#5f5f72",
+          "#808094",
+          "#a2a3b8",
+          "#c6c7dc",
+          "#ecedfe"
+        ],
+        "cssVar": "--line (dark theme)"
+      },
+      "night-line-strong": {
+        "role": "neutral",
+        "displayName": "Strong Line",
+        "canonical": "#353549",
+        "tonalRamp": [
+          "#0a0919",
+          "#232336",
+          "#404054",
+          "#5f5f75",
+          "#7f8097",
+          "#a2a3bb",
+          "#c6c7e0",
+          "#ecedfe"
+        ],
+        "cssVar": "--line-strong (dark theme)"
+      },
+      "moon-ink": {
+        "role": "neutral",
+        "displayName": "Moon Ink",
+        "canonical": "#f5f5fa",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#252528",
+          "#414145",
+          "#616165",
+          "#828286",
+          "#a4a4a9",
+          "#c8c8cd",
+          "#eeeef3"
+        ],
+        "cssVar": "--ink (dark theme)"
+      },
+      "mist-muted": {
+        "role": "neutral",
+        "displayName": "Mist",
+        "canonical": "#a3a3b9",
+        "tonalRamp": [
+          "#0a0918",
+          "#232334",
+          "#404052",
+          "#5f5f73",
+          "#808095",
+          "#a3a3b9",
+          "#c7c7de",
+          "#ecedff"
+        ],
+        "cssVar": "--muted (dark theme)"
+      },
+      "dusk-faint": {
+        "role": "neutral",
+        "displayName": "Dusk",
+        "canonical": "#6d6d84",
+        "tonalRamp": [
+          "#0a0819",
+          "#232336",
+          "#403f54",
+          "#5f5f75",
+          "#808097",
+          "#a2a2bb",
+          "#c6c6e0",
+          "#ecedfe"
+        ],
+        "cssVar": "--faint (dark theme)"
+      },
+      "kmh-lilac": {
+        "role": "semantic",
+        "displayName": "KMH Lilac",
+        "canonical": "#b48bff",
+        "tonalRamp": [
+          "#12002c",
+          "#31015e",
+          "#501f8c",
+          "#6f44b1",
+          "#9167d7",
+          "#b38afe",
+          "#d1bcfe",
+          "#f0ebff"
+        ],
+        "cssVar": "--kmh (dark theme)"
+      },
+      "ok-neon": {
+        "role": "semantic",
+        "displayName": "Neon Green",
+        "canonical": "#19e68c",
+        "tonalRamp": [
+          "#001104",
+          "#002e17",
+          "#00502d",
+          "#067444",
+          "#1d9a5e",
+          "#29c279",
+          "#2bed93",
+          "#c5ffd9"
+        ],
+        "cssVar": "--ok (dark theme)"
+      },
+      "warn-amber": {
+        "role": "semantic",
+        "displayName": "Amber",
+        "canonical": "#ffc24d",
+        "tonalRamp": [
+          "#150800",
+          "#342100",
+          "#573d05",
+          "#7d5a0d",
+          "#a97904",
+          "#d4990c",
+          "#fabe48",
+          "#ffeccd"
+        ],
+        "cssVar": "--warn (dark theme)"
+      },
+      "warn-amber-soft": {
+        "role": "semantic",
+        "displayName": "Amber Wash",
+        "canonical": "#2e2309",
+        "tonalRamp": [
+          "#130900",
+          "#2e2309",
+          "#4c4027",
+          "#6c6045",
+          "#8e8165",
+          "#b1a487",
+          "#d6c8aa",
+          "#fcedce"
+        ],
+        "cssVar": "--warn-soft (dark theme)"
+      },
+      "warn-bar": {
+        "role": "semantic",
+        "displayName": "Amber Bar",
+        "canonical": "#ffb020",
+        "tonalRamp": [
+          "#160700",
+          "#352000",
+          "#5a3b03",
+          "#82580a",
+          "#ae7500",
+          "#db9502",
+          "#febb55",
+          "#ffebd2"
+        ],
+        "cssVar": "--warn-bar (dark theme)"
+      },
+      "crit-neon": {
+        "role": "semantic",
+        "displayName": "Neon Rose",
+        "canonical": "#ff5c7a",
+        "tonalRamp": [
+          "#210004",
+          "#4d0015",
+          "#7b0c2c",
+          "#b50040",
+          "#de3c60",
+          "#fb7287",
+          "#fcb2b9",
+          "#ffe8ea"
+        ],
+        "cssVar": "--crit (dark theme)"
+      },
+      "crit-soft": {
+        "role": "semantic",
+        "displayName": "Rose Wash",
+        "canonical": "#36101c",
+        "tonalRamp": [
+          "#1e0008",
+          "#3d1622",
+          "#5d333e",
+          "#7f525d",
+          "#a3737e",
+          "#c795a1",
+          "#edb9c5",
+          "#fee8ed"
+        ],
+        "cssVar": "--crit-soft (dark theme)"
+      },
+      "light-ground": {
+        "role": "neutral",
+        "displayName": "Light Ground",
+        "canonical": "#f5f5f8",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#252527",
+          "#424244",
+          "#616163",
+          "#828285",
+          "#a5a5a7",
+          "#c9c9cc",
+          "#eeeef1"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-surface": {
+        "role": "neutral",
+        "displayName": "Light Surface",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-surface-2": {
+        "role": "neutral",
+        "displayName": "Light Raised",
+        "canonical": "#f8f8fb",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#252527",
+          "#424244",
+          "#616163",
+          "#828285",
+          "#a5a5a7",
+          "#c9c9cc",
+          "#eeeef1"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-surface-3": {
+        "role": "neutral",
+        "displayName": "Light Track",
+        "canonical": "#ebebf1",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#252529",
+          "#414146",
+          "#616166",
+          "#828287",
+          "#a4a4aa",
+          "#c8c8ce",
+          "#eeeef4"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-line": {
+        "role": "neutral",
+        "displayName": "Light Line",
+        "canonical": "#e3e3ea",
+        "tonalRamp": [
+          "#0b0b0f",
+          "#24242a",
+          "#414147",
+          "#616066",
+          "#828288",
+          "#a4a4ab",
+          "#c8c8cf",
+          "#eeeef5"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-ink": {
+        "role": "neutral",
+        "displayName": "Light Ink",
+        "canonical": "#12121a",
+        "tonalRamp": [
+          "#0a0a12",
+          "#24242d",
+          "#41414b",
+          "#60606a",
+          "#81818c",
+          "#a4a4af",
+          "#c8c8d4",
+          "#ededf9"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-muted": {
+        "role": "neutral",
+        "displayName": "Light Muted",
+        "canonical": "#5f5f72",
+        "tonalRamp": [
+          "#0a0917",
+          "#232333",
+          "#404052",
+          "#5f5f72",
+          "#808094",
+          "#a3a3b8",
+          "#c7c7dd",
+          "#ecedfe"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-ok": {
+        "role": "semantic",
+        "displayName": "Light OK",
+        "canonical": "#0f8a5f",
+        "tonalRamp": [
+          "#001006",
+          "#012d1c",
+          "#094f35",
+          "#14734f",
+          "#28986c",
+          "#54bc8e",
+          "#7ae2b1",
+          "#c3fee0"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-warn": {
+        "role": "semantic",
+        "displayName": "Light Warn",
+        "canonical": "#9a5a0c",
+        "tonalRamp": [
+          "#190500",
+          "#3a1c00",
+          "#603604",
+          "#8b510d",
+          "#b3712d",
+          "#d99452",
+          "#fbba7e",
+          "#feebda"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      },
+      "light-crit": {
+        "role": "semantic",
+        "displayName": "Light Crit",
+        "canonical": "#b3372a",
+        "tonalRamp": [
+          "#210000",
+          "#4d0100",
+          "#7f0803",
+          "#aa2e22",
+          "#d25444",
+          "#fa7866",
+          "#ffb3a7",
+          "#fee9e5"
+        ],
+        "cssVar": "light theme value of the matching --token"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Hero figure",
+        "purpose": "The spending-power figure on Özet only (Özet override of --text-hero)."
+      },
+      "headline": {
+        "displayName": "Greeting",
+        "purpose": "Top-of-screen greeting."
+      },
+      "title": {
+        "displayName": "Section title",
+        "purpose": "Section headings."
+      },
+      "title-sm": {
+        "displayName": "Panel title",
+        "purpose": "Panel headings and wallet card names."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Large amounts; money always in the display face."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text."
+      },
+      "body-strong": {
+        "displayName": "Body strong",
+        "purpose": "Row names, note titles, buttons."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Hero label, sublines, field labels, meta."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Card meta, axis, event chips."
+      }
+    },
+    "shadows": [
+      {
+        "name": "self-lit-card",
+        "value": "0 14px 30px -14px var(--c), 0 2px 6px rgb(0 0 0 / 0.08)",
+        "purpose": "Wallet cards only; glow in the card's own wallet colour."
+      },
+      {
+        "name": "float",
+        "value": "0 10px 30px rgb(0 0 0 / 0.5)",
+        "purpose": "Dark --shadow-2: sheets, + button, toasts."
+      },
+      {
+        "name": "cut-out-ring",
+        "value": "0 0 0 5px var(--bg)",
+        "purpose": "+ button punched out of the tab bar."
+      },
+      {
+        "name": "selected-day-halo",
+        "value": "0 0 0 4px var(--hero-bg), 0 0 0 5px rgb(255 79 216 / 0.5)",
+        "purpose": "Runway scrubbed day."
+      },
+      {
+        "name": "light-lift",
+        "value": "0 1px 2px rgb(18 18 26 / 0.05), 0 8px 20px -8px rgb(18 18 26 / 0.1)",
+        "purpose": "Light --shadow-1; resting surfaces in light theme only (none in dark)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Load moment, wallet scale, dots, runway cursor and fills."
+      },
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.2, 0.7, 0.2, 1)",
+        "purpose": "Small state changes and press feedback."
+      },
+      {
+        "name": "press",
+        "value": "scale(0.98) 0.1-0.15s; rows and notes scale(0.985) 0.12s",
+        "purpose": "Every tappable surface shrinks on press."
+      },
+      {
+        "name": "figure-in",
+        "value": "0.8s ease-out-expo, from translateY(10px) blur(6px) opacity 0",
+        "purpose": "Hero figure load moment."
+      },
+      {
+        "name": "stagger",
+        "value": "spread 60ms + 150ms; wallet cards 70ms + 120ms",
+        "purpose": "Staggered entrance of segments and cards."
+      },
+      {
+        "name": "wallet-active",
+        "value": "inactive scale(0.94) to none, 0.45s ease-out-expo",
+        "purpose": "Active card in the rail."
+      },
+      {
+        "name": "runway-draw",
+        "value": "1.1s clip-path reveal; markers 0.5s after 0.7s",
+        "purpose": "Runway line draws left to right."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "all animation and transition off",
+        "purpose": "prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "content-max",
+        "value": "560px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Neon lime action button; shrinks on press.",
+      "html": "<button class=\"ds-btn-primary\">Kaydet</button>",
+      "css": ".ds-btn-primary{background:var(--accent,#c6ff2e);color:var(--accent-ink,#0a0a11);min-height:52px;padding:0 16px;border:0;border-radius:var(--r-md,12px);font:600 1rem 'Onest Variable',system-ui,sans-serif;transition:background .15s,transform .1s;cursor:pointer}.ds-btn-primary:active{transform:scale(.98)}.ds-btn-primary:focus-visible{outline:2px solid var(--accent-strong,#d8ff6b);outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Raised slate button with hairline border.",
+      "html": "<button class=\"ds-btn-secondary\">Tümü</button>",
+      "css": ".ds-btn-secondary{background:var(--surface-2,#1a1a26);color:var(--ink,#f5f5fa);border:1px solid var(--line,#232333);min-height:44px;padding:0 16px;border-radius:var(--r-md,12px);font:600 .9375rem 'Onest Variable',system-ui,sans-serif;transition:background .15s,transform .1s;cursor:pointer}.ds-btn-secondary:active{transform:scale(.98)}.ds-btn-secondary:focus-visible{outline:2px solid var(--accent,#c6ff2e);outline-offset:2px}"
+    },
+    {
+      "name": "Money Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Raised slate field; lime border and moss halo on focus; figure in display face.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Tutar</span><span class=\"ds-money\"><input class=\"ds-input\" inputmode=\"decimal\" value=\"1.250\"><span class=\"ds-suffix\">₺</span></span></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:6px;font-family:'Onest Variable',system-ui,sans-serif}.ds-field-label{font-size:.8125rem;font-weight:600;color:var(--muted,#a3a3b9)}.ds-money{position:relative}.ds-input{width:100%;min-height:48px;padding:0 40px 0 12px;background:var(--surface-2,#1a1a26);border:1px solid var(--line,#232333);border-radius:var(--r-md,12px);color:var(--ink,#f5f5fa);font:600 1.375rem 'Schibsted Grotesk Variable',sans-serif;caret-color:var(--accent,#c6ff2e)}.ds-input:focus{outline:none;border-color:var(--accent,#c6ff2e);box-shadow:0 0 0 3px var(--accent-soft,#1e2a08)}.ds-suffix{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--faint,#6d6d84);font-weight:600;font-size:1.125rem}"
+    },
+    {
+      "name": "Choice Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill chips; selected fills lime with dark ink.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip is-on\">Kart</button><button class=\"ds-chip\">KMH</button><button class=\"ds-chip\">Nakit</button></div>",
+      "css": ".ds-chips{display:flex;gap:6px;flex-wrap:wrap}.ds-chip{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line,#232333);background:var(--surface-2,#1a1a26);color:var(--muted,#a3a3b9);font:600 .8125rem 'Onest Variable',system-ui,sans-serif;cursor:pointer}.ds-chip.is-on{background:var(--accent,#c6ff2e);border-color:var(--accent,#c6ff2e);color:var(--accent-ink,#0a0a11)}.ds-chip:focus-visible{outline:2px solid var(--accent,#c6ff2e);outline-offset:2px}"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "Fixed slate bar; active tab in lime; raised lime + button cut out of the bar.",
+      "html": "<nav class=\"ds-tabbar\"><a class=\"ds-tab is-on\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z\"/></svg><span>Özet</span></a><a class=\"ds-tab\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/></svg><span>Harcamalar</span></a><button class=\"ds-fab\" aria-label=\"Ekle\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\"><path d=\"M12 5v14M5 12h14\"/></svg></button><a class=\"ds-tab\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M16 3v4M8 3v4M3 10h18\"/></svg><span>Takvim</span></a><a class=\"ds-tab\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1\"/></svg><span>Ayarlar</span></a></nav>",
+      "css": ".ds-tabbar{display:grid;grid-template-columns:repeat(5,1fr);align-items:center;height:64px;padding:0 8px;margin-top:24px;background:var(--surface,#14141e);border-top:1px solid var(--line,#232333)}.ds-tab{display:flex;flex-direction:column;align-items:center;gap:8px;min-height:44px;justify-content:center;color:var(--muted,#a3a3b9);text-decoration:none;font:500 11px 'Onest Variable',system-ui,sans-serif;transition:color .2s}.ds-tab.is-on,.ds-tab:active{color:var(--accent,#c6ff2e)}.ds-tab:focus-visible{outline:2px solid var(--accent,#c6ff2e);outline-offset:2px;border-radius:8px}.ds-fab{justify-self:center;position:relative;top:-16px;width:56px;height:56px;border:0;border-radius:999px;display:grid;place-items:center;background:var(--accent,#c6ff2e);color:var(--accent-ink,#0a0a11);box-shadow:0 0 0 5px var(--bg,#0a0a11),0 10px 30px rgb(0 0 0/.5);cursor:pointer}.ds-fab:active{opacity:.9}.ds-fab:focus-visible{outline:2px solid var(--accent-strong,#d8ff6b);outline-offset:2px}"
+    },
+    {
+      "name": "Wallet Card",
+      "kind": "custom",
+      "refersTo": "wallet-card",
+      "description": "An account as a real-proportion card in its owned wallet colour, glowing in that colour; shrinks on press.",
+      "html": "<button class=\"ds-wcard\"><svg class=\"ds-wcard-art\" viewBox=\"0 0 320 202\" preserveAspectRatio=\"xMaxYMid slice\"><circle cx=\"300\" cy=\"20\" r=\"120\"/><circle cx=\"300\" cy=\"20\" r=\"190\"/></svg><span class=\"ds-wcard-top\"><span class=\"ds-wcard-kind\">Kredi kartı</span><span class=\"ds-wcard-date\">Kesim 18 Eki</span></span><span class=\"ds-wcard-chip\"></span><span class=\"ds-wcard-bottom\"><span class=\"ds-wcard-name\">Akbank Axess</span><span class=\"ds-wcard-amt\">24.800<small>₺</small></span><span class=\"ds-wcard-track\"><span style=\"width:62%\"></span></span></span></button>",
+      "css": ".ds-wcard{--c:var(--w1,#ff6a1a);--k:var(--w-ink,#fff);position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;width:300px;aspect-ratio:1.586;padding:18px 20px;border:0;border-radius:20px;background:var(--c);color:var(--k);text-align:left;box-shadow:0 14px 30px -14px var(--c),0 2px 6px rgb(0 0 0/.08);font-family:'Onest Variable',system-ui,sans-serif;transition:transform .15s cubic-bezier(.2,.7,.2,1);cursor:pointer}.ds-wcard:active{transform:scale(.98)}.ds-wcard:focus-visible{outline:2px solid var(--accent,#c6ff2e);outline-offset:3px}.ds-wcard-art{position:absolute;inset:0;z-index:-1;width:100%;height:100%}.ds-wcard-art circle{fill:var(--k);opacity:.1}.ds-wcard-art circle+circle{opacity:.07}.ds-wcard-top{display:flex;justify-content:space-between;align-items:center}.ds-wcard-kind{font-size:12px;font-weight:600;opacity:.85}.ds-wcard-date{padding:3px 10px;border-radius:999px;background:rgb(255 255 255/.2);font-size:12px;font-weight:600}.ds-wcard-chip{width:34px;height:26px;border-radius:6px;background:linear-gradient(90deg,transparent 45%,rgb(0 0 0/.18) 45% 55%,transparent 55%),linear-gradient(0deg,transparent 45%,rgb(0 0 0/.18) 45% 55%,transparent 55%),rgb(255 255 255/.55)}.ds-wcard-bottom{display:flex;flex-direction:column;gap:4px}.ds-wcard-name{font:700 1.125rem 'Schibsted Grotesk Variable',sans-serif;letter-spacing:-.01em}.ds-wcard-amt{font:700 1.875rem/1 'Schibsted Grotesk Variable',sans-serif;letter-spacing:-.02em}.ds-wcard-amt small{font:600 .62em 'Onest Variable',sans-serif;margin-left:.1em}.ds-wcard-track{display:block;height:5px;margin-top:6px;border-radius:999px;background:rgb(255 255 255/.25);overflow:hidden}.ds-wcard-track span{display:block;height:100%;border-radius:inherit;background:var(--k)}"
+    },
+    {
+      "name": "Runway Panel",
+      "kind": "custom",
+      "refersTo": "runway-panel",
+      "description": "Slate panel with the cyan spending line falling to the kesim and the magenta selected day.",
+      "html": "<section class=\"ds-runway\"><h2>Kesime kadar</h2><div class=\"ds-rw-head\"><span>18 Eki, kesim</span><b>62.120<small>₺</small></b></div><svg class=\"ds-rw-plot\" viewBox=\"0 0 300 92\"><line x1=\"0\" y1=\"20\" x2=\"300\" y2=\"20\" class=\"ds-rw-base\"/><polyline points=\"0,20 180,20 180,70 300,70\" class=\"ds-rw-line\"/><circle cx=\"90\" cy=\"20\" r=\"5\" fill=\"#2ef2ff\"/><circle cx=\"180\" cy=\"70\" r=\"5\" fill=\"#ff4fd8\"/><circle cx=\"290\" cy=\"70\" r=\"13\" fill=\"none\" stroke=\"rgb(255 79 216 / .5)\"/><circle cx=\"290\" cy=\"70\" r=\"8\" fill=\"#ff4fd8\"/></svg><div class=\"ds-rw-axis\"><span>Bugün</span><span>18 Eki · 8 gün</span></div></section>",
+      "css": ".ds-runway{display:flex;flex-direction:column;gap:12px;padding:20px 20px 16px;background:var(--hero-bg,#14141e);color:var(--hero-ink,#f5f5fa);border-radius:28px;font-family:'Onest Variable',system-ui,sans-serif;max-width:360px}.ds-runway h2{margin:0;font:700 1.125rem 'Schibsted Grotesk Variable',sans-serif;letter-spacing:-.015em}.ds-rw-head{display:flex;justify-content:space-between;align-items:baseline;font-size:.8125rem;font-weight:600}.ds-rw-head b{font:700 1.125rem 'Schibsted Grotesk Variable',sans-serif}.ds-rw-head small{font:600 .62em 'Onest Variable',sans-serif;color:var(--hero-muted,#a3a3b9);margin-left:.1em}.ds-rw-plot{width:100%;height:92px;overflow:visible}.ds-rw-base{stroke:rgb(255 255 255/.12);stroke-dasharray:3 4}.ds-rw-line{fill:none;stroke:var(--hero-curve,#2ef2ff);stroke-width:2.5;stroke-linejoin:round}.ds-rw-axis{display:flex;justify-content:space-between;font-size:12px;color:var(--hero-muted,#a3a3b9)}"
+    },
+    {
+      "name": "Payment Row",
+      "kind": "card",
+      "refersTo": "list-card",
+      "description": "Row tinted toward its account colour, led by a date tile in the full wallet colour.",
+      "html": "<button class=\"ds-pay\"><span class=\"ds-pay-date\"><b>18</b><small>Eki</small></span><span class=\"ds-pay-mid\"><span class=\"ds-pay-name\">Akbank Axess</span><span class=\"ds-pay-sub\">Asgari ödeme</span></span><span class=\"ds-pay-right\"><span class=\"ds-pay-amt\">4.520 ₺</span><span class=\"ds-pill-warn\">8 gün kaldı</span></span></button>",
+      "css": ".ds-pay{--c:var(--w2,#2557f0);display:flex;align-items:center;gap:12px;width:340px;padding:12px;background:color-mix(in srgb,var(--c) 10%,var(--surface,#14141e));border:1px solid color-mix(in srgb,var(--c) 22%,var(--surface,#14141e));border-radius:16px;color:var(--ink,#f5f5fa);text-align:left;font-family:'Onest Variable',system-ui,sans-serif;transition:transform .12s cubic-bezier(.2,.7,.2,1);cursor:pointer}.ds-pay:active{transform:scale(.985)}.ds-pay:focus-visible{outline:2px solid var(--accent,#c6ff2e);outline-offset:2px}.ds-pay-date{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;height:52px;border-radius:14px;background:var(--c);color:#fff;line-height:1}.ds-pay-date b{font:800 1.375rem 'Schibsted Grotesk Variable',sans-serif}.ds-pay-date small{font-size:12px;font-weight:600;margin-top:2px}.ds-pay-mid{flex:1;display:flex;flex-direction:column;gap:2px}.ds-pay-name{font-weight:600}.ds-pay-sub{font-size:12px;color:var(--muted,#a3a3b9)}.ds-pay-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.ds-pay-amt{font:700 .9375rem 'Schibsted Grotesk Variable',sans-serif}.ds-pill-warn{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--warn-soft,#2e2309);color:var(--warn,#ffc24d)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Canlı Gece",
+    "overview": "The app is a night ground lit by the user's own cards. Near-black space and quiet slate surfaces hold everything still, so that colour arrives only where it means something: each account is a vivid card in a colour it owns, the spending figure above is split into those same colours, a cyan line falls across a slate panel toward the statement date, and one neon lime marks every action. The mood is bright and tactile rather than sober: things glow a little in their own colour, shrink slightly under a finger, and settle in with a single exponential load moment. It should feel professional and pleasing on first open and clearly unlike a bank app or a grey ledger of white rows.\n\nDensity is mobile-first and generous: one column, at most 560px wide, 24px between blocks, money set large in a tight grotesk while all reading text sits in a softer humanist sans. Dark is the default theme; light remains available in Settings with the same wallet colours on a white ground. Copy is Turkish, sentence case throughout.\n\nThe user has explicitly rejected, across this redesign: grey stone ground with an evergreen accent, a warm peach ground, and violet panels or accents; and, as a durable brand commitment, any themed costume world (road signs, boarding passes, transit boards, calendars, banknotes). Treat those as closed doors.\n\nRollout status: the world is built on the Özet tab (`src/features/home/`) and its shared components (Amount, LimitStrip, controls, Sheet, TabBar). Harcamalar, Takvim, Ayarlar and the sheets have not been migrated; they inherit the tokens only and are the rollout target for this document, not evidence of it.",
+    "keyCharacteristics": [
+      "Near-black ground, slate surfaces, colour reserved for meaning.",
+      "Seven neon wallet colours, each owned by one account and repeated wherever that account appears.",
+      "Neon lime is the single action colour.",
+      "Cyan line and magenta selected day live only in the runway panel.",
+      "Money in Schibsted Grotesk; words in Onest; the ₺ sign always drawn by Onest.",
+      "Pressable surfaces shrink on press; cards glow in their own colour.",
+      "One load moment with exponential ease-out, off under reduced motion."
+    ],
+    "rules": [
+      {
+        "name": "The Owned Colour Rule",
+        "body": "Every account owns one wallet colour by creation order, and that colour follows it everywhere: its card, its spread segment, its payment date tile, the tint of its payment row. Never assign colour by balance, rank or bank brand; a colour must never jump when numbers change.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dark Ink Rule",
+        "body": "Every wallet colour carries near-black ink and a dark translucent veil, except Electric Blue (slot 2), which carries white ink and a white veil. This keeps small card text at 4.5:1 or better on every neon.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lime Is Action Rule",
+        "body": "Neon lime means \"you can act here\", \"you are here\", or, in a limit strip, \"this much is still yours to spend\". It never decorates, and never charts anything other than free limit.",
+        "section": "colors"
+      },
+      {
+        "name": "The Runway Pair Rule",
+        "body": "Cyan and magenta belong to the runway panel: cyan for the line and recurring events, magenta for the selected day and the kesim. Do not reuse them elsewhere.",
+        "section": "colors"
+      },
+      {
+        "name": "The Figure Face Rule",
+        "body": "Every money figure is set in the display face; the ₺ sign is set in Onest at 0.62em, weight 600, in Mist (or the figure's semantic colour). The display face's own ₺ reads as £ and must never show.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "All labels and headings are Turkish sentence case. No uppercase labels, no tracked-out small caps.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Money Rule",
+        "body": "Amounts in lists and rows use tabular numerals (`.num`); only the hero figure and thousands separators switch to proportional spacing for optical tightness.",
+        "section": "typography"
+      },
+      {
+        "name": "The Self-Lit Rule",
+        "body": "In dark, only colour glows. A neutral surface never gets a shadow; a wallet-coloured object may glow in its own colour, never in another.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do give every account its wallet colour by creation order and repeat it on every surface where that account appears (The Owned Colour Rule).",
+      "Do put near-black ink on every wallet colour except Electric Blue, which takes white ink.",
+      "Do reserve neon lime for actions, focus, the active place and the free-limit fill.",
+      "Do set every money figure in Schibsted Grotesk with the ₺ in Onest at 0.62em.",
+      "Do make every tappable surface shrink slightly on press (0.98 for buttons and cards, 0.985 for rows and notes).",
+      "Do keep neutral surfaces shadowless in dark; let wallet cards glow only in their own colour.",
+      "Do run motion once on load with exponential ease-out and turn it off under reduced motion.",
+      "Do keep both themes readable; light keeps the same wallet colours on a white ground.",
+      "Do bring Harcamalar, Takvim, Ayarlar and the sheets onto this world as they are migrated, using these tokens and components rather than new ones."
+    ],
+    "donts": [
+      "Don't use violet panels or accents, a warm peach ground, or grey stone with an evergreen accent; the user rejected each.",
+      "Don't build themed costume worlds (road signs, boarding passes, transit boards, calendars, banknotes) or anything that reads as a bank app.",
+      "Don't fall back to a grey list of white rows; accounts are coloured cards.",
+      "Don't use cyan or magenta outside the runway panel, or lime for any data other than free limit.",
+      "Don't add uppercase or tracked-out labels above headings; headings stand on their own in sentence case.",
+      "Don't let the display face draw the ₺ sign."
+    ]
+  }
+}

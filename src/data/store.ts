@@ -3,6 +3,7 @@ import { nextHue } from '../domain/categories'
 import { startOfDay } from '../domain/dates'
 import { closeCycle } from '../domain/interest'
 import { byMostAvailable, isCard, isKmh, isLiquid, outlook, spendingPower, statementItems } from '../domain/power'
+import { runway } from '../domain/runway'
 import type { Account, Category, Expense, MerchantRule, RecurringPayment } from '../domain/types'
 import { makeBackup, parseBackup, restoreBackup } from './backup'
 import * as repo from './db'
@@ -30,6 +31,7 @@ export const liquidAccounts = computed(() => byMostAvailable(accounts.value.filt
 export const power = computed(() => spendingPower(accounts.value))
 export const statements = computed(() => statementItems(accounts.value, today.value))
 export const forecast = computed(() => outlook(accounts.value, recurring.value, today.value))
+export const runwayDays = computed(() => runway(accounts.value, recurring.value, today.value))
 export const activeCategories = computed(() =>
   categories.value.filter((c) => !c.archived).sort((a, b) => a.order - b.order),
 )
