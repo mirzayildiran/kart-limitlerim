@@ -9,11 +9,18 @@ import { init } from './data/store'
 import { applySavedTheme } from './ui/theme'
 import { App } from './app.tsx'
 import { startReminders } from './platform/reminders'
+import { startLock } from './platform/lock'
+import { LockScreen } from './features/lock/LockScreen'
 
 // Initialize data store (don't await before first render)
 init().catch(() => {})
 
 applySavedTheme()
 startReminders()
+startLock()
 
 render(<App />, document.getElementById('app')!)
+
+// Separate root so the lock covers the app without the app knowing about it.
+const lockRoot = document.body.appendChild(document.createElement('div'))
+render(<LockScreen />, lockRoot)

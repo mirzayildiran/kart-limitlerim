@@ -24,6 +24,7 @@
     "@capacitor/ios": "^8.5.3",
     "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/share": "^8.0.3",
+    "@capgo/capacitor-native-biometric": "^8.8.1",
     "@fontsource-variable/onest": "^5.3.1",
     "@fontsource-variable/schibsted-grotesk": "^5.3.0",
     "@preact/signals": "^2.11.3",
