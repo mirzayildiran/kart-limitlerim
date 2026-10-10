@@ -4,6 +4,13 @@ const biometric = vi.hoisted(() => ({
   isAvailable: vi.fn(),
   verifyIdentity: vi.fn(),
 }))
+// Real Capacitor plugins are proxies that answer `then` too, so awaiting one rejects.
+// Non-enumerable, so resetting the mocks leaves it alone.
+Object.defineProperty(biometric, 'then', {
+  value: () => {
+    throw new Error('plugin awaited as a promise')
+  },
+})
 
 const app = vi.hoisted(() => ({
   handlers: {} as Record<string, (arg?: unknown) => void>,
