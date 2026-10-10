@@ -303,10 +303,6 @@
 .calendar-row-detail {
   font-size: var(--text-sm);
   color: var(--muted);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .calendar-row-detail-line {
