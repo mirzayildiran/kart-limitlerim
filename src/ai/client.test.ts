@@ -105,6 +105,11 @@ describe('askAssistant', () => {
     expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('bad_request')
   })
 
+  it('maps HTTP 403 (origin not allowed) to not_configured, not bad_request', async () => {
+    const { fetchImpl } = fakeFetch(() => json({ error: 'bad_request' }, 403))
+    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('not_configured')
+  })
+
   it('uses a known error code from the body for other failures', async () => {
     const { fetchImpl } = fakeFetch(() => json({ error: 'not_configured' }, 503))
     expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('not_configured')
