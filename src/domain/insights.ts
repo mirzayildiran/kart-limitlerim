@@ -1,4 +1,4 @@
-import { budgetProgress, monthPace as paceOfMonth, type BudgetRow } from './budget'
+import { budgetProgress, monthPace as paceOfMonth, PACE_MIN_DAYS, type BudgetRow } from './budget'
 import { cycleKeyOf, daysBetween, fromIso, formatShort, shiftMonth } from './dates'
 import { projectedInterest } from './interest'
 import { CURRENT_RATES } from './rates'
@@ -26,7 +26,6 @@ const CATEGORY_MAX = 3
 const MONTH_PACE_NUM = 11
 const MONTH_PACE_DEN = 10
 /** Same minimum day count as the budget pace check: earlier estimates are too noisy. */
-const MONTH_PACE_MIN_DAYS = 7
 
 /** Taxes on interest (KKDF + BSMV = 15% + 15%), applied on top of the rate. */
 const TAX_FACTOR = 1.3
@@ -230,7 +229,7 @@ function budgetPace(rows: BudgetRow[]): Insight[] {
 
 function monthPace(input: InsightInput): Insight[] {
   const pace = paceOfMonth(input.expenses, input.today)
-  if (pace.daysPassed < MONTH_PACE_MIN_DAYS || pace.lastMonthTotal <= 0) return []
+  if (pace.daysPassed < PACE_MIN_DAYS || pace.lastMonthTotal <= 0) return []
   // Integer comparison: projected > 1.1 × last month's total.
   if (pace.projected * MONTH_PACE_DEN <= pace.lastMonthTotal * MONTH_PACE_NUM) return []
   return [
