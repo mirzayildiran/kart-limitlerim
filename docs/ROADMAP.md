@@ -40,12 +40,20 @@ Her aşamanın sonunda telefonda denenebilir, çalışan bir sürüm çıkar.
 
 Gerçek ekran görüntüleriyle yapılan değerlendirmede beş bankada 29 satırın 28'i doğru okundu (28/29).
 
-## Aşama 4 — Mağaza sürümleri
+## Aşama 4 — App Store 🚧
 
-- [ ] Capacitor ile iOS ve Android paketleri
-- [ ] Face ID / parmak izi kilidi
-- [ ] Son ödeme hatırlatma bildirimleri
-- [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası (App Store paketi ve kalan eksikler: `docs/APP_STORE.md`; sayfalar: `public/privacy.html`, `public/support.html`)
+Karar (2026-10-10): Öncelik App Store. Google Play çok sonraki bir plan. Ayrıntılar `docs/IOS.md`'de.
+
+- [x] Capacitor ile iOS paketi (`ios/`), iPhone'da canlı test (`npm run ios:dev`)
+- [x] Yedek dışa aktarma iOS paylaşım menüsüyle (`src/platform/files.ts`)
+- [x] Face ID kilidi; uygulama değiştiricide bakiyeler gizli (`src/platform/lock.ts`)
+- [x] Son ödeme yerel bildirimleri, iki gün önce ve son gün (`src/domain/reminders.ts`)
+- [x] iOS dokunsal geri bildirim (`src/platform/haptics.ts`)
+- [ ] Gerçek iPhone'da ilk deneme (Xcode kurulumu bekleniyor)
+- [ ] `PrivacyInfo.xcprivacy` ve App Store gizlilik etiketleri
+- [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası adresi (App Store paketi ve kalan eksikler: `docs/APP_STORE.md`; sayfalar: `public/privacy.html`, `public/support.html`)
+- [ ] Apple Developer Program üyeliği (TestFlight ve yayın için; şimdilik ücretsiz hesap)
+- [ ] Android paketi (sonra)
 
 ## Aşama 4.5 — Bütçe asistanı 🚧
 
