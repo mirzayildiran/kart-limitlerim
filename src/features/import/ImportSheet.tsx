@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import { formatShort, fromIso } from '../../domain/dates'
 import { figure } from '../../ui/components/Amount'
 import { formatTLExact } from '../../domain/money'
-import type { Account, IsoDate, Kurus } from '../../domain/types'
+import type { IsoDate, Kurus } from '../../domain/types'
 import {
   accountById,
+  accounts,
   activeCategories,
   cards,
   expenses,
@@ -17,9 +18,11 @@ import {
   saveRule,
   today,
 } from '../../data/store'
+import { accountColors } from '../../ui/accountColor'
 import { closeSheet } from '../../ui/nav'
 import type { SheetRequest } from '../../ui/nav'
 import { Button, Choice, EmptyState, MoneyField, Pill, Switch, TextField } from '../../ui/components/controls'
+import { AccountPicker } from '../../ui/components/AccountPicker'
 import { Sheet } from '../../ui/components/Sheet'
 import { toast } from '../../ui/components/toast'
 import { merchantKey, suggestCategory } from '../../ocr/categorize'
@@ -247,15 +250,13 @@ export function ImportSheet(_props: ImportSheetProps) {
             <EmptyState title="Önce bir kart ya da hesap ekle." />
           ) : (
             <>
-              <div class="import-account">
-                <Choice<string>
-                  legend="Hangi kart/hesap?"
-                  options={accountOptions.map((a: Account) => ({ value: a.id, label: a.name }))}
-                  value={accountId}
-                  onChange={setAccountId}
-                  look="chips"
-                />
-              </div>
+              <AccountPicker
+                label="Hangi kart/hesap?"
+                accounts={accountOptions}
+                colors={accountColors(accounts.value)}
+                value={accountId}
+                onChange={setAccountId}
+              />
               <label class={`btn btn-primary import-drop ${accountId === null ? 'is-disabled' : ''}`}>
                 <input
                   class="import-file-input"

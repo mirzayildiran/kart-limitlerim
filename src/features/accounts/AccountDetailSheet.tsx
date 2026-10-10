@@ -1,19 +1,33 @@
-import type { JSX } from 'preact'
+import type { ComponentChildren, JSX } from 'preact'
 import { useState } from 'preact/hooks'
-import type { Account, CardAccount, KmhAccount, BalanceAccount } from '../../domain/types'
+import type { Account, CardAccount, KmhAccount, BalanceAccount, Kurus } from '../../domain/types'
 import { formatTL, formatTLExact } from '../../domain/money'
-import { formatMonth } from '../../domain/dates'
+import { formatMonth, fromIso } from '../../domain/dates'
 import { CURRENT_RATES } from '../../domain/rates'
+import { rateFor } from '../../domain/interest'
 import { accountById, accounts, today } from '../../data/store'
 import { accountColors } from '../../ui/accountColor'
 import { openSheet, closeSheet, type SheetRequest } from '../../ui/nav'
 import { Button, Pill } from '../../ui/components/controls'
 import { Sheet } from '../../ui/components/Sheet'
-import { LimitStrip } from '../../ui/components/LimitStrip'
-import { Amount } from '../../ui/components/Amount'
-import { cardInterestPanelData, interestHistory, kmhDailyCost, statementRows } from './detailModel'
-import { rateFor } from '../../domain/interest'
+import { Amount, figure } from '../../ui/components/Amount'
+import { accountFree } from '../../ui/components/AccountPicker'
+import {
+  addExpenseLabel,
+  cardInterestPanelData,
+  interestHistory,
+  interestSourceLine,
+  kmhDailyCost,
+  rateCaption,
+  statementRows,
+} from './detailModel'
 import './account-detail.css'
+
+const CAPTION = { card: 'Kullanılabilir', kmh: 'KMH kullanılabilir', bank: 'Banka bakiyesi', cash: 'Nakit' } as const
+/** Window title: the account's type. The name is already on the card below it. */
+const KIND_TITLE = { card: 'Kredi kartı', kmh: 'KMH', bank: 'Banka hesabı', cash: 'Nakit' } as const
+const effectiveFmt = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+const RATES_SINCE = effectiveFmt.format(fromIso(CURRENT_RATES.effective))
 
 function isCard(a: Account): a is CardAccount {
   return a.kind === 'card'
@@ -27,236 +41,199 @@ function isBalanceAccount(a: Account): a is BalanceAccount {
   return a.kind === 'bank' || a.kind === 'cash'
 }
 
-function renderCardContent(account: CardAccount): JSX.Element {
+/**
+ * The header: the account's wallet card from Özet in miniature, in its owned colour
+ * (name, drawn chip, available figure, track, meta). Not interactive here.
+ */
+function DetailCard({ account, slot }: { account: Account; slot: number }) {
+  const hasLimit = account.kind === 'card' || account.kind === 'kmh'
+  const share = hasLimit && account.limit > 0 ? Math.min(1, Math.max(0, account.available / account.limit)) : 0
+  return (
+    <div class={`account-detail-card is-${account.kind}`} data-slot={slot}>
+      <svg class="account-detail-card-art" viewBox="0 0 320 160" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+        <circle cx="290" cy="10" r="110" />
+        <circle cx="250" cy="180" r="64" />
+      </svg>
+      <span class="account-detail-card-name">{account.name}</span>
+      {hasLimit && <span class="account-detail-card-chip" aria-hidden="true" />}
+      <span class="account-detail-card-bottom">
+        <Amount value={accountFree(account)} size="xl" />
+        {hasLimit && (
+          <span class="account-detail-card-track" aria-hidden="true">
+            <span class="account-detail-card-fill" style={{ width: `${share * 100}%` }} />
+          </span>
+        )}
+        <span class="account-detail-card-meta">{CAPTION[account.kind]}</span>
+      </span>
+    </div>
+  )
+}
+
+/** "Limit" and "Kullanılan": the two figures the card above does not show. */
+function LimitStats({ limit, used }: { limit: Kurus; used: Kurus }) {
+  return (
+    <div class="account-detail-stats">
+      <div class="account-detail-stat">
+        <span class="account-detail-stat-label">Limit</span>
+        <Amount value={limit} size="md" />
+      </div>
+      <div class="account-detail-stat">
+        <span class="account-detail-stat-label">Kullanılan</span>
+        <Amount value={used} size="md" />
+      </div>
+    </div>
+  )
+}
+
+/** Rose wash panel: the title and sentences in ink, only the figure in rose. */
+function InterestPanel({ figure, sub, children }: { figure: Kurus; sub: string; children: ComponentChildren }) {
+  return (
+    <section class="account-detail-interest" aria-label="İşleyen faiz">
+      <h3 class="account-detail-interest-title">İşleyen faiz</h3>
+      <Amount value={figure} exact size="xl" tone={figure > 0 ? 'crit' : 'default'} />
+      <p class="account-detail-interest-sub">{sub}</p>
+      {children}
+    </section>
+  )
+}
+
+function CardContent({ account }: { account: CardAccount }): JSX.Element {
   const t = today.value
   const data = cardInterestPanelData(account, t)
+  const used = account.limit - account.available
+  const hist = interestHistory(account)
 
-  // Calculate available and used
-  const available = account.available
-  const used = account.limit - available
+  // Rate shown in the caption: the tier of the first statement debt, else of what is used.
+  const firstDebt = account.lines.find((l) => (l.statementDebt ?? 0) > 0)?.statementDebt ?? used
+  const caption = rateCaption({
+    override: account.rateOverride?.contractual ?? null,
+    contractual: rateFor(account, firstDebt).contractual,
+    effective: RATES_SINCE,
+  })
 
   return (
     <>
-      {/* LimitStrip + stats */}
-      <LimitStrip
-        name={account.name}
-        available={available}
-        limit={account.limit}
-        tone="card"
-        slot={accountColors(accounts.value).get(account.id)}
-      />
+      <LimitStats limit={account.limit} used={used} />
 
-      <div class="account-detail-stats">
-        <div class="stat-cell">
-          <span class="stat-label">Kullanılabilir</span>
-          <Amount value={available} size="md" />
-        </div>
-        <div class="stat-cell">
-          <span class="stat-label">Limit</span>
-          <Amount value={account.limit} size="md" />
-        </div>
-        <div class="stat-cell">
-          <span class="stat-label">Kullanılan</span>
-          <Amount value={used} size="md" tone="muted" />
-        </div>
-      </div>
-
-      {/* Interest panel */}
       {data && (
-        <div class="interest-panel">
-          <h3>İşleyen faiz</h3>
+        <InterestPanel figure={data.totalInterest + (data.currentProjected ?? 0)} sub="Bu kartta toplam işleyen faiz">
+          <p class="account-detail-interest-source">
+            {interestSourceLine(data.historyCycles, data.currentProjected !== null)}
+          </p>
 
-          <Amount value={data.totalInterest + (data.currentProjected ?? 0)} exact size="xl" tone="crit" />
-          <span class="interest-sub">
-            Bu kartta toplam işleyen faiz
-          </span>
-
-          {data.historyCycles > 0 || data.currentProjected !== null ? (
-            <p class="interest-sub">
-              {data.historyCycles} ekstre geçmişi
-              {data.currentProjected !== null ? ' + bu ekstre tahmini' : ''}
-            </p>
-          ) : (
-            <p class="interest-sub">Henüz faiz kaydı yok</p>
-          )}
-
-          {/* Daily costs */}
-          {data.dailyCosts.length > 0 && (
-            <div class="interest-line">
-              <strong>
-                Borcun her gün ~{formatTLExact(data.dailyCosts.reduce((s, d) => s + d.cost, 0))} faiz işletiyor.
-              </strong>
-            </div>
-          )}
-
-          {/* Line projections */}
-          {data.lineProjections.map((proj) => (
-            <div key={proj.lineIndex} class="interest-line">
-              <strong>{proj.label}:</strong> bu ekstrede ~{formatTLExact(proj.projectedAsEntered)}
-              {(proj.payment === 'unpaid' || proj.payment === 'partial') && proj.projectedMinimum !== null && (
-                <>
-                  {' '}
-                  yalnız asgariyi ödersen ~{formatTLExact(proj.projectedMinimum)}
-                </>
+          {(data.dailyCosts.length > 0 || data.lineProjections.length > 0) && (
+            <ul class="account-detail-interest-lines">
+              {data.dailyCosts.length > 0 && (
+                <li>
+                  Borcun her gün{' '}
+                  <strong class="num">~{figure(formatTLExact(data.dailyCosts.reduce((s, d) => s + d.cost, 0)))}</strong> faiz
+                  işletiyor.
+                </li>
               )}
-            </div>
-          ))}
-
-          {/* Nudge message */}
-          <div class="interest-nudge">
-            {used > 0 ? (
-              <>
-                Tamamını ödersen bu faiz işlemez. Yeni harcama, ödemediğin borcun üstüne eklenir.
-              </>
-            ) : (
-              <>
-                Ekstreni tamamen ödüyorsun; faiz işlemiyor.
-              </>
-            )}
-          </div>
-
-          {/* Rate caption */}
-          <div class="interest-caption">
-            {account.rateOverride ? (
-              <>
-                Oran: senin girdiğin aylık %{account.rateOverride.contractual} akdi. KKDF ve BSMV dahil. Tahmindir; kesin tutar ekstrendedir.
-              </>
-            ) : (
-              <>
-                {(() => {
-                  let debt: number = used
-                  for (const line of account.lines) {
-                    if ((line.statementDebt ?? 0) > 0) {
-                      debt = line.statementDebt ?? used
-                      break
-                    }
-                  }
-                  const rate = rateFor(account, debt)
-                  return (
+              {data.lineProjections.map((proj) => (
+                <li key={proj.lineIndex}>
+                  <strong>{proj.label}:</strong> bu ekstrede <span class="num">~{figure(formatTLExact(proj.projectedAsEntered))}</span>
+                  {(proj.payment === 'unpaid' || proj.payment === 'partial') && proj.projectedMinimum !== null && (
                     <>
-                      Oranlar: TCMB azami oranları ({CURRENT_RATES.effective}), aylık %{rate.contractual} akdi. KKDF ve BSMV dahil. Tahmindir; kesin tutar ekstrendedir.
+                      ; yalnız asgariyi ödersen <span class="num">~{figure(formatTLExact(proj.projectedMinimum))}</span>
                     </>
-                  )
-                })()}
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Statements list */}
-      {account.lines.length > 0 && (
-        <div class="statements-section">
-          <h3>Ekstreler</h3>
-          {statementRows(account, t).map((row) => {
-            const pillTone = row.status === 'paid' ? 'ok' : row.status === 'overdue' ? 'crit' : row.status === 'upcoming' ? 'neutral' : 'warn'
-            return (
-              <button
-                key={account.lines[row.lineIndex].id}
-                type="button"
-                class="statement-row"
-                onClick={() => openSheet({ type: 'statement', accountId: account.id, lineIndex: row.lineIndex })}
-              >
-                <span class="statement-left">
-                  <span class="statement-label">{row.label}</span>
-                  <span class="statement-dates">
-                    Kesim {row.cutShort} · son ödeme {row.dueIsExact ? '' : '~'}{row.dueShort}
-                  </span>
-                </span>
-                <span class="statement-right">
-                  {row.debt !== null && row.debt > 0 && (
-                    <span class="statement-debt">{formatTL(row.debt)}</span>
                   )}
-                  <Pill tone={pillTone}>{row.statusLabel}</Pill>
-                </span>
-              </button>
-            )
-          })}
-        </div>
+                  .
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <p class="account-detail-interest-nudge">
+            {used > 0
+              ? 'Tamamını ödersen bu faiz işlemez. Yeni harcama, ödemediğin borcun üstüne eklenir.'
+              : 'Ekstreni tamamen ödüyorsun; faiz işlemiyor.'}
+          </p>
+          <p class="account-detail-interest-caption">{caption}</p>
+        </InterestPanel>
       )}
 
-      {/* Interest history */}
-      {(() => {
-        const hist = interestHistory(account)
-        return hist.records.length > 0 ? (
-          <div class="history-section">
-            <h3>Faiz geçmişi</h3>
+      {account.lines.length > 0 && (
+        <section class="account-detail-section">
+          <h3 class="account-detail-section-title">Ekstreler</h3>
+          <div class="account-detail-statements">
+            {statementRows(account, t).map((row) => {
+              const pillTone =
+                row.status === 'paid' ? 'ok' : row.status === 'overdue' ? 'crit' : row.status === 'upcoming' ? 'neutral' : 'warn'
+              return (
+                <button
+                  key={account.lines[row.lineIndex].id}
+                  type="button"
+                  class="account-detail-statement"
+                  onClick={() => openSheet({ type: 'statement', accountId: account.id, lineIndex: row.lineIndex })}
+                >
+                  <span class="account-detail-statement-main">
+                    <span class="account-detail-statement-label">{row.label}</span>
+                    <span class="account-detail-statement-dates">
+                      Kesim {row.cutShort} · son ödeme {row.dueIsExact ? '' : '~'}
+                      {row.dueShort}
+                    </span>
+                  </span>
+                  <span class="account-detail-statement-end">
+                    {row.debt !== null && row.debt > 0 && (
+                      <span class="account-detail-statement-debt num">{figure(formatTL(row.debt))}</span>
+                    )}
+                    <Pill tone={pillTone}>{row.statusLabel}</Pill>
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </section>
+      )}
+
+      {hist.records.length > 0 && (
+        <section class="account-detail-section">
+          <h3 class="account-detail-section-title">Faiz geçmişi</h3>
+          <div class="account-detail-history">
             {hist.records.map((rec) => (
-              <div key={rec.cycle} class="history-item">
-                <span class="history-cycle">{formatMonth(rec.cycle)}</span>
-                <div class="history-right">
-                  <span class="history-amount">{formatTLExact(rec.amount)}</span>
+              <div key={rec.cycle} class="account-detail-history-row">
+                <span>{formatMonth(rec.cycle)}</span>
+                <span class="account-detail-history-end">
                   {rec.source === 'estimate' && <Pill tone="neutral">tahmini</Pill>}
-                </div>
+                  <span class="account-detail-history-amount num">{figure(formatTLExact(rec.amount))}</span>
+                </span>
               </div>
             ))}
-            {hist.older > 0 && <p class="history-older">+{hist.older} eski ekstre</p>}
           </div>
-        ) : null
-      })()}
+          {hist.older > 0 && <p class="account-detail-history-older">{hist.older} eski ekstre daha</p>}
+        </section>
+      )}
     </>
   )
 }
 
-function renderKmhContent(account: KmhAccount): JSX.Element {
-  const available = account.available
-  const used = account.limit - available
+function KmhContent({ account }: { account: KmhAccount }): JSX.Element {
+  const used = account.limit - account.available
   const dailyCost = kmhDailyCost(account)
 
   return (
     <>
-      <LimitStrip
-        name={account.name}
-        available={available}
-        limit={account.limit}
-        tone="kmh"
-        slot={accountColors(accounts.value).get(account.id)}
-      />
-
-      <div class="account-detail-stats">
-        <div class="stat-cell">
-          <span class="stat-label">Kullanılabilir</span>
-          <Amount value={available} size="md" />
-        </div>
-        <div class="stat-cell">
-          <span class="stat-label">Limit</span>
-          <Amount value={account.limit} size="md" />
-        </div>
-        <div class="stat-cell">
-          <span class="stat-label">Kullanılan</span>
-          <Amount value={used} size="md" tone="muted" />
-        </div>
-      </div>
+      <LimitStats limit={account.limit} used={used} />
 
       {dailyCost !== null && (
-        <div class="interest-panel">
-          <h3>İşleyen faiz</h3>
-          <Amount value={dailyCost} exact size="xl" tone="crit" />
-          <span class="interest-sub">KMH borcun her gün faiz işletiyor</span>
-
-          <div class="interest-line">
-            Aylık tahmini: ~{formatTLExact(dailyCost * 30)}
-          </div>
-
-          <div class="interest-caption">
-            Oran: TCMB azami nakit çekme oranı ({CURRENT_RATES.effective}), aylık %{CURRENT_RATES.cash.contractual}.
-            {account.rateOverride ? ' senin girdiğin oran' : ''}.
-            KKDF ve BSMV dahil. Tahmindir; kesin tutar ekstrendedir.
-          </div>
-        </div>
+        <InterestPanel figure={dailyCost} sub="KMH borcun her gün bu kadar faiz işletiyor">
+          <ul class="account-detail-interest-lines">
+            <li>
+              Aylık tahmini <strong class="num">~{figure(formatTLExact(dailyCost * 30))}</strong>.
+            </li>
+          </ul>
+          <p class="account-detail-interest-caption">
+            {rateCaption({
+              override: account.rateOverride?.contractual ?? null,
+              contractual: CURRENT_RATES.cash.contractual,
+              effective: RATES_SINCE,
+              cash: true,
+            })}
+          </p>
+        </InterestPanel>
       )}
     </>
-  )
-}
-
-function renderBalanceContent(account: BalanceAccount): JSX.Element {
-  return (
-    <div class="balance-content">
-      <div class="balance-value">
-        <Amount value={account.balance} size="hero" />
-      </div>
-      {account.note && <p class="balance-note">{account.note}</p>}
-    </div>
   )
 }
 
@@ -287,17 +264,23 @@ function AccountDetailSheetImpl({ request }: AccountDetailSheetProps): JSX.Eleme
   return (
     <Sheet
       open={open}
-      title={account.name}
+      title={KIND_TITLE[account.kind]}
       onClose={handleClose}
       footer={
-        <Button variant="primary" block onClick={handleEdit}>
-          Düzenle
-        </Button>
+        <>
+          <Button variant="primary" block onClick={() => openSheet({ type: 'expense', accountId: account.id })}>
+            {addExpenseLabel(account.kind)}
+          </Button>
+          <Button variant="secondary" block onClick={handleEdit}>
+            Düzenle
+          </Button>
+        </>
       }
     >
-      {isCard(account) && renderCardContent(account)}
-      {isKmh(account) && renderKmhContent(account)}
-      {isBalanceAccount(account) && renderBalanceContent(account)}
+      <DetailCard account={account} slot={accountColors(accounts.value).get(account.id) ?? 1} />
+      {isCard(account) && <CardContent account={account} />}
+      {isKmh(account) && <KmhContent account={account} />}
+      {isBalanceAccount(account) && account.note && <p class="account-detail-note">{account.note}</p>}
     </Sheet>
   )
 }

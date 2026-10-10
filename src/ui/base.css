@@ -72,6 +72,11 @@ textarea {
   caret-color: var(--accent);
 }
 
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html {
   scrollbar-color: var(--line-strong) transparent;
   scrollbar-width: thin;
@@ -91,13 +96,4 @@ html {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
 }
