@@ -5,6 +5,7 @@ import type { InsightSeverity } from '../../domain/insightsTypes'
 
 export const QUICK_PROMPTS: string[] = [
   'Bu ay nasıl gidiyorum?',
+  'Bütçe planıma uyuyor muyum?',
   'Kesime kadar neye dikkat etmeliyim?',
   'Asgari ödersem ne olur?',
   'Bugün hangi kartla ödemeliyim?',
