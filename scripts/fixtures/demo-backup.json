@@ -1,0 +1,539 @@
+{
+  "app": "kart-limitlerim",
+  "schema": 1,
+  "exportedAt": "2026-10-10T09:00:00.000Z",
+  "data": {
+    "accounts": [
+      {
+        "id": "acc-bonus",
+        "kind": "card",
+        "name": "Bonus",
+        "limit": 4000000,
+        "available": 3558680,
+        "lines": [
+          {
+            "id": "line-bonus",
+            "label": "Bonus Kart",
+            "cutDay": 5,
+            "dueOffsetDays": 8,
+            "subLimit": null,
+            "cycle": "2026-10",
+            "statementDebt": 1280000,
+            "minimumDue": 128000,
+            "dueDate": "2026-10-13",
+            "payment": "unpaid",
+            "paidAmount": null
+          }
+        ],
+        "updatedAt": 1767592800000,
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "acc-maximum",
+        "kind": "card",
+        "name": "Maximum",
+        "limit": 2500000,
+        "available": 2330400,
+        "lines": [
+          {
+            "id": "line-maximum",
+            "label": "Maximum Kart",
+            "cutDay": 18,
+            "dueOffsetDays": 10,
+            "subLimit": null,
+            "cycle": "2026-09",
+            "statementDebt": 650000,
+            "minimumDue": 65000,
+            "dueDate": "2026-09-28",
+            "payment": "full",
+            "paidAmount": 650000
+          }
+        ],
+        "updatedAt": 1767592800000,
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "acc-world",
+        "kind": "card",
+        "name": "World",
+        "limit": 6000000,
+        "available": 5335900,
+        "lines": [
+          {
+            "id": "line-world",
+            "label": "World Kart",
+            "cutDay": 22,
+            "dueOffsetDays": 10,
+            "subLimit": null,
+            "cycle": "2026-09",
+            "statementDebt": 1120000,
+            "minimumDue": 112000,
+            "dueDate": "2026-10-02",
+            "payment": "minimum",
+            "paidAmount": 112000
+          }
+        ],
+        "updatedAt": 1767592800000,
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "acc-axess",
+        "kind": "card",
+        "name": "Axess",
+        "limit": 1500000,
+        "available": 98000,
+        "lines": [
+          {
+            "id": "line-axess",
+            "label": "Axess Kart",
+            "cutDay": 1,
+            "dueOffsetDays": 18,
+            "subLimit": null,
+            "cycle": "2026-10",
+            "statementDebt": 1402000,
+            "minimumDue": null,
+            "dueDate": "2026-10-19",
+            "payment": "unpaid",
+            "paidAmount": null
+          }
+        ],
+        "updatedAt": 1767592800000,
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "acc-kmh",
+        "kind": "kmh",
+        "name": "Örnek Banka KMH",
+        "limit": 3000000,
+        "available": 2100000,
+        "updatedAt": 1767592800000,
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "acc-bank",
+        "kind": "bank",
+        "name": "Örnek Banka",
+        "balance": 3150000,
+        "updatedAt": 1767592800000,
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "acc-cash",
+        "kind": "cash",
+        "name": "Nakit",
+        "balance": 125000,
+        "updatedAt": 1767592800000,
+        "createdAt": 1767592800000
+      }
+    ],
+    "expenses": [
+      {
+        "id": "exp-01",
+        "amount": 128450,
+        "categoryId": "market",
+        "accountId": "acc-bonus",
+        "date": "2026-09-11",
+        "note": "Haftalık market",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "exp-02",
+        "amount": 14250,
+        "categoryId": "yemek",
+        "accountId": "acc-bonus",
+        "date": "2026-09-13",
+        "note": "Kahve ve börek",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789290000000
+      },
+      {
+        "id": "exp-03",
+        "amount": 30000,
+        "categoryId": "ulasim",
+        "accountId": "acc-bonus",
+        "date": "2026-09-15",
+        "note": "Akbil yüklemesi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789462800000
+      },
+      {
+        "id": "exp-04",
+        "amount": 56400,
+        "categoryId": "yemek",
+        "accountId": "acc-maximum",
+        "date": "2026-09-17",
+        "note": "Pizza",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789635600000
+      },
+      {
+        "id": "exp-05",
+        "amount": 96720,
+        "categoryId": "market",
+        "accountId": "acc-bonus",
+        "date": "2026-09-18",
+        "note": "Hafta sonu alışverişi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789722000000
+      },
+      {
+        "id": "exp-06",
+        "amount": 42800,
+        "categoryId": "eglence",
+        "accountId": "acc-world",
+        "date": "2026-09-19",
+        "note": "Sinema ve kola",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789808400000
+      },
+      {
+        "id": "exp-07",
+        "amount": 48900,
+        "categoryId": "yemek",
+        "accountId": "acc-bonus",
+        "date": "2026-09-21",
+        "note": "Yemek siparişi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789981200000
+      },
+      {
+        "id": "exp-08",
+        "amount": 61300,
+        "categoryId": "market",
+        "accountId": "acc-maximum",
+        "date": "2026-09-23",
+        "note": "Organik sebze kutusu",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1790154000000
+      },
+      {
+        "id": "exp-09",
+        "amount": 255600,
+        "categoryId": "eglence",
+        "accountId": "acc-axess",
+        "date": "2026-09-24",
+        "note": "Konser bileti",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1790240400000
+      },
+      {
+        "id": "exp-10",
+        "amount": 27350,
+        "categoryId": "ulasim",
+        "accountId": "acc-bonus",
+        "date": "2026-09-26",
+        "note": "Taksi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1790413200000
+      },
+      {
+        "id": "exp-11",
+        "amount": 182400,
+        "categoryId": "yemek",
+        "accountId": "acc-world",
+        "date": "2026-09-28",
+        "note": "Akşam yemeği",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1790586000000
+      },
+      {
+        "id": "exp-12",
+        "amount": 438900,
+        "categoryId": "market",
+        "accountId": "acc-world",
+        "date": "2026-09-29",
+        "note": "Toplu alışveriş",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1790672400000
+      },
+      {
+        "id": "exp-13",
+        "amount": 900000,
+        "categoryId": "eglence",
+        "accountId": "acc-kmh",
+        "date": "2026-10-02",
+        "note": "Hafta sonu tatili",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1790931600000
+      },
+      {
+        "id": "exp-14",
+        "amount": 960000,
+        "categoryId": "eglence",
+        "accountId": "acc-axess",
+        "date": "2026-10-04",
+        "note": "Kulaklık, 12 taksit",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1791104400000
+      },
+      {
+        "id": "exp-15",
+        "amount": 39900,
+        "categoryId": "yemek",
+        "accountId": "acc-maximum",
+        "date": "2026-10-05",
+        "note": "Kahvaltı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1791190800000
+      },
+      {
+        "id": "exp-16",
+        "amount": 12000,
+        "categoryId": "ulasim",
+        "accountId": "acc-maximum",
+        "date": "2026-10-06",
+        "note": "Otopark",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1791277200000
+      },
+      {
+        "id": "exp-17",
+        "amount": 85000,
+        "categoryId": "market",
+        "accountId": "acc-cash",
+        "date": "2026-10-07",
+        "note": "Pazar alışverişi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1791363600000
+      },
+      {
+        "id": "exp-18",
+        "amount": 186400,
+        "categoryId": "yemek",
+        "accountId": "acc-axess",
+        "date": "2026-10-08",
+        "note": "Restoran akşam yemeği",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1791450000000
+      },
+      {
+        "id": "exp-19",
+        "amount": 74150,
+        "categoryId": "market",
+        "accountId": "acc-bonus",
+        "date": "2026-10-09",
+        "note": "Market",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1791536400000
+      },
+      {
+        "id": "exp-20",
+        "amount": 21500,
+        "categoryId": "yemek",
+        "accountId": "acc-bonus",
+        "date": "2026-10-10",
+        "note": "Öğle yemeği",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1791622800000
+      },
+      {
+        "id": "exp-rec-kira",
+        "amount": 1850000,
+        "categoryId": "kira",
+        "accountId": "acc-bank",
+        "date": "2026-10-01",
+        "note": "Kira",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "recurring",
+        "recurringId": "rec-kira",
+        "createdAt": 1790845200000
+      },
+      {
+        "id": "exp-rec-internet",
+        "amount": 47900,
+        "categoryId": "fatura",
+        "accountId": "acc-bank",
+        "date": "2026-10-03",
+        "note": "İnternet",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "recurring",
+        "recurringId": "rec-internet",
+        "createdAt": 1791018000000
+      }
+    ],
+    "categories": [
+      {
+        "id": "yemek",
+        "name": "Yemek",
+        "hue": 24,
+        "builtin": true,
+        "order": 0
+      },
+      {
+        "id": "market",
+        "name": "Market",
+        "hue": 140,
+        "builtin": true,
+        "order": 1
+      },
+      {
+        "id": "ulasim",
+        "name": "Ulaşım",
+        "hue": 205,
+        "builtin": true,
+        "order": 2
+      },
+      {
+        "id": "fatura",
+        "name": "Fatura",
+        "hue": 48,
+        "builtin": true,
+        "order": 3
+      },
+      {
+        "id": "kira",
+        "name": "Kira",
+        "hue": 265,
+        "builtin": true,
+        "order": 4
+      },
+      {
+        "id": "eglence",
+        "name": "Eğlence",
+        "hue": 320,
+        "builtin": true,
+        "order": 5
+      }
+    ],
+    "recurring": [
+      {
+        "id": "rec-kira",
+        "name": "Kira",
+        "amount": 1850000,
+        "categoryId": "kira",
+        "accountId": "acc-bank",
+        "dayOfMonth": 1,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "never"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "rec-internet",
+        "name": "İnternet",
+        "amount": 47900,
+        "categoryId": "fatura",
+        "accountId": "acc-bank",
+        "dayOfMonth": 3,
+        "startDate": "2026-03-03",
+        "end": {
+          "type": "never"
+        },
+        "active": true,
+        "handledThrough": "2026-10-03",
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "rec-telefon",
+        "name": "Telefon faturası",
+        "amount": 39900,
+        "categoryId": "fatura",
+        "accountId": "acc-bonus",
+        "dayOfMonth": 9,
+        "startDate": "2026-02-09",
+        "end": {
+          "type": "never"
+        },
+        "active": true,
+        "handledThrough": "2026-09-09",
+        "createdAt": 1767592800000
+      },
+      {
+        "id": "rec-spor",
+        "name": "Spor salonu",
+        "amount": 110000,
+        "categoryId": "eglence",
+        "accountId": "acc-maximum",
+        "dayOfMonth": 15,
+        "startDate": "2026-02-15",
+        "end": {
+          "type": "until",
+          "date": "2027-02-15"
+        },
+        "active": true,
+        "handledThrough": "2026-09-15",
+        "createdAt": 1767592800000
+      }
+    ],
+    "rules": [
+      {
+        "id": "rule-kahve",
+        "pattern": "kahve",
+        "categoryId": "yemek",
+        "hits": 3
+      },
+      {
+        "id": "rule-akbil",
+        "pattern": "akbil",
+        "categoryId": "ulasim",
+        "hits": 2
+      }
+    ]
+  }
+}
