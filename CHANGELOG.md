@@ -10,7 +10,12 @@ Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izle
 - Asistan Worker'ı özeti alan alan yeniden kurar; serbest metin kısa ad ve öneri alanlarıyla sınırlı.
 - Uçtan uca testler (Playwright, 390×844, koyu ve açık tema): örnek veri, harcama ve kart ekleme, Takvim'den ödeme işaretleme, yedek dışa aktar → sil → geri yükle, asistan onay ekranı (Worker taklit edilir) ve her ana sayfada axe-core taraması. `npm run e2e`.
 - Bileşen testleri (happy-dom, Testing Library): pencere odak tuzağı ve Escape, kilit ekranı mesajları, ilk açılış ve geri yükleme önerisi, tutar alanı, harcama formu doğrulaması. `npm run test:components`.
+- CI: bileşen testleri, uçtan uca testler (Playwright Chromium önbellekli), iki derlemede CSP denetimi ve ilk yükleme bütçesi (JS ≤ 40 KB, CSS ≤ 12 KB gzip; `npm run size`).
 - `npm run check:csp`: derlenmiş uygulamada Content-Security-Policy ihlali denetimi (web ve `CAP_NATIVE=1`).
+
+### Changed
+
+- Yedek kodu (biçim, doğrulama, otomatik yedek) ilk pakette değil, ilk kullanımda yüklenir: ilk JS 40,0 KB'tan 37,5 KB'a (gzip) indi.
 
 ### Fixed
 
