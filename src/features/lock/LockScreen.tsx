@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import { Icon } from '../../ui/components/Icon'
-import { locked, shielded, unlock } from '../../platform/lock'
+import { locked, shielded, unlock, unlockResult } from '../../platform/lock'
+import { lockMessage } from './lockMessage'
 import './lock-screen.css'
 
 /** How long the cover fades out once the app is open again; matches .lock-screen.is-leaving. */
@@ -39,7 +40,12 @@ export function LockScreen() {
   // Stays mounted for the fade-out after the cover lifts.
   const [shown, setShown] = useState(covered)
   const [busy, setBusy] = useState(false)
-  const [failed, setFailed] = useState(false)
+  const button = useRef<HTMLButtonElement>(null)
+
+  // The app behind is inert, so put VoiceOver and keyboard focus on the one control there is.
+  useEffect(() => {
+    if (isLocked) button.current?.focus({ preventScroll: true })
+  }, [isLocked])
 
   useEffect(() => {
     // Keep VoiceOver and keyboard focus out of the hidden content.
@@ -48,7 +54,6 @@ export function LockScreen() {
       setShown(true)
       return
     }
-    setFailed(false)
     const t = setTimeout(() => setShown(false), reducedMotion() ? 0 : LEAVE_MS)
     return () => clearTimeout(t)
   }, [covered])
@@ -57,11 +62,9 @@ export function LockScreen() {
 
   async function onUnlock() {
     setBusy(true)
-    setFailed(false)
+    unlockResult.value = null
     await unlock()
     setBusy(false)
-    // Still locked after the attempt: Face ID failed or was cancelled.
-    if (locked.value) setFailed(true)
   }
 
   return (
@@ -81,12 +84,12 @@ export function LockScreen() {
             <Icon name="lock" size={16} />
             Bakiyelerin kilitli
           </p>
-          <button type="button" class="lock-button" onClick={onUnlock} disabled={busy} aria-busy={busy}>
+          <button type="button" class="lock-button" ref={button} onClick={onUnlock} disabled={busy} aria-busy={busy}>
             <Icon name="faceid" size={22} />
             {busy ? 'Doğrulanıyor…' : 'Face ID ile aç'}
           </button>
           <p class="lock-error" role="alert">
-            {failed ? 'Açılamadı. Tekrar dene ya da iPhone şifreni kullan.' : ''}
+            {busy ? '' : lockMessage(unlockResult.value)}
           </p>
         </div>
       )}

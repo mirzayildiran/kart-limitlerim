@@ -1,4 +1,4 @@
-import { formatTL } from '../../domain/money'
+import { spokenTL } from '../../domain/money'
 import type { Kurus } from '../../domain/types'
 import { Amount } from './Amount'
 import { Pill } from './controls'
@@ -20,7 +20,7 @@ export function LimitStrip({ name, sub, available, limit, tone = 'card', slot, o
   const freeShare = limit <= 0 ? 0 : Math.min(1, Math.max(0, available / limit))
   const showWarnBar = freeShare < 0.1
 
-  const accessibleName = `${name}${sub ? `, ${sub}` : ''}, ${formatTL(available)} kullanılabilir, limit ${formatTL(limit)}`
+  const accessibleName = `${name}${sub ? `, ${sub}` : ''}, ${isFull ? 'limit dolu' : `${spokenTL(available)} kullanılabilir`}, limit ${spokenTL(limit)}`
 
   return (
     <button

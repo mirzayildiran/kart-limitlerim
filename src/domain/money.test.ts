@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatInput, formatNumberTL, formatNumberTLExact, formatTL, formatTLExact, parseTL, toLira, toKurus } from './money'
+import { formatInput, formatNumberTL, formatNumberTLExact, formatTL, formatTLExact, parseTL, spokenFigure, spokenTL, toLira, toKurus } from './money'
 
 describe('money', () => {
   describe('toKurus', () => {
@@ -187,5 +187,40 @@ describe('money', () => {
       expect(formatInput(123400)).toBe('1.234')
       expect(parseTL(formatInput(1250))).toBe(1250)
     })
+  })
+})
+
+describe('spokenTL', () => {
+  it('spells the sign and the currency out as words', () => {
+    expect(spokenTL(123400)).toBe('1.234 lira')
+    expect(spokenTL(-123400)).toBe('eksi 1.234 lira')
+    expect(spokenTL(123456, { exact: true })).toBe('1.234,56 lira')
+    expect(spokenTL(-50, { exact: true })).toBe('eksi 0,50 lira')
+  })
+
+  it('follows an explicit sign for the absolute value, as Amount draws it', () => {
+    expect(spokenTL(-5000, { sign: 'minus' })).toBe('eksi 50 lira')
+    expect(spokenTL(5000, { sign: 'minus' })).toBe('eksi 50 lira')
+    expect(spokenTL(5000, { sign: 'plus' })).toBe('artı 50 lira')
+  })
+
+  it('does not say "eksi" for an amount that rounds to zero', () => {
+    expect(spokenTL(-40)).toBe('0 lira')
+    expect(spokenTL(0)).toBe('0 lira')
+  })
+})
+
+describe('spokenFigure', () => {
+  it('reads formatted figures as one phrase', () => {
+    expect(spokenFigure(formatTL(123400))).toBe('1.234 lira')
+    expect(spokenFigure(formatTL(-123400))).toBe('eksi 1.234 lira')
+    expect(spokenFigure(`−${formatTLExact(123456)}`)).toBe('eksi 1.234,56 lira')
+    expect(spokenFigure(`~${formatTLExact(4250)}`)).toBe('yaklaşık 42,50 lira')
+    expect(spokenFigure(`~−${formatTL(1000)}`)).toBe('yaklaşık eksi 10 lira')
+  })
+
+  it('leaves text without a figure sign or ₺ alone', () => {
+    expect(spokenFigure('akdi %3,25')).toBe('akdi %3,25')
+    expect(spokenFigure('Kart-1')).toBe('Kart-1')
   })
 })
