@@ -152,3 +152,37 @@ export function statementRows(account: CardAccount, today: Date): StatementRowDa
     }
   })
 }
+
+/**
+ * The line under the interest figure, saying what the figure is made of.
+ * No history and no running estimate → "Henüz faiz kaydı yok".
+ */
+export function interestSourceLine(historyCycles: number, hasCurrentEstimate: boolean): string {
+  if (historyCycles > 0 && hasCurrentEstimate) return `Geçmiş ${historyCycles} ekstre + bu ekstrenin tahmini`
+  if (historyCycles > 0) return `Geçmiş ${historyCycles} ekstre`
+  if (hasCurrentEstimate) return 'Bu ekstrenin tahmini'
+  return 'Henüz faiz kaydı yok'
+}
+
+/** A monthly rate as Turkish text: 4.25 → "%4,25". */
+export function formatRate(rate: number): string {
+  return `%${rate.toLocaleString('tr-TR', { maximumFractionDigits: 2 })}`
+}
+
+/**
+ * Where the rate behind an interest estimate comes from. `override` is the user's own
+ * monthly contractual rate; otherwise the TCMB ceiling in force (`effective` date) is used.
+ */
+export function rateCaption(opts: { override: number | null; contractual: number; effective: string; cash?: boolean }): string {
+  const tail = 'KKDF ve BSMV dahil. Tahmindir; kesin tutar ekstrendedir.'
+  if (opts.override !== null) return `Oran: senin girdiğin aylık ${formatRate(opts.override)} akdi. ${tail}`
+  const source = opts.cash ? 'TCMB azami nakit çekme oranı' : 'TCMB azami oranları'
+  return `Oran: ${source} (${opts.effective}), aylık ${formatRate(opts.contractual)} akdi. ${tail}`
+}
+
+/** Primary action of the detail sheet: add an expense paid from this account. */
+export function addExpenseLabel(kind: 'card' | 'kmh' | 'bank' | 'cash'): string {
+  if (kind === 'card') return 'Bu karttan harcama ekle'
+  if (kind === 'cash') return 'Nakitten harcama ekle'
+  return 'Bu hesaptan harcama ekle'
+}

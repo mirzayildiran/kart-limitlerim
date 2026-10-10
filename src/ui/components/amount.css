@@ -51,3 +51,8 @@
 .amount-crit .amount-cur {
   color: var(--crit);
 }
+
+
+.amount-sep {
+  font-variant-numeric: proportional-nums;
+}

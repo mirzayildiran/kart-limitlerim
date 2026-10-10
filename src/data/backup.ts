@@ -1,4 +1,4 @@
-import type { Db, Snapshot } from './db'
+import { cleanBudgets, type Db, type Snapshot } from './db'
 
 /** Portable backup file. Lets users move devices; nothing is synced anywhere. */
 export interface BackupFile {
@@ -34,17 +34,22 @@ export function parseBackup(text: string): BackupFile {
     const list = d?.[k]
     if (!isArr(list) || !list.every(hasId)) throw new BackupError('Yedek dosyası eksik ya da bozuk.')
   }
-  return b as BackupFile
+  // Optional: backups made before budgets existed have no key at all.
+  const budgets: unknown = d?.budgets
+  if (budgets !== undefined && !isArr(budgets)) throw new BackupError('Yedek dosyası eksik ya da bozuk.')
+  return { ...b, data: { ...d, budgets: cleanBudgets(budgets) } } as BackupFile
 }
 
 /** Replace everything on this device with the backup's contents. */
 export async function restoreBackup(db: Db, backup: BackupFile): Promise<void> {
   const stores = ['accounts', 'expenses', 'categories', 'recurring', 'rules'] as const
-  const tx = db.transaction(stores, 'readwrite')
+  const tx = db.transaction([...stores, 'meta'], 'readwrite')
   for (const s of stores) {
     const store = tx.objectStore(s)
     await store.clear()
     for (const item of backup.data[s]) await store.put(item as never)
   }
+  // Replace only the budgets key; other meta keys are left as they are.
+  await tx.objectStore('meta').put({ key: 'budgets', value: cleanBudgets(backup.data.budgets) })
   await tx.done
 }

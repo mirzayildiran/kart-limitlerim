@@ -1,0 +1,201 @@
+.assistant-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  min-width: 0;
+  max-width: 100%;
+  padding-bottom: var(--s-8);
+}
+
+.assistant-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+}
+
+.assistant-header > .btn {
+  flex: none;
+  margin-left: calc(var(--s-2) * -1);
+}
+
+/* Navigation, not an action: ink, not lime */
+.assistant-header .assistant-back {
+  color: var(--ink);
+}
+
+.assistant-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  min-width: 0;
+  padding-top: var(--s-1);
+}
+
+.assistant-heading h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.assistant-intro {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.assistant-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.assistant-section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  padding: 0 var(--s-1);
+}
+
+/* Heading on the left, count caption on the right */
+.assistant-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2) var(--s-3);
+  padding: 0 var(--s-1);
+}
+
+.assistant-section-head > .assistant-section-title {
+  padding: 0;
+  min-width: 0;
+}
+
+.assistant-count {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.assistant-card {
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  min-width: 0;
+}
+
+.assistant-muted {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+/* Closed-feature line: one quiet sentence, no box */
+.assistant-quiet {
+  padding: 0 var(--s-1);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Suggestions: one slate container, hairline rows, as on Takvim */
+.assistant-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+.assistant-insight {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 56px;
+  padding: var(--s-3) var(--s-4);
+}
+
+.assistant-insight + .assistant-insight {
+  border-top: 1px solid var(--line);
+}
+
+/* 36 px rounded square in the account's wallet colour; without an account a slate square */
+.assistant-medal {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  background: var(--c);
+  color: var(--c-ink);
+}
+
+.assistant-medal.is-plain {
+  background: var(--surface-3);
+  color: var(--muted);
+}
+
+/* Light theme: a hairline ring keeps pale wallet colours off the white ground */
+:root[data-theme='light'] .assistant-medal {
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .assistant-medal {
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+}
+
+/* Severity: a 2 px ring with a 2 px gap around the medallion. Info has none. */
+.assistant-insight[data-severity='crit'] .assistant-medal {
+  outline: 2px solid var(--crit);
+  outline-offset: 2px;
+}
+
+.assistant-insight[data-severity='warn'] .assistant-medal {
+  outline: 2px solid var(--warn);
+  outline-offset: 2px;
+}
+
+.assistant-insight-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.assistant-insight-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.assistant-insight-body {
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.assistant-note {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  padding: 0 var(--s-1);
+}
+
+.assistant-disclaimer {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  text-align: center;
+}

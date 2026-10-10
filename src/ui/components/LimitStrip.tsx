@@ -10,10 +10,12 @@ interface Props {
   available: Kurus
   limit: Kurus
   tone?: 'card' | 'kmh'
+  /** Wallet colour slot (ui/accountColor.ts); the free-limit bar takes the account's own colour. */
+  slot?: number
   onClick?: () => void
 }
 
-export function LimitStrip({ name, sub, available, limit, tone = 'card', onClick }: Props) {
+export function LimitStrip({ name, sub, available, limit, tone = 'card', slot, onClick }: Props) {
   const isFull = available <= 0
   const freeShare = limit <= 0 ? 0 : Math.min(1, Math.max(0, available / limit))
   const showWarnBar = freeShare < 0.1
@@ -25,11 +27,10 @@ export function LimitStrip({ name, sub, available, limit, tone = 'card', onClick
       type="button"
       class="limit-strip"
       data-tone={tone}
+      data-slot={slot}
       aria-label={accessibleName}
       onClick={onClick}
     >
-      <span class={`limit-strip-fill${showWarnBar ? ' is-low' : ''}`} style={{ width: `${isFull ? 0 : freeShare * 100}%` }} />
-
       <span class="limit-strip-content">
         <span class="limit-strip-left">
           <span class="limit-strip-name">{name}</span>
@@ -46,6 +47,10 @@ export function LimitStrip({ name, sub, available, limit, tone = 'card', onClick
             </>
           )}
         </span>
+      </span>
+
+      <span class="limit-strip-track" aria-hidden="true">
+        <span class={`limit-strip-fill${showWarnBar ? ' is-low' : ''}`} style={{ width: `${isFull ? 0 : freeShare * 100}%` }} />
       </span>
     </button>
   )

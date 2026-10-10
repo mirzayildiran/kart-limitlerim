@@ -17,7 +17,11 @@ export const DEFAULT_CATEGORIES: Category[] = [
 
 export const FALLBACK_CATEGORY_ID = 'diger'
 
-/** Spread hues for new categories so they stay distinguishable. */
+/** Violet band the product rejects for accents. */
+const VIOLET_FROM = 250
+const VIOLET_TO = 300
+
+/** Spread hues for new categories so they stay distinguishable. Never lands in the violet band. */
 export function nextHue(existing: Category[]): number {
   const used = existing.map((c) => c.hue).sort((a, b) => a - b)
   if (!used.length) return 24
@@ -31,5 +35,16 @@ export function nextHue(existing: Category[]): number {
       best = (a + (b - a) / 2) % 360
     }
   }
-  return Math.round(best)
+  const hue = Math.round(best)
+  if (hue < VIOLET_FROM || hue >= VIOLET_TO) return hue
+  // Gap midpoint fell in the violet band: take the nearer edge of it.
+  return hue - VIOLET_FROM < VIOLET_TO - hue ? VIOLET_FROM - 1 : VIOLET_TO
+}
+
+/** Hue to paint a category with. The violet band (250–299) is shifted out: the product rejects violet accents. */
+export function displayHue(h: number): number {
+  const n = ((h % 360) + 360) % 360
+  if (n >= 250 && n < 275) return 232
+  if (n >= 275 && n < 300) return 312
+  return n
 }

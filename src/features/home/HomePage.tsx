@@ -1,39 +1,107 @@
 import { computed } from '@preact/signals'
 import type { JSX } from 'preact'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import { cycleKeyOf, formatShort } from '../../domain/dates'
+import { displayHue } from '../../domain/categories'
 import { formatTL, formatTLExact } from '../../domain/money'
-import type { Kurus } from '../../domain/types'
+import { byMostAvailable } from '../../domain/power'
+import type { Account, Kurus } from '../../domain/types'
 import {
   accounts,
   accountById,
-  cards,
+  budgets,
+  categories,
   categoryById,
   forecast,
-  kmhAccounts,
-  liquidAccounts,
   power,
+  recurring,
+  runwayDays,
   statements,
   today,
   expenses,
 } from '../../data/store'
 import { openSheet, go } from '../../ui/nav'
-import { Button, EmptyState, Pill } from '../../ui/components/controls'
-import { LimitStrip } from '../../ui/components/LimitStrip'
-import { Amount } from '../../ui/components/Amount'
+import { Button, Pill } from '../../ui/components/controls'
+import { Amount, figure } from '../../ui/components/Amount'
+import { Icon } from '../../ui/components/Icon'
+import { computeInsights } from '../../domain/insights'
+import { assistantInput } from '../assistant/assistantModel'
 import { RecurringDueBanner } from './RecurringDueBanner'
+import { Runway } from './Runway'
+import { Wallet, accountColors } from './Wallet'
 import './home-page.css'
 
+const monthShort = new Intl.DateTimeFormat('tr-TR', { month: 'short' })
 const dateFormatter = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' })
 
-function renderTopbar(): JSX.Element {
+function greeting(hour: number): string {
+  if (hour >= 5 && hour < 11) return 'Günaydın'
+  if (hour >= 11 && hour < 17) return 'İyi günler'
+  return 'İyi akşamlar'
+}
+
+/** Number of budget suggestions, from the same input the assistant page uses. */
+const assistantCount = computed(
+  () =>
+    computeInsights(
+      assistantInput({
+        accounts: accounts.value,
+        expenses: expenses.value,
+        categories: categories.value,
+        recurring: recurring.value,
+        budgets: budgets.value,
+        today: today.value,
+      }),
+    ).length,
+)
+
+/** The status line opens the budget assistant; it names the suggestion count when there is more than one. */
+function renderTopbar(status: { text: string; tone: 'ok' | 'warn' | 'crit' } | undefined, suggestions: number): JSX.Element {
+  const chevron = (
+    <span class="home-status-chevron" aria-hidden="true">
+      <Icon name="chevron" size={16} />
+    </span>
+  )
   return (
     <header class="home-topbar">
-      <span class="home-app-name">Kart Limitlerim</span>
+      <h1 class="home-greeting">{greeting(new Date().getHours())}</h1>
       <time class="home-date" dateTime={today.value.toISOString()}>
         {dateFormatter.format(today.value)}
       </time>
+      {status ? (
+        <button type="button" class={`home-status is-${status.tone}`} onClick={() => go('assistant')}>
+          <span class="home-status-dot" aria-hidden="true" />
+          <span class="home-status-text">
+            {status.text}
+            {suggestions > 1 && ` · ${suggestions} öneri`}
+          </span>
+          {chevron}
+        </button>
+      ) : (
+        suggestions > 0 && (
+          <button type="button" class="home-status is-muted" onClick={() => go('assistant')}>
+            <span class="home-status-text">Bütçe asistanı · {suggestions} öneri</span>
+            {chevron}
+          </button>
+        )
+      )}
     </header>
   )
+}
+
+/** One plain sentence on how things stand, most urgent first. */
+function homeStatus(): { text: string; tone: 'ok' | 'warn' | 'crit' } {
+  const items = statements.value
+  const overdue = items.filter((i) => i.view.status === 'overdue').length
+  if (overdue > 0) return { text: `${overdue} ödemenin tarihi geçti, önce onlara bakalım.`, tone: 'crit' }
+  const f = forecast.value
+  if (f.cashAfter < 0) return { text: 'Asgariler için nakit yetmiyor, ödemeden önce plan yap.', tone: 'crit' }
+  const soon = items.find((i) => i.view.status === 'today' || i.view.status === 'soon')
+  if (soon) {
+    const d = soon.view.daysLeft
+    return { text: d === 0 ? `${soon.account.name} için bugün son ödeme günü.` : `${soon.account.name} son ödemesine ${d} gün var.`, tone: 'warn' }
+  }
+  return { text: `Kesime ${f.days} gün var, her şey yolunda.`, tone: 'ok' }
 }
 
 /** Expenses for the current month */
@@ -60,187 +128,78 @@ const topCategories = computed(() => {
 /** 4 most recent expenses */
 const recentExpenses = computed(() => thisMonthExpenses.value.slice(0, 4))
 
-function renderRibbon(power_: typeof power.value): JSX.Element | null {
-  const total = power_.total
+/** Spending power split by account, each in its wallet colour. */
+function renderSpread(list: Account[], colors: Map<string, number>, total: Kurus): JSX.Element | null {
   if (total <= 0) return null
-
-  const cardShare = power_.cards / total
-  const kmhShare = power_.kmh / total
-  const liquidShare = power_.liquid / total
-
+  const parts = list
+    .map((a) => ({ a, value: a.kind === 'card' || a.kind === 'kmh' ? Math.max(0, a.available) : Math.max(0, a.balance) }))
+    .filter((p) => p.value > 0)
   return (
-    <div class="home-ribbon">
-      <div class="home-ribbon-bar">
-        {power_.cards > 0 && <div class="home-ribbon-segment home-ribbon-card" style={{ flex: cardShare }} />}
-        {power_.kmh > 0 && <div class="home-ribbon-segment home-ribbon-kmh" style={{ flex: kmhShare }} />}
-        {power_.liquid > 0 && <div class="home-ribbon-segment home-ribbon-cash" style={{ flex: liquidShare }} />}
-      </div>
-      <div class="home-ribbon-legend">
-        <div class="home-ribbon-legend-item">
-          <span class="home-ribbon-legend-head">
-            <span class="home-ribbon-legend-dot home-ribbon-card" />
-            <span>Kartlar</span>
-          </span>
-          <span class="home-ribbon-legend-amount num">{formatTL(power_.cards)}</span>
-        </div>
-        <div class="home-ribbon-legend-item">
-          <span class="home-ribbon-legend-head">
-            <span class="home-ribbon-legend-dot home-ribbon-kmh" />
-            <span>KMH</span>
-          </span>
-          <span class="home-ribbon-legend-amount num">{formatTL(power_.kmh)}</span>
-        </div>
-        <div class="home-ribbon-legend-item">
-          <span class="home-ribbon-legend-head">
-            <span class="home-ribbon-legend-dot home-ribbon-cash" />
-            <span>Nakit</span>
-          </span>
-          <span class="home-ribbon-legend-amount num">{formatTL(power_.liquid)}</span>
-        </div>
-      </div>
+    <div class="home-spread" role="img" aria-label={parts.map((p) => `${p.a.name} ${formatTL(p.value)}`).join(', ')}>
+      {parts.map(({ a, value }, i) => (
+        <span
+          key={a.id}
+          class="home-spread-seg"
+          data-slot={colors.get(a.id) ?? 1}
+          style={{ flex: value / total, '--i': i }}
+        />
+      ))}
     </div>
   )
 }
 
-function renderOutlookTiles(forecast_: typeof forecast.value): JSX.Element {
-  const powerAfter = forecast_.powerAfter
-  const cashAfter = forecast_.cashAfter
-  const cashAfterIsNegative = cashAfter < 0
+function HeroFigure({ value }: { value: Kurus }) {
+  const prev = useRef(value)
+  const [change, setChange] = useState<{ delta: Kurus; key: number } | null>(null)
 
-  const minimumShorfall = cashAfterIsNegative ? -cashAfter : 0
+  // Acknowledge a change (an expense saved, a limit updated): the figure settles in and the delta floats off.
+  useEffect(() => {
+    if (prev.current === value) return
+    const delta = value - prev.current
+    prev.current = value
+    setChange({ delta, key: Date.now() })
+    const t = setTimeout(() => setChange(null), 1800)
+    return () => clearTimeout(t)
+  }, [value])
 
   return (
-    <div class="home-outlook">
-      <div class="home-outlook-tile">
-        <Amount value={powerAfter} size="xl" />
-        <div class="home-outlook-label">Kesime kadar</div>
-        <div class="home-outlook-sub">
-          {formatShort(forecast_.until)} · {forecast_.days} gün{forecast_.recurringCount > 0 ? ' · düzenli ödemeler düşüldü' : ''}
-        </div>
-      </div>
-      <div class="home-outlook-tile">
-        <Amount value={cashAfter} size="xl" tone={cashAfterIsNegative ? 'crit' : 'default'} />
-        <div class="home-outlook-label">Ödemelerden sonra nakit</div>
-        <div class="home-outlook-sub">
-          {cashAfterIsNegative && minimumShorfall > 0 && (
-            <>
-              <div>asgariler için {formatTL(minimumShorfall)} eksik</div>
-              {forecast_.unknownMinimums > 0 && <div>{forecast_.unknownMinimums} ekstre tutarı bekleniyor</div>}
-            </>
-          )}
-          {!cashAfterIsNegative && forecast_.unknownMinimums > 0 && <div>{forecast_.unknownMinimums} ekstre tutarı bekleniyor</div>}
-        </div>
-      </div>
-    </div>
+    <p class="home-hero-figure">
+      <span key={change?.key ?? 0} class={change ? 'home-hero-value is-changed' : 'home-hero-value'}>
+        <Amount value={value} size="hero" />
+      </span>
+      {change && (
+        <span key={`d${change.key}`} class={`home-hero-delta num${change.delta < 0 ? ' is-down' : ' is-up'}`} aria-live="polite">
+          {change.delta < 0 ? '−' : '+'}
+          {formatTL(Math.abs(change.delta))}
+        </span>
+      )}
+    </p>
   )
 }
 
-function renderCardSection(): JSX.Element | null {
-  const cardsValue = cards.value
-  if (cardsValue.length === 0) return null
-
-  const powerValue = power.value
-
+function renderCashStatus(forecast_: typeof forecast.value): JSX.Element {
+  const short = forecast_.cashAfter < 0
+  const overdue = statements.value.filter((i) => i.view.status === 'overdue').length
+  const notes = [
+    overdue > 0 ? `${overdue} ödeme gecikti` : null,
+    forecast_.unknownMinimums > 0 ? `${forecast_.unknownMinimums} ekstre bekleniyor` : null,
+  ].filter(Boolean)
   return (
-    <section class="home-section">
-      <div class="home-section-header">
-        <h2>Kredi kartları</h2>
-        <div class="home-section-meta">
-          {formatTL(powerValue.cards)} / {formatTL(powerValue.cardLimit)}
-        </div>
-      </div>
-      <div class="home-section-content">
-        {cardsValue.map((card) => {
-          const share = card.limit > 0 ? Math.min(1, Math.max(0, card.available / card.limit)) : 0
-          const subText = card.limit <= 0 ? 'Limit girilmedi' : `Limit ${formatTL(card.limit)} · %${Math.round(share * 100)} boş`
-          return (
-            <LimitStrip
-              key={card.id}
-              name={card.name}
-              sub={subText}
-              available={card.available}
-              limit={card.limit}
-              onClick={() => openSheet({ type: 'accountDetail', id: card.id })}
-            />
-          )
-        })}
-        <button
-          type="button"
-          class="home-add-button"
-          onClick={() => openSheet({ type: 'account', kind: 'card' })}
-        >
-          + Kart ekle
-        </button>
-      </div>
-    </section>
-  )
-}
-
-function renderKmhSection(): JSX.Element | null {
-  const kmhValue = kmhAccounts.value
-  if (kmhValue.length === 0) return null
-
-  const powerValue = power.value
-  const kmhUsedValue = powerValue.kmhUsed
-  const kmhUsedText = kmhUsedValue > 0 ? `${formatTL(kmhUsedValue)} kullanımda` : 'Kullanım yok'
-
-  return (
-    <section class="home-section">
-      <div class="home-section-header">
-        <h2>KMH</h2>
-        <div class="home-section-meta">{kmhUsedText}</div>
-      </div>
-      <div class="home-section-content">
-        {kmhValue.map((kmh) => {
-          const share = kmh.limit > 0 ? Math.min(1, Math.max(0, kmh.available / kmh.limit)) : 0
-          const subText = kmh.limit <= 0 ? 'Limit girilmedi' : `Limit ${formatTL(kmh.limit)} · %${Math.round(share * 100)} boş`
-          return (
-            <LimitStrip
-              key={kmh.id}
-              name={kmh.name}
-              sub={subText}
-              available={kmh.available}
-              limit={kmh.limit}
-              tone="kmh"
-              onClick={() => openSheet({ type: 'accountDetail', id: kmh.id })}
-            />
-          )
-        })}
-      </div>
-      {kmhUsedValue > 0 && <div class="home-section-note">KMH faizi günlük işler.</div>}
-    </section>
-  )
-}
-
-function renderLiquidSection(): JSX.Element {
-  const liquidValue = liquidAccounts.value
-  const powerValue = power.value
-  const totalLiquid = powerValue.liquid
-
-  return (
-    <section class="home-section">
-      <div class="home-section-header">
-        <h2>Nakit ve hesaplar</h2>
-        <div class="home-section-meta">{formatTL(totalLiquid)}</div>
-      </div>
-      <div class="home-section-content">
-        {liquidValue.map((account) => (
-          <div key={account.id} class="home-account-row">
-            <div class="home-account-row-left">
-              <div class="home-account-row-name">{account.name}</div>
-              {account.note && <div class="home-account-row-note">{account.note}</div>}
-            </div>
-            <div class="home-account-row-balance num">{formatTL(account.balance)}</div>
-          </div>
-        ))}
-        <button
-          type="button"
-          class="home-add-button"
-          onClick={() => openSheet({ type: 'account', kind: 'bank' })}
-        >
-          + Hesap ekle
-        </button>
-      </div>
+    <section class={`home-cash${short || overdue > 0 ? ' is-short' : ''}`} aria-label="Ödemelerden sonra nakit">
+      <p class="home-cash-title">
+        {short ? (
+          <>
+            Asgariler için <span class="num">{figure(formatTL(-forecast_.cashAfter))}</span> eksik
+          </>
+        ) : (
+          <>
+            Ödemelerden sonra <span class="num">{figure(formatTL(forecast_.cashAfter))}</span> nakit kalıyor
+          </>
+        )}
+      </p>
+      <p class="home-cash-sub">
+        {notes.length > 0 ? notes.join(' · ') : `${formatShort(forecast_.until)} tarihine kadar nakit, banka ve boş KMH: ${formatTL(forecast_.cashAvailable)}`}
+      </p>
     </section>
   )
 }
@@ -270,29 +229,28 @@ function renderExpenseSection(): JSX.Element | null {
     <section class="home-section">
       <div class="home-section-header">
         <h2>Harcamalar</h2>
+        <div class="home-section-meta">
+          Bu ay <span class="num">{figure(formatTL(monthTotalValue))}</span>
+        </div>
       </div>
       <div class="home-section-content">
-        <div class="home-expenses-header">
-          <div class="home-expenses-month">{formatTL(monthTotalValue)}</div>
-          <div class="home-expenses-month-label">Bu ay</div>
-        </div>
-
         {topCatsValue.length > 0 && (
-          <div class="home-expenses-categories">
+          <ul class="home-expenses-categories">
             {topCatsValue.map(({ catId, amount }) => {
               const cat = categoryByIdValue.get(catId)
               if (!cat) return null
               const shareOfTotal = monthTotalValue > 0 ? amount / monthTotalValue : 0
               return (
-                <div key={catId} class="home-expenses-category">
-                  <div class="home-expenses-category-bar">
-                    <div class="home-expenses-category-fill" style={{ width: `${shareOfTotal * 100}%`, backgroundColor: 'var(--accent)' }} />
-                  </div>
-                  <div class="home-expenses-category-label">{cat.name}</div>
-                </div>
+                <li key={catId} class="home-expenses-category cat-color" style={{ '--h': displayHue(cat.hue) }}>
+                  <span class="home-expenses-category-label">{cat.name}</span>
+                  <span class="home-expenses-category-amount num">{figure(formatTL(amount))}</span>
+                  <span class="home-expenses-category-bar" aria-hidden="true">
+                    <span class="home-expenses-category-fill" style={{ width: `${shareOfTotal * 100}%` }} />
+                  </span>
+                </li>
               )
             })}
-          </div>
+          </ul>
         )}
 
         {recentValue.length > 0 && (
@@ -314,7 +272,7 @@ function renderExpenseSection(): JSX.Element | null {
                       {account?.name} · {formatShort(expenseDate)}
                     </span>
                   </span>
-                  <span class="home-expense-row-amount num">−{formatTLExact(expense.amount)}</span>
+                  <span class="home-expense-row-amount num">−{figure(formatTLExact(expense.amount))}</span>
                 </button>
               )
             })}
@@ -329,14 +287,14 @@ function renderExpenseSection(): JSX.Element | null {
   )
 }
 
-function renderStatementsSection(): JSX.Element | null {
+function renderStatementsSection(colors: Map<string, number>): JSX.Element | null {
   const statementsValue = statements.value
   if (statementsValue.length === 0) return null
 
   return (
     <section class="home-section">
       <div class="home-section-header">
-        <h2>Asgari ödemeler</h2>
+        <h2>Ödemeler</h2>
       </div>
       <div class="home-section-content">
         {statementsValue.map((item) => {
@@ -362,8 +320,13 @@ function renderStatementsSection(): JSX.Element | null {
               key={`${account.id}-${item.lineIndex}`}
               type="button"
               class="home-statement-row"
+              data-slot={colors.get(account.id) ?? 1}
               onClick={() => openSheet({ type: 'statement', accountId: account.id, lineIndex: item.lineIndex })}
             >
+              <span class="home-statement-date" aria-hidden="true">
+                <span class="home-statement-day">{view.due.getDate()}</span>
+                <span class="home-statement-month">{monthShort.format(view.due)}</span>
+              </span>
               <span class="home-statement-row-left">
                 <span class="home-statement-row-name">
                   {account.name}
@@ -376,7 +339,7 @@ function renderStatementsSection(): JSX.Element | null {
               </span>
               <span class="home-statement-row-right">
                 <span class={`home-statement-row-amount num${minOutstanding == null ? ' is-warn' : ''}`}>
-                  {minOutstanding == null ? 'Tutar girilmedi' : `${minIsEst ? '~' : ''}${formatTL(minOutstanding)}`}
+                  {minOutstanding == null ? 'Tutar girilmedi' : figure(`${minIsEst ? '~' : ''}${formatTL(minOutstanding)}`)}
                 </span>
                 <span class="home-statement-row-status">{statusPill}</span>
               </span>
@@ -395,10 +358,21 @@ export function HomePage() {
   if (accountsValue.length === 0) {
     return (
       <div class="home-page">
-        {renderTopbar()}
-        <EmptyState title="İlk kartını ekle">
-          <p>Kartlarının limitini ve kullanılabilir limitini gir; uygulama ne kadar harcayabileceğini hesaplasın.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
+        {renderTopbar(undefined, assistantCount.value)}
+        <section class="home-welcome" aria-labelledby="home-welcome-title">
+          <div class="home-welcome-fan" aria-hidden="true">
+            <span class="home-welcome-card" data-slot="2" />
+            <span class="home-welcome-card" data-slot="5" />
+            <span class="home-welcome-card" data-slot="4" />
+          </div>
+          <h2 id="home-welcome-title" class="home-welcome-title">
+            Cüzdanını kuralım
+          </h2>
+          <p class="home-welcome-text">
+            Kartlarını ve hesaplarını ekle; ne kadar harcayabileceğini ve kesime kadar ne kalacağını hemen görelim. Her şey
+            yalnızca bu telefonda kalır.
+          </p>
+          <div class="home-welcome-actions">
             <Button variant="primary" block onClick={() => openSheet({ type: 'account', kind: 'card' })}>
               Kart ekle
             </Button>
@@ -409,30 +383,42 @@ export function HomePage() {
               Yedekten geri yükle
             </Button>
           </div>
-        </EmptyState>
+        </section>
       </div>
     )
   }
 
   const powerValue = power.value
   const forecastValue = forecast.value
+  const colors = accountColors(accountsValue)
+  const wallet = byMostAvailable(accountsValue)
 
   return (
     <div class="home-page">
-      {renderTopbar()}
-      <div class="home-hero">
-        <div class="home-hero-eyebrow">Şu an harcayabileceğin</div>
-        <Amount value={powerValue.total} size="hero" />
-        {renderRibbon(powerValue)}
-        {renderOutlookTiles(forecastValue)}
-      </div>
+      {renderTopbar(homeStatus(), assistantCount.value)}
+
+      <section class="home-hero" aria-labelledby="home-hero-label">
+        <h2 id="home-hero-label" class="home-hero-label">
+          Harcama gücün
+        </h2>
+        <HeroFigure value={powerValue.total} />
+        {renderSpread(wallet, colors, powerValue.total)}
+      </section>
+
+      <Wallet accounts={wallet} colors={colors} statements={statements.value} />
+
+      <section class="home-runway" aria-labelledby="home-runway-label">
+        <h2 id="home-runway-label" class="home-runway-label">
+          Kesime kadar
+        </h2>
+        <Runway days={runwayDays.value} />
+      </section>
+
+      {renderCashStatus(forecastValue)}
       <RecurringDueBanner />
 
-      {renderCardSection()}
-      {renderKmhSection()}
-      {renderLiquidSection()}
+      {renderStatementsSection(colors)}
       {renderExpenseSection()}
-      {renderStatementsSection()}
     </div>
   )
 }

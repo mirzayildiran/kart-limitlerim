@@ -11,6 +11,7 @@
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc -b",
     "lint": "eslint . && node scripts/check-css.mjs",
+    "shots": "node scripts/shots.mjs",
     "ios:dev": "node scripts/ios-dev.mjs",
     "ios:build": "CAP_NATIVE=1 npm run build && cap sync ios",
     "ios:open": "cap open ios"
@@ -36,6 +37,7 @@
     "eslint": "^9.39.5",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "fake-indexeddb": "^6.2.5",
+    "playwright-core": "^1.64.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.71.1",
     "vite": "^8.3.0",
