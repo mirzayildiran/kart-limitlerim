@@ -40,6 +40,16 @@ npm run ios:build
 
 Sonra Xcode'da Run. `ios:dev` sonrası bu komut çalıştırılmadan yapılan sürüm Mac'e bağlı kalır.
 
+## Duman testi
+
+```bash
+bash scripts/ios-smoke.sh
+```
+
+Release simülatör derlemesini kurar, açar, ekranın boş kalmadığını ve `kartlimitlerim://takvim`,
+`kartlimitlerim://harcama-ekle` bağlantılarını denetler. `ios/`, `src/platform/`, `capacitor.config.ts`
+ya da `index.html` değişince çalıştır.
+
 ## Yalnızca uygulamada olanlar
 
 Ayarlar → **Bu iPhone** (tarayıcıda görünmez):
@@ -75,3 +85,26 @@ Mağazaya göndermeden önce: gizlilik politikası adresi (`docs/PRIVACY.md` yay
 App Store gizlilik etiketleri, 6.9" iPhone ekran görüntüleri, `PrivacyInfo.xcprivacy`,
 ve uygulamanın "web sitesini saran uygulama" sayılmaması için yerel özellikler
 (Face ID kilidi, son ödeme bildirimleri, dokunsal geri bildirim).
+
+## Üyelik alınınca (TestFlight ve App Store)
+
+1. [developer.apple.com](https://developer.apple.com/programs/) → Apple Developer Program'a katıl (yıllık 99 USD, onay 1–2 gün sürebilir).
+2. Xcode → Settings → Accounts: aynı Apple ID'de artık ücretli ekip görünür.
+3. `npm run ios:open` → *App* hedefi → *Signing & Capabilities* → *Team*: ücretli ekibi seç.
+   Bundle ID aynı kalır (`com.mirzayildiran.kartlimitlerim`); Xcode kimliği ve profili kendisi oluşturur.
+4. [App Store Connect](https://appstoreconnect.apple.com) → Uygulamalar → `+` → Yeni Uygulama:
+   platform iOS, ad "Kart Limitlerim", birincil dil Türkçe, Bundle ID'yi listeden seç, SKU `kartlimitlerim`.
+5. Sürüm ve paket:
+   ```bash
+   npm run ios:release
+   ```
+   Sürümü `package.json`'dan, derleme numarasını commit sayısından yazar, paketlenmiş sürümü hazırlar.
+   Her yüklemede derleme numarası büyük olmalı: yüklemeden önce commit'le. Ardından `bash scripts/ios-smoke.sh`.
+6. Xcode → üstte cihaz olarak **Any iOS Device (arm64)** → Product → **Archive**.
+7. Organizer açılır → arşiv → **Distribute App** → **App Store Connect** → Upload.
+   Birkaç dakika sonra App Store Connect → TestFlight'ta derleme görünür; ihracat uyumu sorulmaz
+   (`ITSAppUsesNonExemptEncryption = NO`).
+8. **TestFlight**: Dahili test → kendini ekle → iPhone'da TestFlight uygulamasından kur. Kurulum 90 gün geçerli.
+9. Mağaza bilgileri, gizlilik etiketleri, ekran görüntüleri (`store/screenshots/6.9/`), inceleme notları:
+   [docs/APP_STORE.md](APP_STORE.md). Gizlilik bildirimi `ios/App/App/PrivacyInfo.xcprivacy` o tabloyla aynı olmalı.
+10. Sürüm sayfasında derlemeyi seç → **İncelemeye Gönder**.
