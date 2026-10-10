@@ -8,6 +8,7 @@
 .expenses-header {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--s-3);
   padding: var(--s-2) var(--s-1) 0;
 }
@@ -18,10 +19,11 @@
   letter-spacing: -0.025em;
 }
 
+/* Month switcher: one pill, chevron, label, chevron. */
 .expenses-month-nav {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--s-1);
   padding: 4px;
   background: var(--surface);
   border: 1px solid var(--line);
@@ -33,9 +35,9 @@
   place-items: center;
   width: var(--tap);
   height: var(--tap);
-  border-radius: 50%;
+  border-radius: var(--r-pill);
   color: var(--ink);
-  transition: background 0.15s, transform 0.12s var(--ease);
+  transition: background var(--dur-state) var(--ease), transform var(--dur-tap) var(--ease);
 }
 
 .expenses-nav-btn:hover {
@@ -43,7 +45,7 @@
 }
 
 .expenses-nav-btn:active {
-  transform: scale(0.9);
+  transform: scale(var(--press));
 }
 
 .expenses-nav-btn:disabled {
@@ -54,6 +56,8 @@
 }
 
 .expenses-month-label {
+  min-width: 8.5em;
+  text-align: center;
   font-weight: 600;
   font-size: var(--text-md);
 }
@@ -68,23 +72,43 @@
   gap: var(--s-6);
 }
 
-/* Month total */
+/* Summary: the figure is the filtered set; the chips clear the filter. */
 .expenses-summary-total {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--s-2);
   padding: 0 var(--s-1);
-}
-
-.expenses-summary .amount-xl {
-  font-size: clamp(2.5rem, 12vw, 3.25rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
 }
 
 .expenses-summary-label {
   font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--muted);
+}
+
+.expenses-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  padding-top: var(--s-1);
+}
+
+.expenses-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  padding: 0 var(--s-4);
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: transform var(--dur-tap) var(--ease);
+}
+
+.expenses-chip:active {
+  transform: scale(var(--press));
 }
 
 .expenses-section-title {
@@ -94,50 +118,90 @@
   letter-spacing: -0.02em;
 }
 
-/* Categories: one sheet of coloured bars */
-.expenses-category-bars,
-.expenses-account-list {
+/* Categories: one slate container, one row per category */
+.expenses-category-list {
   display: flex;
   flex-direction: column;
-  gap: var(--s-3);
-  padding: var(--s-4);
+  padding: var(--s-1) 0;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-1);
+  overflow: hidden;
 }
 
-.expenses-category-item {
+.expenses-category {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 6px var(--s-3);
   align-items: baseline;
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--s-3) var(--s-4);
+  text-align: left;
+  transition:
+    transform var(--dur-tap) var(--ease),
+    background var(--dur-state) var(--ease);
+}
+
+.expenses-category + .expenses-category {
+  border-top: 1px solid var(--line);
+}
+
+.expenses-category:active {
+  transform: scale(var(--press-row));
+}
+
+.expenses-category.is-active {
+  background: var(--accent-soft);
+}
+
+/* Amount and the selected check share the right column; the check takes no space when hidden. */
+/* Baseline follows the amount's text, so amounts stay on the name's line; the icon is centred on it. */
+.expenses-category-end {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+
+.expenses-category-check {
+  flex: 0 0 auto;
+  align-self: center;
+  color: var(--accent);
+  visibility: hidden;
+}
+
+.expenses-category.is-active .expenses-category-check {
+  visibility: visible;
 }
 
 .expenses-category-name {
   display: inline-flex;
   align-items: center;
   gap: var(--s-2);
-  font-size: var(--text-sm);
+  font-size: var(--text-md);
   font-weight: 600;
+  min-width: 0;
 }
 
 .expenses-category-name::before {
   content: '';
+  flex: 0 0 auto;
   width: 10px;
   height: 10px;
-  border-radius: 3px;
+  border-radius: 50%;
   background: var(--cat);
 }
 
 .expenses-category-amount {
   font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--muted);
 }
 
 .expenses-category-bar {
   grid-column: 1 / -1;
-  height: 8px;
+  height: 6px;
   border-radius: var(--r-pill);
   background: var(--surface-3);
   overflow: hidden;
@@ -148,88 +212,148 @@
   height: 100%;
   border-radius: var(--r-pill);
   background: var(--cat);
-  transform-origin: left center;
-  animation: expenses-fill 0.8s var(--ease-out-expo) both;
 }
 
-/* By source: the account's wallet colour */
-.expenses-account-item {
-  display: flex;
-  align-items: center;
+/* Accounts: filled tiles in each account's wallet colour */
+.expenses-account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--s-3);
-  font-size: var(--text-md);
 }
 
-.expenses-account-item::before {
-  content: '';
-  flex: 0 0 auto;
-  width: 22px;
-  height: 14px;
-  border-radius: 4px;
+.expenses-account {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--s-2);
+  min-width: 0;
+  min-height: 64px;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-lg);
   background: var(--c);
+  color: var(--c-ink);
+  text-align: left;
+  transition: transform var(--dur-tap) var(--ease);
+}
+
+.expenses-account:active {
+  transform: scale(var(--press));
+}
+
+/* Selected tile: outline in ink, check in the tile's own ink at the top right. */
+.expenses-account.is-active {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.expenses-account-check {
+  position: absolute;
+  top: var(--s-2);
+  right: var(--s-2);
+  color: var(--c-ink);
 }
 
 .expenses-account-name {
-  flex: 1;
+  display: block;
   min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.expenses-account-amount {
-  font-weight: 600;
+.expenses-account.is-active .expenses-account-name {
+  padding-right: var(--s-5);
+}
+
+/* Amounts inside a tile take the tile's ink, not the page's. */
+.expenses-account .amount,
+.expenses-account .amount-cur {
+  color: inherit;
 }
 
 /* Day groups */
 .expenses-list {
   display: flex;
   flex-direction: column;
-  gap: var(--s-5);
 }
 
-.expenses-day-group {
+/* The whole month in one slate container. */
+.expenses-list-box {
   display: flex;
   flex-direction: column;
-  gap: var(--s-2);
-}
-
-.expenses-day-header {
-  padding: 0 var(--s-1);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--muted);
-}
-
-.expenses-day-items {
-  display: flex;
-  flex-direction: column;
-  padding: var(--s-1) 0;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+.expenses-list-box.is-swapped {
+  animation: expenses-swap var(--dur-state) var(--ease) both;
+}
+
+.expenses-day {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Day divider inside the container: label left, total right, hairline above (none on the first). */
+.expenses-day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-height: 36px;
+  padding: 0 var(--s-4);
+}
+
+.expenses-day + .expenses-day .expenses-day-head {
+  border-top: 1px solid var(--line);
+}
+
+.expenses-day-header {
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.expenses-day-total {
+  flex: 0 0 auto;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--muted);
 }
 
 .expenses-item {
   display: flex;
   align-items: center;
   gap: var(--s-3);
+  width: 100%;
   min-height: 56px;
   padding: var(--s-3) var(--s-4);
   text-align: left;
-  transition: background 0.15s;
+  transition:
+    transform var(--dur-tap) var(--ease),
+    background var(--dur-state) var(--ease);
 }
 
 .expenses-item + .expenses-item {
   border-top: 1px solid var(--line);
 }
 
-.expenses-item:hover,
+.expenses-item:hover {
+  background: var(--surface-2);
+}
+
 .expenses-item:active {
   background: var(--surface-2);
+  transform: scale(var(--press-row));
 }
 
 .expenses-item-dot {
@@ -249,7 +373,9 @@
 }
 
 .expenses-item-label {
+  font-size: var(--text-md);
   font-weight: 600;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -266,25 +392,43 @@
 .expenses-item-amount {
   flex: 0 0 auto;
   font-family: var(--font-display);
+  font-size: var(--text-lg);
   font-weight: 700;
+}
+
+/* Filter with no results */
+.expenses-none {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-6) 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--text-md);
 }
 
 .expenses-page .amount-sep {
   font-variant-numeric: proportional-nums;
 }
 
-@keyframes expenses-fill {
+/* Filter change: the list fades, no movement. Colour and fade stay under reduced motion. */
+@keyframes expenses-swap {
   from {
-    transform: scaleX(0);
+    opacity: 0.6;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .expenses-category-fill {
-    animation: none;
+  .expenses-nav-btn,
+  .expenses-chip,
+  .expenses-category,
+  .expenses-account,
+  .expenses-item {
+    transform: none !important;
   }
 
   .expenses-nav-btn {
-    transition: none;
+    transition: background var(--dur-state) var(--ease);
   }
 }
