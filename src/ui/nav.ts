@@ -42,6 +42,8 @@ export type SheetRequest =
   | { type: 'recurring'; id?: string }
   | { type: 'category'; id?: string }
   | { type: 'import' }
+  /** One-time, native only: offer reminders and Face ID after the first card is added. */
+  | { type: 'phoneSetup' }
 
 export const sheet = signal<SheetRequest | null>(null)
 
