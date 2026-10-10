@@ -9,6 +9,8 @@ import {
   interestNudge,
   monthNavigation,
   filterExpenses,
+  facetTotals,
+  isFacetDisabled,
   dayTotal,
 } from './expenseModel'
 import type { Expense, CardAccount, KmhAccount, Kurus, IsoDate } from '../../domain/types'
@@ -277,6 +279,76 @@ describe('expenseModel', () => {
       const copy = [...list]
       filterExpenses(list, { accountId: 'acc_2' })
       expect(list).toEqual(copy)
+    })
+  })
+
+  describe('isFacetDisabled', () => {
+    it('disables an unselected row with nothing under the other filter', () => {
+      expect(isFacetDisabled(0 as Kurus, false)).toBe(true)
+    })
+
+    it('keeps rows with an amount enabled', () => {
+      expect(isFacetDisabled(1 as Kurus, false)).toBe(false)
+    })
+
+    it('never disables a selected row, even at zero', () => {
+      expect(isFacetDisabled(0 as Kurus, true)).toBe(false)
+      expect(isFacetDisabled(500 as Kurus, true)).toBe(false)
+    })
+  })
+
+  describe('facetTotals', () => {
+    const list = [
+      mockExpense({ id: 'a', amount: 1000 as Kurus, categoryId: 'cat_food', accountId: 'acc_1' }),
+      mockExpense({ id: 'b', amount: 2000 as Kurus, categoryId: 'cat_food', accountId: 'acc_2' }),
+      mockExpense({ id: 'c', amount: 4000 as Kurus, categoryId: 'cat_fun', accountId: 'acc_1' }),
+    ]
+
+    it('with no filter, both breakdowns cover the whole list', () => {
+      const { byCategory, byAccount } = facetTotals(list)
+      expect(byCategory.get('cat_food')).toBe(3000)
+      expect(byCategory.get('cat_fun')).toBe(4000)
+      expect(byAccount.get('acc_1')).toBe(5000)
+      expect(byAccount.get('acc_2')).toBe(2000)
+    })
+
+    it('a category filter narrows the account breakdown only', () => {
+      const { byCategory, byAccount } = facetTotals(list, { categoryId: 'cat_food' })
+      expect(byAccount.get('acc_1')).toBe(1000)
+      expect(byAccount.get('acc_2')).toBe(2000)
+      // The selected category does not narrow the category rows themselves
+      expect(byCategory.get('cat_food')).toBe(3000)
+      expect(byCategory.get('cat_fun')).toBe(4000)
+    })
+
+    it('an account filter narrows the category breakdown only', () => {
+      const { byCategory, byAccount } = facetTotals(list, { accountId: 'acc_1' })
+      expect(byCategory.get('cat_food')).toBe(1000)
+      expect(byCategory.get('cat_fun')).toBe(4000)
+      expect(byAccount.get('acc_1')).toBe(5000)
+      expect(byAccount.get('acc_2')).toBe(2000)
+    })
+
+    it('omits rows with no expenses under the other filter', () => {
+      const { byCategory } = facetTotals(list, { accountId: 'acc_2' })
+      expect(byCategory.get('cat_food')).toBe(2000)
+      expect(byCategory.has('cat_fun')).toBe(false)
+    })
+
+    it('each breakdown ignores its own filter and keeps the other one', () => {
+      const { byCategory, byAccount } = facetTotals(list, { categoryId: 'cat_food', accountId: 'acc_1' })
+      // Category rows are limited by the account (acc_1): food 1000, fun 4000
+      expect(byCategory.get('cat_food')).toBe(1000)
+      expect(byCategory.get('cat_fun')).toBe(4000)
+      // Account tiles are limited by the category (food): acc_1 1000, acc_2 2000
+      expect(byAccount.get('acc_1')).toBe(1000)
+      expect(byAccount.get('acc_2')).toBe(2000)
+    })
+
+    it('returns empty maps for an empty list', () => {
+      const { byCategory, byAccount } = facetTotals([], { categoryId: 'cat_food' })
+      expect(byCategory.size).toBe(0)
+      expect(byAccount.size).toBe(0)
     })
   })
 

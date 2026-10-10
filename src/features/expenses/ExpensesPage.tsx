@@ -17,15 +17,17 @@ import { accountColors } from '../../ui/accountColor'
 import {
   dayTotal,
   expensesByMonth,
+  facetTotals,
   filterExpenses,
   groupExpensesByDay,
   categoryTotals,
   accountTotals,
+  isFacetDisabled,
   monthNavigation,
 } from './expenseModel'
 import './expenses-page.css'
 
-const CATEGORY_PREVIEW = 6
+const CATEGORY_PREVIEW = 4
 
 // Start with current month
 const currentMonth = computed(() => cycleKeyOf(today.value))
@@ -63,12 +65,15 @@ function clearFilters() {
   listSwap.value++
 }
 
+/** "Ekim 2026" → "Ekim" */
+const monthName = (key: string) => formatMonth(key).replace(/\s+\d{4}$/, '')
+
 const monthExpenses = computed(() => {
   const filtered = expensesByMonth(expenses.value, selectedMonth.value)
   return filtered.sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt)
 })
 
-// Breakdowns always describe the whole month; filters narrow the figure and the list only.
+// The list and the hero figure follow both filters (AND).
 const visibleExpenses = computed(() =>
   filterExpenses(monthExpenses.value, {
     categoryId: categoryFilter.value ?? undefined,
@@ -80,37 +85,42 @@ const visibleTotal = computed(() => dayTotal(visibleExpenses.value))
 const visibleCount = computed(() => visibleExpenses.value.length)
 const isFiltered = computed(() => categoryFilter.value !== null || accountFilter.value !== null)
 
-const topCategories = computed(() => {
-  const totals = categoryTotals(monthExpenses.value)
-  if (totals.size === 0) return []
-
-  const max = Math.max(...Array.from(totals.values()))
-  return Array.from(totals.entries())
-    .sort((a, b) => b[1] - a[1])
-    .map(([catId, amount]) => ({
-      catId,
-      amount,
-      name: categoryById.value.get(catId)?.name ?? 'Diğer',
-      hue: categoryById.value.get(catId)?.hue ?? 160,
-      ratio: max > 0 ? amount / max : 0,
-    }))
-})
-
-const categoryRows = computed(() =>
-  showAllCategories.value ? topCategories.value : topCategories.value.slice(0, CATEGORY_PREVIEW),
+// Each breakdown applies the other filter (faceted). Row order stays on the whole month
+// so rows do not jump while the user filters.
+const facets = computed(() =>
+  facetTotals(monthExpenses.value, {
+    categoryId: categoryFilter.value ?? undefined,
+    accountId: accountFilter.value ?? undefined,
+  }),
 )
 
-const accountBreakdown = computed(() => {
-  const totals = accountTotals(monthExpenses.value)
-  if (totals.size === 0) return []
+const categoryBreakdown = computed(() => {
+  const amounts = facets.value.byCategory
+  const max = Math.max(0, ...Array.from(amounts.values()))
+  return Array.from(categoryTotals(monthExpenses.value).entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([catId]) => {
+      const amount = amounts.get(catId) ?? 0
+      const cat = categoryById.value.get(catId)
+      return {
+        catId,
+        amount,
+        name: cat?.name ?? 'Diğer',
+        hue: cat?.hue ?? 160,
+        ratio: max > 0 ? amount / max : 0,
+      }
+    })
+})
 
-  return Array.from(totals.entries())
-    .map(([accId, amount]) => ({
+const accountBreakdown = computed(() => {
+  const amounts = facets.value.byAccount
+  return Array.from(accountTotals(monthExpenses.value).entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([accId]) => ({
       accId,
-      amount,
+      amount: amounts.get(accId) ?? 0,
       name: accountById.value.get(accId)?.name ?? 'Silinmiş hesap',
     }))
-    .sort((a, b) => b.amount - a.amount)
 })
 
 const groupedExpenses = computed(() => {
@@ -128,7 +138,17 @@ export function ExpensesPage() {
   const accFilter = accountFilter.value
   const catName = catFilter ? (categoryById.value.get(catFilter)?.name ?? 'Diğer') : null
   const accName = accFilter ? (accountById.value.get(accFilter)?.name ?? 'Silinmiş hesap') : null
+  const filterNames = [catName, accName].filter((n): n is string => n !== null)
+  const scope = filterNames.length > 0 ? filterNames.join(' · ') : monthName(selectedMonth.value)
+  const summaryLine = `${scope} toplamı · ${visibleCount.value} harcama`
+  const emptyText =
+    catName && accName
+      ? `${catName} ve ${accName} için harcama yok`
+      : `${catName ?? accName} için harcama yok`
+  const clearLabel = filterNames.length > 1 ? 'Filtreleri kaldır' : 'Filtreyi kaldır'
   const swapped = listSwap.value > 0
+  const categories = categoryBreakdown.value
+  const categoryRows = showAllCategories.value ? categories : categories.slice(0, CATEGORY_PREVIEW)
 
   return (
     <div class="expenses-page">
@@ -169,13 +189,15 @@ export function ExpensesPage() {
         </div>
       ) : (
         <div class="expenses-content">
-          {/* Month summary: figure and count follow the active filter */}
+          {/* Month summary: figure and status line follow the active filters */}
           <section class="expenses-summary" aria-label="Toplam">
             <div class="expenses-summary-total">
-              <div class="expenses-summary-amount">
-                <Amount value={visibleTotal.value} size="hero" />
+              <div class="expenses-summary-live" aria-live="polite">
+                <div class="expenses-summary-amount">
+                  <Amount value={visibleTotal.value} size="hero" />
+                </div>
+                <div class="expenses-summary-label">{summaryLine}</div>
               </div>
-              <div class="expenses-summary-label">{visibleCount.value} harcama</div>
               {isFiltered.value && (
                 <div class="expenses-chips">
                   {catFilter && catName && (
@@ -206,12 +228,16 @@ export function ExpensesPage() {
           </section>
 
           {/* Category breakdown: toggles a category filter */}
-          {topCategories.value.length > 0 && (
+          {categories.length > 0 && (
             <section class="expenses-categories">
-              <h2 class="expenses-section-title">Kategoriler</h2>
+              <div class="expenses-section-head">
+                <h2 class="expenses-section-title">Kategoriler</h2>
+                <span class="expenses-section-caption">Dokunarak süz</span>
+              </div>
               <div class="expenses-category-list">
-                {categoryRows.value.map((cat) => {
+                {categoryRows.map((cat) => {
                   const active = catFilter === cat.catId
+                  const disabled = isFacetDisabled(cat.amount, active)
                   return (
                     <button
                       key={cat.catId}
@@ -219,7 +245,10 @@ export function ExpensesPage() {
                       class={`expenses-category cat-color${active ? ' is-active' : ''}`}
                       style={{ '--h': displayHue(cat.hue) }}
                       aria-pressed={active}
-                      onClick={() => toggleCategory(cat.catId)}
+                      aria-disabled={disabled ? 'true' : undefined}
+                      onClick={() => {
+                        if (!disabled) toggleCategory(cat.catId)
+                      }}
                     >
                       <span class="expenses-category-name">{cat.name}</span>
                       <span class="expenses-category-end">
@@ -233,7 +262,7 @@ export function ExpensesPage() {
                   )
                 })}
               </div>
-              {topCategories.value.length > CATEGORY_PREVIEW && (
+              {categories.length > CATEGORY_PREVIEW && (
                 <Button
                   variant="ghost"
                   block
@@ -249,10 +278,11 @@ export function ExpensesPage() {
           {/* Account breakdown: coloured tiles in each wallet colour, toggles an account filter */}
           {accountBreakdown.value.length > 0 && (
             <section class="expenses-accounts">
-              <h2 class="expenses-section-title">Kaynağa göre</h2>
+              <h2 class="expenses-section-title">Hesaba göre</h2>
               <div class="expenses-account-grid">
                 {accountBreakdown.value.map((acc) => {
                   const active = accFilter === acc.accId
+                  const disabled = isFacetDisabled(acc.amount, active)
                   return (
                     <button
                       key={acc.accId}
@@ -260,7 +290,10 @@ export function ExpensesPage() {
                       class={`expenses-account${active ? ' is-active' : ''}`}
                       data-slot={colors.value.get(acc.accId) ?? 1}
                       aria-pressed={active}
-                      onClick={() => toggleAccount(acc.accId)}
+                      aria-disabled={disabled ? 'true' : undefined}
+                      onClick={() => {
+                        if (!disabled) toggleAccount(acc.accId)
+                      }}
                     >
                       <span class="expenses-account-name">{acc.name}</span>
                       <Amount value={acc.amount} size="md" />
@@ -274,12 +307,12 @@ export function ExpensesPage() {
 
           {/* Expenses by day */}
           <section class="expenses-list" aria-labelledby="expenses-list-title">
-            <h2 id="expenses-list-title" class="expenses-section-title">Liste</h2>
+            <h2 id="expenses-list-title" class="expenses-section-title">Tüm harcamalar</h2>
             {groupedExpenses.value.length === 0 ? (
               <div class="expenses-none">
-                <p>Bu filtrede harcama yok</p>
+                <p>{emptyText}</p>
                 <Button variant="ghost" onClick={clearFilters}>
-                  Filtreyi kaldır
+                  {clearLabel}
                 </Button>
               </div>
             ) : (
