@@ -95,8 +95,22 @@
   --tabbar-h: 64px;
   --tap: 44px;
 
+  /* Motion (see .impeccable/surfaces/motion-system.md). Transform and opacity only. */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  --dur-tap: 120ms;
+  --dur-state: 200ms;
+  --dur-page: 300ms;
+  --dur-page-out: 130ms;
+  --dur-page-gap: 50ms;
+  --dur-sheet: 380ms;
+  --dur-sheet-out: 220ms;
+
+  /* Press scale: 0.97 for buttons and large surfaces, 0.985 for rows and cards. */
+  --press: 0.97;
+  --press-row: 0.985;
 }
 
 @media (prefers-color-scheme: dark) {
