@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks'
 import type { JSX } from 'preact'
 import { daysBetween } from '../../domain/dates'
-import { formatTL } from '../../domain/money'
+import { formatTL, spokenTL } from '../../domain/money'
 import { figure } from '../../ui/components/Amount'
 import type { RunwayDay } from '../../domain/runway'
 import './runway.css'
@@ -29,6 +29,13 @@ function dayTitle(day: RunwayDay, index: number, last: number): string {
 function eventText(e: RunwayDay['events'][number]): string {
   if (e.kind === 'recurring') return `${e.label} −${formatTL(e.amount ?? 0)}`
   if (e.kind === 'due') return e.amount == null ? `${e.label} · tutar girilmedi` : `${e.label} · asgari ${formatTL(e.amount)}`
+  return e.label
+}
+
+/** eventText for VoiceOver: amounts as words, no "·" or "−" glyphs. */
+function spokenEvent(e: RunwayDay['events'][number]): string {
+  if (e.kind === 'recurring') return `${e.label}, ${spokenTL(e.amount ?? 0, { sign: 'minus' })}`
+  if (e.kind === 'due') return e.amount == null ? `${e.label}, tutar girilmedi` : `${e.label}, asgari ${spokenTL(e.amount)}`
   return e.label
 }
 
@@ -88,7 +95,8 @@ export function Runway({ days }: Props) {
 
   return (
     <div class="runway">
-      <div class="runway-readout" aria-live="polite">
+      {/* No live region: the slider's value text already speaks each day while it moves. */}
+      <div class="runway-readout">
         <div class="runway-readout-head">
           <span class="runway-day">{title}</span>
           <span class="runway-amount num">
@@ -116,7 +124,7 @@ export function Runway({ days }: Props) {
         aria-valuemin={0}
         aria-valuemax={last}
         aria-valuenow={index}
-        aria-valuetext={`${title}: ${formatTL(day.power)} kalır`}
+        aria-valuetext={`${title}: ${spokenTL(day.power)} kalır. ${day.events.length ? day.events.map(spokenEvent).join('. ') : 'Planlı ödeme yok'}`}
         onPointerDown={onPointer}
         onPointerMove={onPointer}
         onKeyDown={onKey}

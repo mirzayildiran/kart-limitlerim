@@ -69,9 +69,10 @@ function RowBody({ row, onEdit }: { row: BudgetRow; onEdit: () => void }) {
       <div
         class="budget-plan-bar"
         role="progressbar"
-        aria-valuenow={row.usedPercent}
+        aria-valuenow={Math.min(100, Math.max(0, row.usedPercent))}
         aria-valuemin={0}
         aria-valuemax={100}
+        aria-valuetext={`Yüzde ${row.usedPercent} kullanıldı`}
         aria-label={`${row.name} bütçesi`}
       >
         <span class={`budget-plan-fill budget-plan-fill-${row.status}`} style={{ width: `${ratio * 100}%` }} />
