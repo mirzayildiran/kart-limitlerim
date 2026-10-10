@@ -1,8 +1,8 @@
+/* The 16px gutter comes from .sheet-body; an extra padding here would indent the fields and clip the account rail. */
 .recurring-sheet {
   display: flex;
   flex-direction: column;
   gap: var(--s-4);
-  padding: var(--s-4);
 }
 
 .recurring-footer {
@@ -17,9 +17,10 @@
   gap: var(--s-3);
 }
 
-.recurring-choice {
+.recurring-account-empty {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--s-2);
 }
 

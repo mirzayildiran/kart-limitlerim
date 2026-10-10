@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Kart Limitlerim — Banknot Baskısı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f3f4f0;--ink:#1e2430;--ink2:#5b6270;--ink3:#8a909b;--rule:#c9ccc4;--g20:#3f7d4e;--r10:#b8352f;--b100:#2f5f9e;--v200:#8a3f7a;--o50:#d9822b}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:var(--paper);color:var(--ink);font:400 14px/1.35 Onest,system-ui,sans-serif}
+.num{font-family:"Schibsted Grotesk",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.cap{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.status{height:47px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 8px;font:600 15px "Schibsted Grotesk"}
+header{display:flex;justify-content:space-between;align-items:baseline;padding:10px 20px 0}
+header h1{font:700 17px "Schibsted Grotesk";letter-spacing:-.01em}
+header span{font-size:13px;color:var(--ink2)}
+.hero{position:relative;height:208px;margin:0 20px;overflow:hidden}
+.hero svg.ros{position:absolute;right:-64px;top:-14px;width:250px;height:250px}
+.hero .lbl{position:absolute;left:0;top:44px}
+.hero .big{position:absolute;left:-3px;top:62px;font-size:68px;font-weight:800;line-height:1}
+.hero .big small{font-size:30px;font-weight:700;margin-left:4px}
+.hero .mix{position:absolute;left:0;bottom:14px;display:flex;gap:14px;font-size:13px;color:var(--ink2)}
+.mix b{font:700 13px "Schibsted Grotesk";color:var(--ink);font-variant-numeric:tabular-nums}
+.mix i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;margin:0 20px;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
+.stat{padding:12px 0 12px}
+.stat+.stat{border-left:1px solid var(--rule);padding-left:16px}
+.stat .v{font-size:26px;font-weight:700;line-height:1.15;margin-top:4px}
+.stat p{font-size:12px;color:var(--ink2);margin-top:2px}
+.stat.warn .v,.stat.warn p b{color:var(--r10)}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:18px 20px 2px}
+.sec em{font-style:normal;font-size:12px;color:var(--ink3)}
+.row{display:grid;grid-template-columns:6px 30px 1fr auto;align-items:center;column-gap:12px;margin:0 20px;height:58px;
+  background-image:linear-gradient(90deg,var(--ink3) 1px,transparent 1px);background-size:3px 1px;background-repeat:repeat-x;background-position:0 100%}
+.row .band{align-self:stretch;margin:8px 0}
+.row svg{justify-self:center}
+.row .nm{font-weight:500;font-size:15px}
+.row .nm small{display:block;font-size:12px;color:var(--ink3);font-weight:400}
+.row .av{text-align:right;font-size:20px;font-weight:700}
+.row .av small{display:block;font:500 12px "Schibsted Grotesk";color:var(--ink3)}
+nav{position:absolute;left:0;right:0;bottom:0;height:84px;border-top:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:repeat(5,1fr);padding:8px 6px 0}
+nav a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--ink3);text-decoration:none}
+nav a.on{color:var(--ink);font-weight:600}
+nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+nav .plus{width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;margin-top:-14px}
+nav .plus svg{stroke-width:2}
+.home{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink)}
+</style></head>
+<body>
+<div class="status"><span>9:41</span><span>●●● ▮</span></div>
+<header><h1>Kart Limitlerim</h1><span>10 Ekim Cumartesi</span></header>
+
+<section class="hero">
+  <svg class="ros" viewBox="-100 -100 200 200" aria-hidden="true">
+    <defs>
+      <g id="p"><ellipse rx="92" ry="34" fill="none" stroke="#1e2430" stroke-width=".6"/></g>
+      <g id="q"><ellipse rx="58" ry="20" fill="none" stroke="#1e2430" stroke-width=".5"/></g>
+      <g id="r6"><use href="#p"/><use href="#p" transform="rotate(30)"/><use href="#p" transform="rotate(60)"/><use href="#p" transform="rotate(90)"/><use href="#p" transform="rotate(120)"/><use href="#p" transform="rotate(150)"/></g>
+      <g id="s6"><use href="#q"/><use href="#q" transform="rotate(30)"/><use href="#q" transform="rotate(60)"/><use href="#q" transform="rotate(90)"/><use href="#q" transform="rotate(120)"/><use href="#q" transform="rotate(150)"/></g>
+    </defs>
+    <g opacity=".22">
+      <use href="#r6"/><use href="#r6" transform="rotate(7.5)"/><use href="#r6" transform="rotate(15)"/><use href="#r6" transform="rotate(22.5)"/>
+      <use href="#s6" transform="rotate(3.75)"/><use href="#s6" transform="rotate(11.25)"/><use href="#s6" transform="rotate(18.75)"/><use href="#s6" transform="rotate(26.25)"/>
+      <g fill="none" stroke="#1e2430" stroke-width=".6"><circle r="96"/><circle r="93.5"/><circle r="36"/><circle r="33"/><circle r="14"/><circle r="11"/></g>
+      <circle r="97" fill="none" stroke="#1e2430" stroke-width="1.2" stroke-dasharray=".6 1.8"/>
+    </g>
+  </svg>
+  <div class="cap lbl">Şu an harcayabileceğin</div>
+  <div class="num big">80.220<small>₺</small></div>
+  <div class="mix">
+    <span><i style="background:var(--ink)"></i>Kartlar <b>57.100 ₺</b></span>
+    <span><i style="background:var(--v200)"></i>KMH <b>13.500 ₺</b></span>
+    <span><i style="background:var(--o50)"></i>Nakit <b>9.620 ₺</b></span>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stat"><div class="cap">Kesime kadar</div><div class="num v">62.120 ₺</div><p>18 Eki · 8 gün · düzenli ödemeler düşüldü</p></div>
+  <div class="stat warn"><div class="cap">Ödemelerden sonra nakit</div><div class="num v">−4.520 ₺</div><p>asgariler için <b>4.520 ₺</b> eksik</p></div>
+</section>
+
+<div class="sec"><span class="cap">Kartlar</span><em>kullanılabilir / limit</em></div>
+<div class="row"><span class="band" style="background:var(--g20)"></span>
+  <svg width="26" height="26" viewBox="-13 -13 26 26"><g fill="none" stroke="#3f7d4e" stroke-width=".8"><circle r="12"/><circle r="8.5"/><circle r="5"/><circle r="1.6" fill="#3f7d4e"/></g></svg>
+  <div class="nm">Garanti Bonus<small>20 TL yeşili</small></div><div class="num av">31.200 ₺<small>/ 45.000 ₺</small></div></div>
+<div class="row"><span class="band" style="background:var(--r10)"></span>
+  <svg width="26" height="26" viewBox="-13 -13 26 26"><g fill="none" stroke="#b8352f" stroke-width=".8"><circle r="9.5"/><circle r="6"/><circle r="1.6" fill="#b8352f"/></g></svg>
+  <div class="nm">Akbank Axess<small>10 TL kırmızısı</small></div><div class="num av">21.800 ₺<small>/ 60.000 ₺</small></div></div>
+<div class="row"><span class="band" style="background:var(--b100)"></span>
+  <svg width="26" height="26" viewBox="-13 -13 26 26"><g fill="none" stroke="#2f5f9e" stroke-width=".8"><circle r="4.5"/><circle r="1.6" fill="#2f5f9e"/></g></svg>
+  <div class="nm">İş Maximum<small>100 TL mavisi</small></div><div class="num av">4.100 ₺<small>/ 25.000 ₺</small></div></div>
+
+<div class="sec"><span class="cap">KMH</span><em>kullanılabilir / limit</em></div>
+<div class="row"><span class="band" style="background:var(--v200)"></span>
+  <svg width="26" height="26" viewBox="-13 -13 26 26"><g fill="none" stroke="#8a3f7a" stroke-width=".8"><circle r="7.5"/><circle r="4"/><circle r="1.6" fill="#8a3f7a"/></g></svg>
+  <div class="nm">Ziraat KMH<small>200 TL moru</small></div><div class="num av">13.500 ₺<small>/ 20.000 ₺</small></div></div>
+
+<nav>
+  <a class="on"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>Özet</a>
+  <a><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Harcamalar</a>
+  <a><span class="plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></a>
+  <a><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Takvim</a>
+  <a><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Ayarlar</a>
+  <span class="home"></span>
+</nav>
+</body></html>

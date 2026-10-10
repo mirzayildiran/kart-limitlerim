@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Kart Limitlerim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#e9ecef;--ink:#14181d;--mute:#5b636c;--line:#c9ced4;--blue:#1d4f9c;--green:#0f7a4f;--white:#fff;--yellow:#f6c400;--yink:#111;--red:#c62828;
+--sign:"Barlow Semi Condensed","Barlow",sans-serif;--num:"Barlow",sans-serif;--body:"Onest",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:var(--ground);color:var(--ink);font-family:var(--body)}
+.app{position:relative;width:390px;height:844px}
+.status{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font:600 15px var(--num)}
+.top{padding:6px 20px 0;display:flex;justify-content:space-between;align-items:baseline}
+.top h1{font:700 17px var(--sign);letter-spacing:.02em}
+.top span{font:500 13px var(--body);color:var(--mute)}
+.power{padding:14px 20px 0}
+.lbl{font:600 12px var(--sign);text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.big{font:700 48px/1.05 var(--num);font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:2px}
+.big small{font-size:28px;font-weight:600;margin-left:4px}
+.split{display:flex;height:6px;margin-top:12px;border-radius:2px;overflow:hidden;gap:2px}
+.split i{display:block}
+.legend{display:flex;gap:14px;margin-top:8px;font:500 13px var(--body);color:var(--mute)}
+.legend b{font:600 13px var(--num);font-variant-numeric:tabular-nums;color:var(--ink)}
+.legend em{display:inline-block;width:8px;height:8px;border-radius:1px;margin-right:5px;vertical-align:1px}
+.sign{margin:18px 16px 0;background:var(--blue);border-radius:8px;padding:4px;color:var(--white)}
+.sign-in{border:2px solid var(--white);border-radius:5px;overflow:hidden}
+.row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid rgba(255,255,255,.85)}
+.row:first-child{border-top:0}
+.row svg{flex:none}
+.dest{flex:1;min-width:0}
+.dest b{display:block;font:700 16px/1.15 var(--sign);letter-spacing:.01em}
+.dest span{font:500 12px var(--body);opacity:.85;font-variant-numeric:tabular-nums}
+.km{font:700 22px var(--num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.km small{font-size:13px;font-weight:600;margin-left:2px}
+.otoyol{background:var(--green);margin:4px;border:2px solid var(--white);border-radius:4px}
+.otoyol .row{border:0;padding:8px 10px}
+.otoyol .dest b{text-transform:uppercase;letter-spacing:.06em}
+.arrive{display:flex;justify-content:space-between;align-items:baseline;padding:0 10px 9px;border-top:1px solid rgba(255,255,255,.85);margin:0 0;padding-top:7px}
+.arrive span{font:600 12px var(--sign);text-transform:uppercase;letter-spacing:.08em}
+.arrive b{font:700 20px var(--num);font-variant-numeric:tabular-nums}
+.warn{margin:12px 16px 0;background:var(--yellow);color:var(--yink);border:2px solid var(--yink);border-radius:6px;display:flex;gap:10px;align-items:flex-start;padding:9px 12px}
+.warn p{font:500 13px/1.35 var(--body)}
+.warn p b{font:700 14px var(--num);font-variant-numeric:tabular-nums}
+.sec{margin:18px 20px 6px;display:flex;justify-content:space-between;align-items:baseline}
+.sec h2{font:700 15px var(--sign);text-transform:uppercase;letter-spacing:.08em}
+.sec a{font:500 13px var(--body);color:var(--blue);text-decoration:none}
+.card{margin:0 20px;padding:10px 0;border-top:1px solid var(--line)}
+.card .l1{display:flex;justify-content:space-between;font:600 14px var(--body)}
+.card .l1 b{font:700 15px var(--num);font-variant-numeric:tabular-nums}
+.bar{height:4px;background:#d3d8dd;border-radius:2px;margin:7px 0 4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink)}
+.card .l2{font:400 12px var(--body);color:var(--mute);font-variant-numeric:tabular-nums}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--white);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:flex-start;padding:8px 6px 0}
+.tab{width:64px;display:flex;flex-direction:column;align-items:center;gap:3px;font:500 11px var(--body);color:var(--mute)}
+.tab.on{color:var(--blue);font-weight:600}
+.plus{width:52px;height:52px;border-radius:50%;background:var(--blue);margin-top:-18px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px var(--ground)}
+.home{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="status"><span>09:41</span><span>●●● ▮</span></div>
+  <header class="top"><h1>Kart Limitlerim</h1><span>10 Ekim Cumartesi</span></header>
+
+  <section class="power">
+    <div class="lbl">Şu an harcayabileceğin</div>
+    <div class="big">80.220<small>₺</small></div>
+    <div class="split"><i style="flex:57100;background:var(--blue)"></i><i style="flex:13500;background:var(--green)"></i><i style="flex:9620;background:var(--ink)"></i></div>
+    <div class="legend">
+      <span><em style="background:var(--blue)"></em>Kartlar <b>57.100 ₺</b></span>
+      <span><em style="background:var(--green)"></em>KMH <b>13.500 ₺</b></span>
+      <span><em style="background:var(--ink)"></em>Nakit <b>9.620 ₺</b></span>
+    </div>
+  </section>
+
+  <section class="sign" aria-label="Önümüzdeki ödemeler">
+    <div class="sign-in">
+      <div class="row">
+        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 15V3M3 8l5-5 5 5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="square"/></svg>
+        <div class="dest"><b>Garanti Bonus son ödeme</b><span>13 Eki · asgari 1.960 ₺</span></div>
+        <div class="km">3<small>gün</small></div>
+      </div>
+      <div class="row">
+        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 15V3M3 8l5-5 5 5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="square"/></svg>
+        <div class="dest"><b>Kira</b><span>15 Eki · 18.000 ₺</span></div>
+        <div class="km">5<small>gün</small></div>
+      </div>
+      <div class="row">
+        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 14V7h9M8 3l4 4-4 4" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="square"/></svg>
+        <div class="dest"><b>İş Maximum son ödeme</b><span>15 Eki · asgari 3.740 ₺</span></div>
+        <div class="km">5<small>gün</small></div>
+      </div>
+      <div class="otoyol">
+        <div class="row">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 15V3M3 8l5-5 5 5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="square"/></svg>
+          <div class="dest"><b>Kesim · Akbank Axess</b><span>18 Eki</span></div>
+          <div class="km">8<small>gün</small></div>
+        </div>
+        <div class="arrive"><span>varınca</span><b>62.120 ₺</b></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="warn" role="alert">
+    <svg width="22" height="20" viewBox="0 0 22 20" style="flex:none;margin-top:1px"><path d="M11 1.5L21 18.5H1z" fill="#111"/><path d="M11 7v5.5" stroke="#f6c400" stroke-width="2.2"/><circle cx="11" cy="15.3" r="1.3" fill="#f6c400"/></svg>
+    <p>Ödemelerden sonra nakit <b>−4.520 ₺</b> — asgariler için 4.520 ₺ eksik</p>
+  </div>
+
+  <div class="sec"><h2>Kartlar</h2><a href="#">Tümü</a></div>
+  <div class="card">
+    <div class="l1"><span>Garanti Bonus</span><b>21.400 ₺</b></div>
+    <div class="bar"><i style="width:43%"></i></div>
+    <div class="l2">Boş limit · kesim 3 Kas</div>
+  </div>
+
+  <nav class="tabs">
+    <div class="tab on"><svg width="22" height="22" viewBox="0 0 22 22"><rect x="3" y="3" width="7" height="7" fill="#1d4f9c"/><rect x="12" y="3" width="7" height="7" fill="#1d4f9c"/><rect x="3" y="12" width="7" height="7" fill="#1d4f9c"/><rect x="12" y="12" width="7" height="7" fill="#1d4f9c"/></svg>Özet</div>
+    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5b636c" stroke-width="1.8"><path d="M4 6h14M4 11h14M4 16h9"/></svg>Harcamalar</div>
+    <div class="tab"><div class="plus"><svg width="22" height="22" viewBox="0 0 22 22"><path d="M11 3v16M3 11h16" stroke="#fff" stroke-width="2.6"/></svg></div></div>
+    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5b636c" stroke-width="1.8"><rect x="3" y="5" width="16" height="14" rx="2"/><path d="M3 9h16M7 3v4M15 3v4"/></svg>Takvim</div>
+    <div class="tab"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#5b636c" stroke-width="1.8"><circle cx="11" cy="11" r="3"/><path d="M11 2v3M11 17v3M2 11h3M17 11h3M4.6 4.6l2.1 2.1M15.3 15.3l2.1 2.1M4.6 17.4l2.1-2.1M15.3 6.7l2.1-2.1"/></svg>Ayarlar</div>
+  </nav>
+  <div class="home"></div>
+</div>
+</body>
+</html>

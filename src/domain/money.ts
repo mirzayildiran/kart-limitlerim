@@ -1,7 +1,15 @@
 import type { Kurus } from './types'
 
 const whole = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 })
-const exact = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+const twoDigits = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+/**
+ * Exact text without the sign: a zero kuruş part is dropped ("215"), any other
+ * kuruş part always shows two digits ("741,50", never "741,5").
+ */
+function exactText(k: Kurus): string {
+  return k % 100 === 0 ? whole.format(k / 100) : twoDigits.format(k / 100)
+}
 
 export function toKurus(lira: number): Kurus {
   return Math.round(lira * 100)
@@ -18,7 +26,7 @@ export function formatNumberTL(k: Kurus): string {
 
 /** "1.234,56" — keeps kuruş when present, without the ₺ sign. */
 export function formatNumberTLExact(k: Kurus): string {
-  return exact.format(k / 100)
+  return exactText(k)
 }
 
 /** "12.345 ₺" — rounded to whole lira, for summaries. */
@@ -26,14 +34,14 @@ export function formatTL(k: Kurus): string {
   return `${formatNumberTL(k)} ₺`
 }
 
-/** "1.234,56 ₺" — keeps kuruş when present, for individual amounts. */
+/** "1.234,56 ₺" — keeps kuruş when present (two digits), for individual amounts. */
 export function formatTLExact(k: Kurus): string {
   return `${formatNumberTLExact(k)} ₺`
 }
 
-/** Number only, for prefilling inputs: 123456 → "1.234,56". */
+/** Number only, for prefilling inputs: 123456 → "1.234,56". Same shape as formatNumberTLExact. */
 export function formatInput(k: Kurus): string {
-  return exact.format(k / 100)
+  return exactText(k)
 }
 
 /**

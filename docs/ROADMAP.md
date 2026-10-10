@@ -47,6 +47,20 @@ Gerçek ekran görüntüleriyle yapılan değerlendirmede beş bankada 29 satır
 - [ ] Son ödeme hatırlatma bildirimleri
 - [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası
 
+## Aşama 4.5 — Bütçe asistanı 🚧
+
+Karar (2026-10-10): Telefonda çalışan model yerine ücretsiz bulut API'leri kullanılacak. Uygulamanın boyutu büyümeyecek. Anahtarlar kullanıcıdan istenmez; projenin Cloudflare Workers üzerindeki aracı sunucusunda durur (`worker/assistant-proxy/`).
+
+- [x] Kurala dayalı öneriler (yapay zekasız): kesime kadar nakit açığı, yaklaşan ve geciken asgari ödemeler, limiti azalan kart, KMH günlük faizi, asgari ödeme faizi, kategori artışları, "bugün hangi kartla öde". Rakamlar yalnızca `src/domain/` hesaplarından gelir (`src/domain/insights.ts`).
+- [x] Sohbet ekranı (`#/asistan`): model uygulamanın hesapladığı özeti (`src/domain/insightsSummary.ts`) okur, açıklar ve tartışır. Model hesap yapmaz. Sohbet geçmişi yalnızca bellekte tutulur.
+- [x] Sağlayıcı katmanı: aracı sunucu sırayla Gemini (`gemini-flash-lite-latest`), Groq ve OpenRouter'ı dener (`src/ai/`, `worker/assistant-proxy/`). CORS, IP başına dakikalık (Workers Rate Limiting) ve saatlik hız sınırı var. Gemini yolu gerçek anahtarla uçtan uca denendi (Flash Lite ~1 sn; tam Flash ~60 sn sürdüğü için kullanılmıyor).
+- [x] Bütçe planı: kategori başına aylık hedef, ay gidişatı ve tahmini ay sonu (`src/domain/budget.ts`). Hedef aşımı ve "bu hızla aşılır" önerileri; sohbet planı bu rakamlarla tartışır. Plan yedeğe girer.
+- [x] Gizlilik: varsayılan kapalı. Onay ekranı gönderilecek alanları, gönderilmeyenleri, servisleri ve özetin tam hâlini gösterir. PRODUCT.md ilkesi ve `docs/PRIVACY.md` güncellendi.
+- [x] Her yanıtta "Tahmindir, finansal tavsiye değildir." ibaresi (uygulama ekler, modele bırakılmaz).
+- [x] Aracı sunucunun otomatik kurulumu: `deploy.yml` her `main` gönderiminde Worker'ı kurar ve adresini derlemeye verir (`scripts/deploy-assistant.sh`).
+- [ ] Depo gizli değerlerini tanımla: `CLOUDFLARE_API_TOKEN`, `GEMINI_API_KEY`, `GROQ_API_KEY` (bkz. `worker/assistant-proxy/README.md`). Tanımlanmadıkça site sohbetsiz yayınlanır.
+- [ ] Ana ekrandan asistana giriş (şu an Ayarlar → Bütçe asistanı). Tasarım çalışmasıyla birlikte yerleştirilecek.
+
 ## Aşama 5 — İleri özellikler
 
 - [ ] "Bu harcamayı hangi kartla yapmalıyım?" önerisi (boş limit ve faizsiz süreye göre)

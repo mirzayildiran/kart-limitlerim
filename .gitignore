@@ -25,4 +25,14 @@ legacy/
 *.export.json
 .env
 .env.*
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/skills/
+!.claude/agents/
+
+# Tasarım incelemesi ekran görüntüleri (npm run shots ile yeniden üretilir)
+.impeccable/review/shots/
+
+# Cloudflare Worker yerel anahtarları ve wrangler önbelleği
+.dev.vars
+.wrangler/

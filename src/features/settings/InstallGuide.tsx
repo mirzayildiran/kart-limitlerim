@@ -50,25 +50,27 @@ export function InstallGuide() {
         Uygulama gibi kullan
       </h2>
 
-      <div class="install-guide-group">
-        <h3 class="install-guide-platform">iPhone</h3>
-        <ol class="install-guide-steps">
-          <li>Safari'de Paylaş düğmesine dokun</li>
-          <li>Ana Ekrana Ekle</li>
-          <li>Ekle</li>
-        </ol>
-      </div>
+      <div class="install-guide-card">
+        <div class="install-guide-group">
+          <h3 class="install-guide-platform">iPhone</h3>
+          <ol class="install-guide-steps">
+            <li>Safari'de Paylaş düğmesine dokun</li>
+            <li>Ana Ekrana Ekle</li>
+            <li>Ekle</li>
+          </ol>
+        </div>
 
-      <div class="install-guide-group">
-        <h3 class="install-guide-platform">Android</h3>
-        <ol class="install-guide-steps">
-          <li>Chrome menüsü (⋮) → Uygulamayı yükle</li>
-        </ol>
-        {prompt && (
-          <Button variant="primary" block onClick={() => install(prompt)}>
-            Yükle
-          </Button>
-        )}
+        <div class="install-guide-group">
+          <h3 class="install-guide-platform">Android</h3>
+          <ol class="install-guide-steps">
+            <li>Chrome'da menü (üç nokta) → Uygulamayı yükle</li>
+          </ol>
+          {prompt && (
+            <Button variant="primary" block onClick={() => install(prompt)}>
+              Yükle
+            </Button>
+          )}
+        </div>
       </div>
     </section>
   )

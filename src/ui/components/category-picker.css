@@ -1,0 +1,83 @@
+/* CategoryPicker: wrapping chips; category colour only as a dot, selection in the lime wash. */
+.category-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.category-picker-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.category-picker-group {
+  display: contents;
+}
+
+.category-picker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  padding: 0 var(--s-4) 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-state) var(--ease),
+    border-color var(--dur-state) var(--ease),
+    color var(--dur-state) var(--ease),
+    transform var(--dur-tap) var(--ease-out-expo);
+}
+
+.category-picker-chip:active {
+  transform: scale(var(--press));
+  transition-timing-function: var(--ease);
+}
+
+/* base.css rounds every focus ring to 8px; keep the pill. */
+.category-picker-chip:focus-visible {
+  border-radius: var(--r-pill);
+}
+
+.category-picker-chip.is-selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--ink);
+  /* The check takes the space the right padding gave. */
+  padding-right: var(--s-3);
+}
+
+.category-picker-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cat);
+}
+
+.category-picker-check {
+  flex: none;
+  color: var(--accent);
+}
+
+.category-picker-new {
+  color: var(--ink);
+}
+
+.category-picker-plus {
+  flex: none;
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-picker-chip:active {
+    transform: none;
+  }
+}

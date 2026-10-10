@@ -1,6 +1,15 @@
 import { describe, it, expect } from 'vitest'
 import type { CardAccount, CardLine } from '../../domain/types'
-import { cardInterestPanelData, interestHistory, kmhDailyCost, statementRows } from './detailModel'
+import {
+  addExpenseLabel,
+  cardInterestPanelData,
+  formatRate,
+  interestHistory,
+  interestSourceLine,
+  kmhDailyCost,
+  rateCaption,
+  statementRows,
+} from './detailModel'
 
 describe('detailModel', () => {
   // Helper to create a test card line
@@ -249,6 +258,45 @@ describe('detailModel', () => {
         // Should use view's payment state (which matches raw for current cycle)
         expect(data.lineProjections[0].payment).toBe('unpaid')
       }
+    })
+  })
+
+  describe('interestSourceLine', () => {
+    it('reads naturally without history', () => {
+      expect(interestSourceLine(0, true)).toBe('Bu ekstrenin tahmini')
+      expect(interestSourceLine(0, false)).toBe('Henüz faiz kaydı yok')
+    })
+
+    it('names the past statements', () => {
+      expect(interestSourceLine(3, true)).toBe('Geçmiş 3 ekstre + bu ekstrenin tahmini')
+      expect(interestSourceLine(2, false)).toBe('Geçmiş 2 ekstre')
+    })
+  })
+
+  describe('rateCaption', () => {
+    it('uses a Turkish decimal comma', () => {
+      expect(formatRate(4.25)).toBe('%4,25')
+      expect(formatRate(3)).toBe('%3')
+    })
+
+    it('names the user rate when overridden', () => {
+      const text = rateCaption({ override: 3.5, contractual: 4.25, effective: '2026-01' })
+      expect(text).toContain('senin girdiğin aylık %3,5 akdi')
+      expect(text).not.toContain('TCMB')
+    })
+
+    it('names the TCMB ceiling otherwise, cash for KMH', () => {
+      expect(rateCaption({ override: null, contractual: 4.25, effective: '2026-01' })).toContain('TCMB azami oranları (2026-01), aylık %4,25')
+      expect(rateCaption({ override: null, contractual: 4.25, effective: '2026-01', cash: true })).toContain('nakit çekme')
+    })
+  })
+
+  describe('addExpenseLabel', () => {
+    it('says card for cards and account otherwise', () => {
+      expect(addExpenseLabel('card')).toBe('Bu karttan harcama ekle')
+      expect(addExpenseLabel('kmh')).toBe('Bu hesaptan harcama ekle')
+      expect(addExpenseLabel('bank')).toBe('Bu hesaptan harcama ekle')
+      expect(addExpenseLabel('cash')).toBe('Nakitten harcama ekle')
     })
   })
 })

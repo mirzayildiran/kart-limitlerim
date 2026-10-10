@@ -60,7 +60,7 @@ const longFmt = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long'
 const monthFmt = new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' })
 
 /** "8 Eki" */
-export const formatShort = (d: Date) => shortFmt.format(d)
+export const formatShort = (d: Date) => shortFmt.format(d).replace(/ /g, ' ')
 /** "8 Ekim" */
 export const formatLong = (d: Date) => longFmt.format(d)
 /** "Ekim 2026" */

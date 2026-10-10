@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { readFileSync } from 'node:fs'
 import preact from '@preact/preset-vite'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -7,9 +8,13 @@ import { VitePWA } from 'vite-plugin-pwa'
 // CAP_NATIVE=1: iOS app build (Capacitor). Served from the app root, no service worker.
 const native = process.env.CAP_NATIVE === '1'
 const base = native ? '/' : (process.env.BASE_PATH ?? '/kart-limitlerim/')
+const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }
 
 export default defineConfig({
   base,
+  define: {
+    __APP_VERSION__: JSON.stringify(version),
+  },
   plugins: [
     preact(),
     VitePWA({
@@ -54,6 +59,6 @@ export default defineConfig({
   ],
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'worker/**/*.test.ts'],
   },
 })

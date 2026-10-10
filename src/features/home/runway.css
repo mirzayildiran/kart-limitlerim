@@ -1,0 +1,208 @@
+.runway {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.runway-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 44px;
+}
+
+.runway-readout-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s-3);
+}
+
+.runway-day {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--hero-ink);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.runway-amount {
+  flex: 0 0 auto;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--hero-ink);
+  letter-spacing: -0.01em;
+}
+
+.runway-amount-tail {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--hero-muted);
+}
+
+.runway-events {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.runway-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--hero-track);
+  color: var(--hero-ink);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.runway-event::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hero-curve);
+}
+
+.runway-event.is-due::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--hero-ink);
+}
+
+.runway-event.is-cut::before {
+  background: var(--hero-sun);
+}
+
+.runway-event.is-quiet {
+  background: transparent;
+  padding-left: 0;
+  color: var(--hero-muted);
+}
+
+.runway-event.is-quiet::before {
+  display: none;
+}
+
+/* Plot: SVG stretches; markers are HTML so they stay round. */
+.runway-plot {
+  position: relative;
+  height: 92px;
+  margin: 0 6px;
+  touch-action: pan-y;
+  cursor: ew-resize;
+  border-radius: var(--r-sm);
+}
+
+.runway-plot:focus-visible {
+  outline: 2px solid var(--hero-sun);
+  outline-offset: 6px;
+}
+
+.runway-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: runway-draw 1.1s var(--ease-out-expo) both;
+}
+
+.runway-base {
+  stroke: var(--hero-line);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.runway-line {
+  fill: none;
+  stroke: var(--hero-curve);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.runway-mark,
+.runway-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: runway-mark-in 0.5s var(--ease-out-expo) 0.7s both;
+}
+
+.runway-mark.is-recurring {
+  background: var(--hero-curve);
+}
+
+.runway-mark.is-due {
+  background: var(--hero-bg);
+  box-shadow: inset 0 0 0 2px var(--hero-ink);
+}
+
+.runway-mark.is-cut {
+  background: var(--hero-sun);
+}
+
+.runway-cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--hero-line);
+  pointer-events: none;
+  transition: left 0.18s var(--ease-out-expo);
+}
+
+.runway-dot {
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  background: var(--hero-sun);
+  box-shadow: 0 0 0 4px var(--hero-bg), 0 0 0 5px rgb(255 79 216 / 0.5); /* allow-color */
+  transition: left 0.18s var(--ease-out-expo), top 0.18s var(--ease-out-expo);
+}
+
+.runway-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  color: var(--hero-muted);
+}
+
+@keyframes runway-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes runway-mark-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .runway-svg,
+  .runway-mark,
+  .runway-dot {
+    animation: none;
+  }
+}

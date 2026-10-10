@@ -5,9 +5,13 @@ import {
   buildTimeline,
   dayLabel,
   dayOfMonthLabel,
+  dayTotal,
   groupByDay,
   monthlyRecurringTotal,
   pendingOccurrences,
+  periodSummary,
+  sumAmounts,
+  type TimelineEvent,
 } from './calendarModel'
 
 /** Tests use invented data only. "Today" is 10 Oct 2026 (a Saturday). */
@@ -143,25 +147,55 @@ describe('buildTimeline', () => {
     expect(cuts).toContain('2026-10-15 Örnek Bank Ana kesim')
     expect(cuts).toContain('2026-10-25 Örnek Bank Sanal kesim')
     expect(cuts).toContain('2026-11-03 Demo Kart kesim')
+    expect(timeline.find((e) => e.title === 'Demo Kart kesim')?.detail).toBe('Ekstre kesimi')
   })
 
-  it('shows unpaid statement due dates with the minimum, and paid ones not at all', () => {
+  it('shows unpaid statement due dates with their minimum as the amount, and paid ones not at all', () => {
     const due = timeline.find((e) => e.kind === 'due' && e.title === 'Örnek Bank Ana son ödeme')
     expect(due?.iso).toBe('2026-10-20')
-    expect(due?.detail).toBe('Asgari 300 ₺')
+    expect(due?.detail).toBe('Asgari ödeme')
+    expect(due?.amount).toBe(30_000)
+    expect(due?.estimated).toBe(false)
     expect(timeline.some((e) => e.kind === 'due' && e.title.startsWith('Örnek Bank Sanal'))).toBe(false)
   })
 
   it('says the amount is pending when the minimum is not known and flags dues within 3 days', () => {
     const due = timeline.find((e) => e.kind === 'due' && e.title === 'Demo Kart son ödeme')
     expect(due?.iso).toBe('2026-10-13')
-    expect(due?.detail).toBe('tutar bekleniyor')
+    expect(due?.detail).toBe('Tutar bekleniyor')
+    expect(due?.amount).toBeNull()
     expect(due?.soon).toBe(true)
+  })
+
+  it('marks the amount of a due date as estimated when the minimum is estimated from the debt', () => {
+    const est: CardAccount = {
+      ...demoCard,
+      id: 'card_e',
+      name: 'Tahmin Kart',
+      limit: 1_000_000 as Kurus,
+      lines: [{ id: 'e1', label: 'Tek', cutDay: 3, dueOffsetDays: 10, cycle: '2026-10', statementDebt: 200_000 as Kurus, payment: 'unpaid' }],
+    }
+    const items = statementItems([est], TODAY)
+    const [due] = buildTimeline([est], items, [], TODAY, 5)
+    expect(due.kind).toBe('due')
+    expect(due.amount).toBe(items[0].minimumOutstanding)
+    expect(due.estimated).toBe(true)
+  })
+
+  it('keeps an overdue unpaid due date, first in the list, flagged as soon', () => {
+    const late: CardAccount = {
+      ...demoCard,
+      id: 'card_l',
+      name: 'Geciken Kart',
+      lines: [{ id: 'g1', label: 'Tek', cutDay: 3, dueOffsetDays: 5, cycle: null, payment: 'unpaid' }],
+    }
+    const [first] = buildTimeline([late], statementItems([late], TODAY), [], TODAY)
+    expect(first).toMatchObject({ kind: 'due', iso: '2026-10-08', soon: true, amount: null })
   })
 
   it('lists recurring charges with account name and amount, skipping paused and finished ones', () => {
     const net = timeline.find((e) => e.kind === 'recurring' && e.title.startsWith('Netflix'))
-    expect(net).toMatchObject({ iso: '2026-10-12', title: 'Netflix · Örnek Bank', amount: 19_900, target: { type: 'recurring', id: 'rec_net' } })
+    expect(net).toMatchObject({ iso: '2026-10-12', title: 'Netflix', detail: 'Düzenli ödeme · Örnek Bank', amount: 19_900, target: { type: 'recurring', id: 'rec_net' } })
     expect(timeline.some((e) => e.title.startsWith('Pasif'))).toBe(false)
     expect(timeline.some((e) => e.title.startsWith('Telefon'))).toBe(false)
   })
@@ -201,3 +235,55 @@ describe('dayOfMonthLabel', () => {
     expect(dayOfMonthLabel(5)).toBe('Ayın 5. günü')
   })
 })
+
+describe('money out', () => {
+  const statements = statementItems(accounts, TODAY)
+  const days = groupByDay(buildTimeline(accounts, statements, recurring, TODAY), TODAY)
+
+  it('sums the known amounts of the period in exact kuruş', () => {
+    // Ana minimum 30.000 kr + Kira 2.500.000 kr + Netflix 19.900 kr x2; Demo minimum unknown, cuts carry no amount.
+    expect(periodSummary(days)).toEqual({ total: 2_569_800, estimated: false, payments: 5, cuts: 3, unknown: 1 })
+  })
+
+  it('flags the period total as estimated when a minimum is estimated', () => {
+    const est: CardAccount = {
+      ...demoCard,
+      id: 'card_e',
+      limit: 1_000_000 as Kurus,
+      lines: [{ id: 'e1', label: 'Tek', cutDay: 3, dueOffsetDays: 10, cycle: '2026-10', statementDebt: 200_000 as Kurus, payment: 'unpaid' }],
+    }
+    const items = statementItems([est], TODAY)
+    const summary = periodSummary(groupByDay(buildTimeline([est], items, [], TODAY, 5), TODAY))
+    expect(summary).toEqual({ total: items[0].minimumOutstanding, estimated: true, payments: 1, cuts: 0, unknown: 0 })
+  })
+
+  it('totals one day, and gives nothing for a day with only unknown or cut events', () => {
+    const oct12 = days.find((d) => d.iso === '2026-10-12')
+    const oct13 = days.find((d) => d.iso === '2026-10-13')
+    expect(oct12 && dayTotal(oct12)).toEqual({ total: 19_900, estimated: false })
+    expect(oct13 && dayTotal(oct13)).toEqual({ total: 0, estimated: false })
+  })
+
+  it('adds exact kuruş without float drift', () => {
+    const ev = (amount: Kurus | null): TimelineEvent => ({
+      id: 'x', kind: 'due', date: TODAY, iso: '2026-10-10', accountId: 'a', title: 'x',
+      detail: null, amount, estimated: false, soon: false, target: { type: 'recurring', id: 'x' },
+    })
+    expect(sumAmounts([ev(1), ev(2), ev(99), ev(null)])).toEqual({ total: 102, estimated: false })
+  })
+
+  it('counts the due dates whose amount is not entered, outside the total', () => {
+    const late: CardAccount = {
+      ...demoCard,
+      id: 'card_l',
+      lines: [{ id: 'g1', label: 'Tek', cutDay: 3, dueOffsetDays: 5, cycle: null, payment: 'unpaid' }],
+    }
+    const summary = periodSummary(groupByDay(buildTimeline([late], statementItems([late], TODAY), [], TODAY), TODAY))
+    expect(summary).toMatchObject({ total: 0, unknown: 1, payments: 1 })
+  })
+
+  it('has an empty summary for an empty agenda', () => {
+    expect(periodSummary([])).toEqual({ total: 0, estimated: false, payments: 0, cuts: 0, unknown: 0 })
+  })
+})
+

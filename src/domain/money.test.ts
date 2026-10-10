@@ -110,16 +110,22 @@ describe('money', () => {
       expect(result).toContain('₺')
     })
 
-    it('includes fractional kuruş (minimized decimals)', () => {
-      const result = formatTLExact(1250)
-      // Intl.NumberFormat minimizes trailing zeros
-      expect(result).toMatch(/12,5\s*₺/)
+    it('shows two kuruş digits whenever the kuruş part is not zero', () => {
+      expect(formatTLExact(1250)).toBe('12,50 ₺')
+      expect(formatTLExact(74150)).toBe('741,50 ₺')
+      expect(formatTLExact(159150)).toBe('1.591,50 ₺')
+      expect(formatTLExact(1)).toBe('0,01 ₺')
     })
 
-    it('handles whole amounts (no forced decimals)', () => {
-      const result = formatTLExact(123400)
-      // Intl.NumberFormat with minimumFractionDigits: 0 skips .00
-      expect(result).toMatch(/1\.234\s*₺/)
+    it('drops the kuruş part when it is zero', () => {
+      expect(formatTLExact(123400)).toBe('1.234 ₺')
+      expect(formatTLExact(21500)).toBe('215 ₺')
+      expect(formatTLExact(100)).toBe('1 ₺')
+    })
+
+    it('keeps two digits for negative amounts with kuruş', () => {
+      expect(formatTLExact(-74150)).toBe('-741,50 ₺')
+      expect(formatTLExact(-21500)).toBe('-215 ₺')
     })
 
     it('handles zero', () => {
@@ -150,7 +156,7 @@ describe('money', () => {
   describe('formatNumberTLExact', () => {
     it('keeps kuruş without the currency sign', () => {
       expect(formatNumberTLExact(123456)).toBe('1.234,56')
-      expect(formatNumberTLExact(1250)).toBe('12,5')
+      expect(formatNumberTLExact(1250)).toBe('12,50')
       expect(formatNumberTLExact(123400)).toBe('1.234')
       expect(formatNumberTLExact(0)).toBe('0')
     })
@@ -173,8 +179,13 @@ describe('money', () => {
 
     it('handles zero', () => {
       const result = formatInput(0)
-      // Intl.NumberFormat minimizes trailing zeros
       expect(result).toBe('0')
+    })
+
+    it('uses the same kuruş rule as the display formats', () => {
+      expect(formatInput(1250)).toBe('12,50')
+      expect(formatInput(123400)).toBe('1.234')
+      expect(parseTL(formatInput(1250))).toBe(1250)
     })
   })
 })
