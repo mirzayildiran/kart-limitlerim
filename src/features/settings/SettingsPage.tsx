@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact'
 import { useRef, useState } from 'preact/hooks'
 import { activeCategories, categories, exportBackupText, importBackupText, resetAllData } from '../../data/store'
+import { clearAutoBackups } from '../../data/autoBackupRuntime'
 import { displayHue } from '../../domain/categories'
 import { BackupError, parseBackup } from '../../data/backup'
 import { go, openSheet, route } from '../../ui/nav'
@@ -249,6 +250,7 @@ function DangerSection() {
   async function eraseAll() {
     try {
       await resetAllData()
+      await clearAutoBackups()
       toast('Bütün veriler silindi')
       go('home')
     } catch {
