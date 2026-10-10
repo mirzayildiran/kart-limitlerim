@@ -5,6 +5,7 @@ Kart Limitlerim bir bütçe uygulamasıdır. Verilerinizi toplamaz, bir sunucuya
 ## Verileriniz nerede durur
 
 - Bütün veriler yalnızca kullandığınız cihazın tarayıcı deposunda (IndexedDB) tutulur. Hesaplar, kartlar, harcamalar, kategoriler, bütçe planı, düzenli ödemeler ve kurallar bu depodadır.
+- iPhone uygulaması, iOS'un web depolamasını temizlemesine karşı her değişiklikten sonra verilerin bir kopyasını (son üç kopya) uygulamanın kendi özel klasörüne (`Library/autobackup/`) yazar. Bu kopya da cihazda kalır, hiçbir yere gönderilmez; telefonun iCloud ya da bilgisayar yedeği açıksa o yedeğe dahil olur. "Tüm verileri sil" bu kopyaları da siler.
 - Hesap açmanız gerekmez. Uygulamanın sunucusu, kullanıcı tablosu ya da giriş sistemi yoktur.
 - Uygulama analiz, izleme ya da reklam kodu içermez. Kullanım bilgisi toplanmaz.
 - Banka şifresi, internet bankacılığı bilgisi, kart numarası veya CVV hiçbir zaman istenmez ve girilmemelidir.

@@ -9,7 +9,10 @@ import { init } from './data/store'
 import { applySavedTheme } from './ui/theme'
 import { App } from './app.tsx'
 import { startReminders } from './platform/reminders'
+import { startAutoBackup } from './data/autoBackupRuntime'
 import { startLock } from './platform/lock'
+import { startDeepLinks } from './platform/deeplinks'
+import { startTextSize } from './platform/textSize'
 import { LockScreen } from './features/lock/LockScreen'
 import { startPhoneSetup } from './features/onboarding/phoneSetup'
 
@@ -18,7 +21,10 @@ init().catch(() => {})
 
 applySavedTheme()
 startReminders()
+startAutoBackup()
 startLock()
+startDeepLinks()
+startTextSize()
 startPhoneSetup()
 
 render(<App />, document.getElementById('app')!)
