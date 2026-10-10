@@ -10,7 +10,9 @@ import { figure } from '../../ui/components/Amount'
 import { toast } from '../../ui/components/toast'
 import { setTheme, themePref, type ThemePref } from '../../ui/theme'
 import { backupFileName, rateGroups, sourceLines, type RateRow } from './settingsModel'
+import { isNativeApp, saveTextFile } from '../../platform/files'
 import { InstallGuide } from './InstallGuide'
+import { RemindersSection } from './RemindersSection'
 import './settings-page.css'
 
 function Section({ title, id, children }: { title: string; id: string; children: ComponentChildren }) {
@@ -93,16 +95,8 @@ function BackupSection() {
   async function download() {
     try {
       const text = await exportBackupText()
-      const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
-      const a = document.createElement('a')
-      a.href = url
-      a.download = backupFileName(new Date())
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      // Revoke after the click has started the download; some browsers read the URL late.
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-      toast('Yedek indirildi')
+      const saved = await saveTextFile(backupFileName(new Date()), text, 'application/json')
+      if (saved) toast(isNativeApp ? 'Yedek hazır' : 'Yedek indirildi')
     } catch {
       toast('Yedek hazırlanamadı. Tekrar dene.')
     }
@@ -267,6 +261,7 @@ export function SettingsPage() {
         <p class="settings-caption">Hesap yok. Verilerin bu cihazda kalır.</p>
       </header>
       <AppearanceSection />
+      <RemindersSection />
       <CategoriesSection />
       <BackupSection />
       <RatesSection />
