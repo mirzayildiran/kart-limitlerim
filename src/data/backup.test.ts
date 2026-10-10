@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { BACKUP_SCHEMA, BackupError, MAX_BACKUP_CHARS, MAX_RECORDS, makeBackup, migrate, parseBackup, serializeBackup } from './backup'
+import { BACKUP_SCHEMA, BackupError, MAX_BACKUP_BYTES, checkBackupSize, MAX_BACKUP_CHARS, MAX_RECORDS, makeBackup, migrate, parseBackup, serializeBackup } from './backup'
 import demoRaw from './demo-backup.json'
 import type { Snapshot } from './db'
 
@@ -65,6 +65,13 @@ describe('parseBackup budgets', () => {
     const original = makeBackup(snapshot(), new Date('2026-03-04T05:06:07.000Z'))
     const parsed = parseBackup(JSON.stringify(original))
     expect(parsed).toEqual(original)
+  })
+})
+
+describe('checkBackupSize', () => {
+  it('refuses a file over the byte limit before reading it', () => {
+    expect(() => checkBackupSize(MAX_BACKUP_BYTES)).not.toThrow()
+    expect(() => checkBackupSize(MAX_BACKUP_BYTES + 1)).toThrow('fazla büyük')
   })
 })
 

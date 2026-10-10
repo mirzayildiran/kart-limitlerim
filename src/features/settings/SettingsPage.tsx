@@ -3,7 +3,7 @@ import { useRef, useState } from 'preact/hooks'
 import { activeCategories, categories, exportBackupText, importBackupText, resetAllData } from '../../data/store'
 import { clearAutoBackups } from '../../data/autoBackupRuntime'
 import { displayHue } from '../../domain/categories'
-import { BackupError, parseBackup } from '../../data/backup'
+import { BackupError, checkBackupSize, parseBackup } from '../../data/backup'
 import { go, openSheet, route } from '../../ui/nav'
 import { Button, Choice, ConfirmButton } from '../../ui/components/controls'
 import { Icon } from '../../ui/components/Icon'
@@ -112,6 +112,7 @@ function BackupSection() {
     setPending(null)
     setError(null)
     try {
+      checkBackupSize(file.size)
       const text = await file.text()
       parseBackup(text) // Validate now so a bad file is reported before the confirm step.
       setPending(text)
