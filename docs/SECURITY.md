@@ -39,7 +39,7 @@ Yayın öncesi denetim, 2026-10-10. Dal: `claude/security-pass`. Bulgular önem 
 - Onay geri alınınca ya da sohbet kapatılınca (`resetChat`) sürmekte olan istek `AbortController` ile iptal edilir.
 - Test: onaysız çağrıda `fetch` hiç çalışmaz.
 
-**Cihazdan çıkan alanlar** (`BudgetSummary`, `src/domain/insightsTypes.ts`): tarih; harcama gücü toplamları; kesime kadar görünüm; hesaplar (kullanıcının yazdığı ad, tür, kullanılabilir tutar, limit, en yakın ekstre); kategori adları ve bu ay/geçen ay toplamları; ay gidişatı; bütçe hedefleri; kurala dayalı önerilerin metni; kullanıcının mesajları (son 12, her biri en çok 1.000 karakter).
+**Cihazdan çıkan alanlar** (`BudgetSummary`, `src/domain/insightsTypes.ts`): tarih; harcama gücü toplamları; kesime kadar görünüm; hesaplar (kullanıcının yazdığı ad, tür, kullanılabilir tutar, limit, en yakın ekstre); kategori adları ve bu ay/geçen ay toplamları; ay gidişatı; bütçe hedefleri; süren taksitlerin toplamı; kurala dayalı önerilerin metni; kullanıcının mesajları (son 12, her biri en çok 1.000 karakter).
 
 Gönderilmeyenler: tek tek harcamalar, notlar, düzenli ödeme adları, yedek, kart numarası ya da şifre (uygulama bunları zaten istemez).
 

@@ -122,11 +122,18 @@ export function parseSummary(value: unknown): BudgetSummary | null {
           body: text(r.body, LIMITS.maxBodyChars),
         }
       }),
+      ...installments(s.installments),
     }
   } catch (err) {
     if (err instanceof Invalid) return null
     throw err
   }
+}
+
+function installments(value: unknown): Pick<BudgetSummary, 'installments'> {
+  if (value === undefined) return {}
+  const r = record(value)
+  return { installments: { plans: count(r.plans), monthly: figure(r.monthly), remaining: figure(r.remaining) } }
 }
 
 function parseAccount(value: unknown): SummaryAccount {
