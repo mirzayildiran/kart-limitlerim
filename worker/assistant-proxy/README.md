@@ -18,7 +18,20 @@ Kart Limitlerim'deki bütçe asistanı, mesajlarını doğrudan bir LLM sağlay�
 - Anahtarlar yalnızca Wrangler "secret" olarak saklanır. `wrangler.toml` içinde anahtar yoktur ve olmamalıdır.
 - **Önemli:** Ücretsiz katmanlardaki bazı sağlayıcılar gönderilen istemleri model eğitimi için kullanabilir. Gemini'nin ücretsiz katmanı bunu yapar. Bu durum uygulamanın onay ekranında listelenen sağlayıcılarla açıklanmalıdır. Kullanıcı onay vermeden hiçbir veri gönderilmez.
 
-## Kurulum
+## Otomatik kurulum (önerilen)
+
+`main` dalına her gönderimde `.github/workflows/deploy.yml`, `scripts/deploy-assistant.sh` ile Worker'ı kurar, anahtarları Worker'a gizli değer olarak yükler, kısa bir duman testi yapar ve Worker adresini uygulamanın derlemesine verir. Bunun için depoda bir kez şu **Actions secrets** değerlerini tanımla (GitHub → Settings → Secrets and variables → Actions → New repository secret):
+
+| Ad | Değer |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → "Edit Cloudflare Workers" şablonu |
+| `GEMINI_API_KEY` | Google AI Studio anahtarı |
+| `GROQ_API_KEY` | Groq anahtarı (isteğe bağlı, yedek) |
+| `OPENROUTER_API_KEY` | OpenRouter anahtarı (isteğe bağlı, yedek) |
+
+Hesapta workers.dev alt alanı yoksa betik `kart-limitlerim-<hesap kimliğinin ilk 6 karakteri>` adıyla oluşturur. Birden fazla Cloudflare hesabın varsa `CLOUDFLARE_ACCOUNT_ID` adıyla bir depo değişkeni (Variables) ekle. Token tanımlı değilse ya da kurulum başarısız olursa site yine yayınlanır, yalnızca sohbet kapalı derlenir.
+
+## Elle kurulum
 
 Komutları bu klasörde (`worker/assistant-proxy`) çalıştır.
 
