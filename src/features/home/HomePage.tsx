@@ -19,11 +19,13 @@ import {
   statements,
   today,
   expenses,
+  loadDemoData,
 } from '../../data/store'
 import { openSheet, go } from '../../ui/nav'
 import { Button, Pill } from '../../ui/components/controls'
 import { Amount, figure } from '../../ui/components/Amount'
 import { Icon } from '../../ui/components/Icon'
+import { toast } from '../../ui/components/toast'
 import { computeInsights } from '../../domain/insights'
 import { assistantInput } from '../assistant/assistantModel'
 import { RecurringDueBanner } from './RecurringDueBanner'
@@ -356,6 +358,15 @@ export function HomePage() {
 
   // Empty state: no accounts at all
   if (accountsValue.length === 0) {
+    const tryDemo = async () => {
+      try {
+        await loadDemoData()
+        toast('Örnek veriler yüklendi. Ayarlar → Tüm verileri sil ile temizleyebilirsin.', undefined, 6000)
+      } catch {
+        toast('Örnek veriler yüklenemedi. Tekrar dene.')
+      }
+    }
+
     return (
       <div class="home-page">
         {renderTopbar(undefined, assistantCount.value)}
@@ -378,6 +389,9 @@ export function HomePage() {
             </Button>
             <Button variant="secondary" block onClick={() => openSheet({ type: 'account', kind: 'bank' })}>
               Nakit veya hesap ekle
+            </Button>
+            <Button variant="ghost" block onClick={tryDemo}>
+              Örnek verilerle dene
             </Button>
             <Button variant="ghost" block onClick={() => go('settings')}>
               Yedekten geri yükle

@@ -51,6 +51,12 @@
   color: var(--muted);
 }
 
+.consent-note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .consent-details {
   border: 1px solid var(--line);
   border-radius: var(--r-md);
