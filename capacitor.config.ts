@@ -15,6 +15,14 @@ const config: CapacitorConfig = {
     backgroundColor: '#0a0a11',
     limitsNavigationsToAppBoundDomains: false,
   },
+  plugins: {
+    Keyboard: {
+      // The web view itself shrinks above the keyboard, so sheets (100dvh, footer button) stay
+      // in view without per-sheet code. The form accessory bar (✓ on the amount field) stays.
+      resize: 'native',
+      resizeOnFullScreen: true,
+    },
+  },
   server: devServer ? { url: devServer, cleartext: true } : undefined,
 }
 

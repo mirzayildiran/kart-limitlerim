@@ -6,13 +6,14 @@ import './ui/base.css'
 import './app.css'
 import { render } from 'preact'
 import { init } from './data/store'
-import { applySavedTheme } from './ui/theme'
+import { applySavedTheme, dismissBoot } from './ui/theme'
 import { App } from './app.tsx'
 import { startReminders } from './platform/reminders'
 import { startAutoBackup } from './data/autoBackupRuntime'
 import { startLock } from './platform/lock'
 import { startDeepLinks } from './platform/deeplinks'
 import { startTextSize } from './platform/textSize'
+import { startKeyboard } from './platform/keyboard'
 import { LockScreen } from './features/lock/LockScreen'
 import { startPhoneSetup } from './features/onboarding/phoneSetup'
 
@@ -25,8 +26,11 @@ startAutoBackup()
 startLock()
 startDeepLinks()
 startTextSize()
+startKeyboard()
 startPhoneSetup()
 
+// Same task as the render, so no frame is painted without the boot screen or the app.
+dismissBoot()
 render(<App />, document.getElementById('app')!)
 
 // Separate root so the lock covers the app without the app knowing about it.
