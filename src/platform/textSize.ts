@@ -10,8 +10,8 @@ import { isNativeApp } from './files'
 const SYSTEM_DEFAULT = 17
 const BASE = 16
 const MIN = 14
-/** ≈ the system "xxxLarge" step (23pt); beyond it layouts would wrap. */
-const MAX = 22
+/** 160 % of the base: the largest size the layout is checked at (design/polish-4). */
+const MAX = 25.6
 
 export function rootSizeFor(systemBodyPx: number): number {
   if (!Number.isFinite(systemBodyPx) || systemBodyPx <= 0) return BASE
