@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Kart Limitlerim — Saatli Maarif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--sheet:#fbfbf8;--ink:#141414;--red:#d2232a;--navy:#1d3f8f;--ground:#ececea;--mute:#6b6b66;--line:#dcdcd7}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:var(--ground)}
+body{font-family:"Onest",system-ui,sans-serif;color:var(--ink);font-variant-numeric:tabular-nums;position:relative;-webkit-font-smoothing:antialiased}
+.cond{font-family:"Archivo",sans-serif;font-stretch:62%}
+.status{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:15px;font-weight:600}
+.top{display:flex;justify-content:space-between;align-items:baseline;padding:4px 16px 10px}
+.top h1{font-size:15px;font-weight:600}
+.top span{font-size:12px;color:var(--mute)}
+.pad{position:relative;margin:0 16px}
+.under{position:absolute;left:6px;right:6px;bottom:-9px;height:40px;background:var(--sheet);border:1px solid var(--line);border-top:0;display:flex;justify-content:flex-end;align-items:flex-end;padding:0 12px 1px}
+.under b{font-family:"Archivo";font-stretch:62%;font-weight:800;font-size:12px;color:#c4c4bf;line-height:1}
+.leaf{position:relative;background:var(--sheet);border:1px solid var(--line)}
+.band{height:30px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:11px;font-weight:600;letter-spacing:.14em}
+.holes{display:flex;gap:44px}
+.holes i{width:8px;height:8px;border-radius:50%;background:var(--ground);display:block}
+.head{display:flex;align-items:flex-end;gap:12px;padding:6px 16px 0}
+.num{font-family:"Archivo";font-stretch:62%;font-weight:800;font-size:132px;line-height:.82;color:var(--red);letter-spacing:-.02em}
+.gun{padding-bottom:6px}
+.gun b{display:block;font-family:"Archivo";font-stretch:62%;font-weight:800;font-size:34px;line-height:.9;letter-spacing:.02em}
+.gun span{display:block;font-size:12px;color:var(--mute);margin-top:6px;line-height:1.35}
+.gun em{font-style:normal;color:var(--red);font-weight:600}
+.body{padding:14px 16px 14px;border-top:1px solid var(--line);margin-top:12px}
+.lbl{font-size:10.5px;font-weight:600;letter-spacing:.12em;color:var(--mute)}
+.big{font-family:"Archivo";font-stretch:75%;font-weight:800;font-size:44px;line-height:1;margin-top:4px;letter-spacing:-.01em}
+.big small{font-size:26px;font-weight:700;margin-left:2px}
+.split{display:flex;gap:14px;font-size:12px;color:var(--mute);margin-top:6px}
+.split b{color:var(--ink);font-weight:600}
+.kk{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.kk p{font-size:13px;font-weight:600}
+.kk p span{display:block;font-size:11px;font-weight:400;color:var(--mute);margin-top:2px}
+.kk strong{font-family:"Archivo";font-stretch:75%;font-weight:800;font-size:22px}
+.perf{height:8px;border-top:1.5px dashed #bdbdb7;margin:0 0 -1px}
+.warn{margin:22px 16px 0;background:var(--sheet);border:1px solid var(--line);border-left:3px solid var(--red);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.warn p{font-size:13px;font-weight:600}
+.warn p span{display:block;font-size:11.5px;font-weight:400;color:var(--red);margin-top:2px}
+.warn strong{font-family:"Archivo";font-stretch:75%;font-weight:800;font-size:22px;color:var(--red)}
+.sec{display:flex;justify-content:space-between;padding:16px 16px 6px;font-size:10.5px;font-weight:600;letter-spacing:.12em;color:var(--mute)}
+.list{margin:0 16px;background:var(--sheet);border:1px solid var(--line)}
+.row{display:flex;align-items:center;height:42px;padding:0 14px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.d{width:40px;display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+.d b{font-family:"Archivo";font-stretch:62%;font-weight:800;font-size:22px}
+.d small{font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--mute);margin-top:1px}
+.t{flex:1;font-size:13px;font-weight:500}
+.t span{display:block;font-size:11px;color:var(--mute);font-weight:400;margin-top:1px}
+.a{font-size:13.5px;font-weight:600}
+.due .d b,.due .t span{color:var(--red)}
+.cut .a{font-size:10.5px;letter-spacing:.12em;color:#fff;background:var(--navy);padding:3px 6px}
+.hint{margin:10px 16px 0;font-size:12px;color:var(--mute);line-height:1.4}
+.hint b{color:var(--ink);font-weight:600}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--sheet);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:flex-start;padding-top:9px}
+.tab{width:62px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:500;color:var(--mute)}
+.tab i{display:block;width:22px;height:22px;border:1.8px solid currentColor;border-radius:5px}
+.tab.on{color:var(--ink);font-weight:600}
+.tab.on i{background:var(--ink)}
+.tab.c2 i{border-radius:50%}
+.tab.c3 i{border-radius:3px;border-top-width:5px}
+.tab.c4 i{border-radius:50%;border-style:dotted;border-width:2.5px}
+.plus{width:52px;height:52px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:400;margin-top:-4px;line-height:1}
+.home{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink)}
+</style>
+</head>
+<body>
+<div class="status"><span>9:41</span><span>●●● ▮</span></div>
+<div class="top"><h1>10 Ekim Cumartesi</h1><span>Cihazında · çevrimdışı</span></div>
+
+<div class="pad">
+  <div class="under"><b>9</b></div>
+  <div class="leaf">
+    <div class="band"><span>KESİME</span><span class="holes"><i></i><i></i></span><span>AKBANK AXESS</span></div>
+    <div class="head">
+      <div class="num">8</div>
+      <div class="gun"><b>GÜN</b><span>Kesim <em>18 Ekim Pazar</em><br>düzenli ödemeler düşüldü</span></div>
+    </div>
+    <div class="body">
+      <div class="lbl">ŞU AN HARCAYABİLECEĞİN</div>
+      <div class="big">80.220<small>₺</small></div>
+      <div class="split"><span>Kartlar <b>57.100 ₺</b></span><span>KMH <b>13.500 ₺</b></span><span>Nakit <b>9.620 ₺</b></span></div>
+      <div class="kk"><p>Kesime kadar<span>18 Eki · 8 gün</span></p><strong>62.120 ₺</strong></div>
+    </div>
+    <div class="perf"></div>
+  </div>
+</div>
+
+<div class="warn"><p>Ödemelerden sonra nakit<span>Asgariler için 4.520 ₺ eksik</span></p><strong>−4.520 ₺</strong></div>
+
+<div class="sec"><span>YAKLAŞANLAR</span><span>Takvim ›</span></div>
+<div class="list">
+  <div class="row"><div class="d"><b>12</b><small>EKİ</small></div><div class="t">Spotify<span>Düzenli ödeme</span></div><div class="a">99,99 ₺</div></div>
+  <div class="row due"><div class="d"><b>13</b><small>EKİ</small></div><div class="t">Garanti Bonus<span>Son ödeme · asgari</span></div><div class="a">1.960 ₺</div></div>
+  <div class="row"><div class="d"><b>15</b><small>EKİ</small></div><div class="t">Kira<span>Düzenli ödeme</span></div><div class="a">18.000 ₺</div></div>
+  <div class="row due"><div class="d"><b>15</b><small>EKİ</small></div><div class="t">İş Maximum<span>Son ödeme · asgari</span></div><div class="a">3.740 ₺</div></div>
+  <div class="row cut"><div class="d"><b style="color:var(--red)">18</b><small>EKİ</small></div><div class="t">Akbank Axess<span>Hesap kesim günü</span></div><div class="a">KESİM</div></div>
+</div>
+<p class="hint">Yalnız asgariyi ödersen gelecek ekstrede <b>≈1.284 ₺ faiz</b> (tahmin)</p>
+
+<nav class="tabs">
+  <div class="tab on"><i></i>Özet</div>
+  <div class="tab c2"><i></i>Harcamalar</div>
+  <div class="plus">+</div>
+  <div class="tab c3"><i></i>Takvim</div>
+  <div class="tab c4"><i></i>Ayarlar</div>
+  <div class="home"></div>
+</nav>
+</body>
+</html>

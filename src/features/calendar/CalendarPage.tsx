@@ -1,5 +1,6 @@
 import { useState } from 'preact/hooks'
 import { formatLong } from '../../domain/dates'
+import { figure } from '../../ui/components/Amount'
 import { formatTL } from '../../domain/money'
 import { accounts, newId, recurring, saveExpense, saveRecurring, statements, today } from '../../data/store'
 import { openSheet } from '../../ui/nav'
@@ -37,7 +38,7 @@ function EventRow({ e }: { e: TimelineEvent }) {
           <span class="cal-event-title">{e.title}</span>
           {e.detail && <span class="cal-event-detail">{e.detail}</span>}
         </span>
-        {e.amount != null && <span class="cal-event-amount num">{formatTL(e.amount)}</span>}
+        {e.amount != null && <span class="cal-event-amount num">{figure(formatTL(e.amount))}</span>}
       </button>
     </li>
   )
@@ -124,7 +125,7 @@ export function CalendarPage() {
                         {formatLong(p.date)} · {accountName(all, p.accountId)}
                       </span>
                     </div>
-                    <span class="cal-item-amount num">{formatTL(p.amount)}</span>
+                    <span class="cal-item-amount num">{figure(formatTL(p.amount))}</span>
                   </div>
                   <div class="cal-pending-actions">
                     <Button
@@ -195,7 +196,7 @@ export function CalendarPage() {
                       {dayOfMonthLabel(r.dayOfMonth)} · {accountName(all, r.accountId)}
                     </span>
                   </span>
-                  <span class="cal-item-amount num">{formatTL(r.amount)}</span>
+                  <span class="cal-item-amount num">{figure(formatTL(r.amount))}</span>
                 </button>
               </li>
             ))}

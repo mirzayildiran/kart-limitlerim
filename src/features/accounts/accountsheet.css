@@ -12,8 +12,8 @@
 
 .card-sheet-warning {
   padding: 0.75rem;
-  background-color: var(--bg-warn);
-  color: var(--fg-warn);
+  background-color: var(--warn-soft);
+  color: var(--warn);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   margin: -0.5rem 0 0 0;
@@ -29,7 +29,7 @@
 .card-line {
   position: relative;
   padding: 1rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
@@ -45,7 +45,7 @@
   padding: 0;
   background: none;
   border: none;
-  color: var(--fg-secondary);
+  color: var(--muted);
   font-size: 1.5rem;
   cursor: pointer;
   display: flex;
@@ -57,27 +57,27 @@
 
 .card-line-remove:hover {
   opacity: 1;
-  color: var(--fg-crit);
+  color: var(--crit);
 }
 
 .card-line-add {
   padding: 0.75rem 1rem;
   margin-top: 0.5rem;
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 0.5rem;
-  color: var(--fg);
+  color: var(--ink);
   font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .card-line-add:hover {
-  background-color: var(--bg-secondary);
+  background-color: var(--surface-2);
 }
 
 .rate-override {
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 0.5rem;
   padding: 1rem;
   cursor: pointer;
@@ -85,7 +85,7 @@
 
 .rate-override summary {
   font-weight: 600;
-  color: var(--fg);
+  color: var(--ink);
   outline: none;
   user-select: none;
 }
@@ -111,5 +111,5 @@
   gap: 1rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--line);
 }

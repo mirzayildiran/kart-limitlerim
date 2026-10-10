@@ -91,8 +91,30 @@
   gap: 0;
 }
 
+.tab-fab {
+  transition: transform 0.15s var(--ease), box-shadow 0.2s var(--ease);
+}
+
 .tab-fab:active {
-  opacity: 0.9;
+  transform: scale(0.92);
+}
+
+.tab-item svg {
+  transition: transform 0.25s var(--ease-out-expo);
+}
+
+.tab-item:active svg {
+  transform: scale(0.88);
+}
+
+.tab-item[aria-current="page"] svg {
+  animation: tab-pop 0.35s var(--ease-out-expo);
+}
+
+@keyframes tab-pop {
+  from {
+    transform: scale(0.8);
+  }
 }
 
 .tab-fab:focus-visible {
@@ -102,7 +124,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tab-item,
-  .tab-fab {
+  .tab-fab,
+  .tab-item svg {
     transition: none;
+    animation: none;
   }
 }

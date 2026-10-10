@@ -136,14 +136,13 @@
   flex-wrap: wrap;
   gap: var(--s-3);
   padding: var(--s-3);
-  background: var(--surface-2);
-  border-left: 4px solid var(--ok);
-  border-radius: var(--r-sm);
+  background: var(--ok-soft);
+  border-radius: var(--r-md);
   font-size: var(--text-sm);
 }
 
 .expense-preview.is-negative {
-  border-left-color: var(--crit);
+  background: var(--crit-soft);
 }
 
 .expense-preview .num {

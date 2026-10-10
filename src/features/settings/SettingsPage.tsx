@@ -62,7 +62,7 @@ function CategoriesSection() {
       <div class="settings-card">
         {activeCategories.value.map((c) => (
           <button key={c.id} type="button" class="settings-row settings-row-tap" onClick={() => open(c.id)}>
-            <span class={`settings-dot ${c.builtin ? 'settings-dot-builtin' : 'settings-dot-custom'}`} aria-hidden="true" />
+            <span class="settings-dot cat-color" style={{ '--h': c.hue }} aria-hidden="true" />
             <span class="settings-row-label">{c.name}</span>
             <Icon name="chevron" size={18} class="settings-chev" />
           </button>
@@ -78,7 +78,7 @@ function CategoriesSection() {
           <div class="settings-card">
             {archived.map((c) => (
               <button key={c.id} type="button" class="settings-row settings-row-tap" onClick={() => open(c.id)}>
-                <span class={`settings-dot ${c.builtin ? 'settings-dot-builtin' : 'settings-dot-custom'}`} aria-hidden="true" />
+                <span class="settings-dot cat-color" style={{ '--h': c.hue }} aria-hidden="true" />
                 <span class="settings-row-label settings-muted">{c.name}</span>
                 <Icon name="chevron" size={18} class="settings-chev" />
               </button>

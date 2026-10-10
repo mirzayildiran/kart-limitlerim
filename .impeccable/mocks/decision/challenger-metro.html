@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Gece Metro Haritası</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#0f1d3a;--deep:#0a1530;--ink:#f4f1ea;--dim:rgba(244,241,234,.62);--faint:rgba(244,241,234,.14);
+--red:#e2231a;--cobalt:#1e5bd8;--amber:#f2a900;--green:#1a9b4b}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:var(--ground);color:var(--ink);
+font-family:"Hanken Grotesk",system-ui,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.app{position:relative;width:390px;height:844px;padding:54px 16px 0}
+.top{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:14px;border-bottom:1px solid var(--faint)}
+.top h1{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.top span{font-size:13px;color:var(--dim);font-weight:500}
+.label{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--dim)}
+.hero{padding:20px 0 16px}
+.big{font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1;margin:8px 0 12px}
+.big small{font-size:28px;font-weight:600;margin-left:4px;color:var(--dim)}
+.split{display:flex;gap:16px;font-size:13px;color:var(--dim)}
+.split b{color:var(--ink);font-weight:600}
+.split i{display:inline-block;width:12px;height:4px;margin-right:6px;vertical-align:middle;border-radius:2px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{border:1px solid var(--faint);border-radius:12px;padding:12px}
+.tile .t{font-size:12px;color:var(--dim);font-weight:500}
+.tile .v{font-size:22px;font-weight:700;margin:4px 0 2px;letter-spacing:-.01em}
+.tile .s{font-size:12px;color:var(--dim)}
+.tile.warn{border-color:rgba(242,169,0,.45);box-shadow:inset 4px 0 0 var(--red)}
+.tile.warn .v{color:var(--amber)}
+.tile.warn .s{color:var(--ink)}
+.route{margin:20px 0 4px}
+.route .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.route .head span{font-size:12px;color:var(--dim)}
+svg text{font-family:"Hanken Grotesk",sans-serif;fill:var(--ink)}
+.d{font-size:11px;font-weight:700}.n{font-size:11px;font-weight:500;fill:var(--dim)}.k{font-size:11px;font-weight:800;letter-spacing:.08em;fill:var(--amber)}
+.cards{border-top:1px solid var(--faint);margin-top:6px}
+.card{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:0 12px;padding:11px 0;border-bottom:1px solid var(--faint)}
+.rd{position:relative;width:26px;height:26px;border-radius:50%;border:5px solid var(--c)}
+.rd::after{content:"";position:absolute;left:-8px;right:-8px;top:50%;height:6px;margin-top:-3px;background:var(--ink);border:1.5px solid var(--ground)}
+.card .nm{font-size:15px;font-weight:600}
+.card .am{font-size:13px;color:var(--dim);text-align:right}.card .am b{color:var(--ink);font-size:15px;font-weight:700}
+.bar{grid-column:2/4;height:3px;background:var(--faint);border-radius:2px;margin-top:8px}
+.bar i{display:block;height:3px;border-radius:2px;background:var(--c)}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:86px;background:var(--deep);border-top:1px solid var(--faint);
+display:grid;grid-template-columns:repeat(5,1fr);padding:8px 6px 0}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--dim)}
+.tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--ink)}.tab.on::before{content:"";width:22px;height:3px;background:var(--amber);border-radius:2px;margin:-8px 0 1px}
+.plus{width:52px;height:52px;border-radius:50%;background:var(--amber);color:var(--ground);display:grid;place-items:center;margin-top:-4px}
+.plus svg{stroke:var(--ground);stroke-width:2.6}
+.home{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--ink);opacity:.8}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top"><h1>Kart Limitlerim</h1><span>10 Ekim Cumartesi</span></header>
+
+  <section class="hero">
+    <div class="label">ŞU AN HARCAYABİLECEĞİN</div>
+    <div class="big">80.220<small>₺</small></div>
+    <div class="split">
+      <span><i style="background:var(--cobalt)"></i>Kartlar <b>57.100 ₺</b></span>
+      <span><i style="background:var(--amber)"></i>KMH <b>13.500 ₺</b></span>
+      <span><i style="background:var(--green)"></i>Nakit <b>9.620 ₺</b></span>
+    </div>
+  </section>
+
+  <section class="tiles">
+    <div class="tile"><div class="t">Kesime kadar</div><div class="v">62.120 ₺</div><div class="s">18 Eki · 8 gün</div></div>
+    <div class="tile warn"><div class="t">Ödemelerden sonra nakit</div><div class="v">−4.520 ₺</div><div class="s">Asgariler için 4.520 ₺ eksik</div></div>
+  </section>
+
+  <section class="route">
+    <div class="head"><div class="label">BUGÜN → KESİM</div><span>5 durak · 8 gün</span></div>
+    <svg width="358" height="132" viewBox="0 0 358 132" aria-label="Kesime kadar güzergâh">
+      <path d="M10 52 H168 L198 82 H340" fill="none" stroke="var(--amber)" stroke-width="6" stroke-linejoin="round"/>
+      <!-- terminus bar -->
+      <rect x="338" y="68" width="6" height="28" fill="var(--amber)"/>
+      <!-- stations -->
+      <circle cx="10" cy="52" r="6" fill="var(--ink)" stroke="var(--ground)" stroke-width="2"/>
+      <rect x="76" y="52" width="4" height="9" fill="var(--ink)"/>
+      <rect x="138" y="43" width="4" height="9" fill="var(--ink)"/>
+      <circle cx="252" cy="82" r="10" fill="var(--ink)" stroke="var(--ground)" stroke-width="3.5"/>
+      <circle cx="252" cy="82" r="4" fill="var(--ground)"/>
+      <!-- labels -->
+      <text x="4" y="22" class="d">10 Eki</text><text x="4" y="36" class="k">BUGÜN</text>
+      <text x="78" y="76" class="d" text-anchor="middle">12 Eki</text><text x="78" y="89" class="n" text-anchor="middle">Spotify</text><text x="78" y="102" class="n" text-anchor="middle">99,99 ₺</text>
+      <text x="140" y="11" class="d" text-anchor="middle">13 Eki</text><text x="140" y="24" class="n" text-anchor="middle">Garanti Bonus</text><text x="140" y="37" class="n" text-anchor="middle">asgari 1.960 ₺</text>
+      <text x="252" y="37" class="d" text-anchor="middle">15 Eki</text><text x="252" y="50" class="n" text-anchor="middle">Kira 18.000 ₺</text><text x="252" y="63" class="n" text-anchor="middle" style="fill:var(--ink)">⇄ aktarma</text>
+      <text x="252" y="110" class="n" text-anchor="middle">İş Maximum</text><text x="252" y="123" class="n" text-anchor="middle">asgari 3.740 ₺</text>
+      <text x="354" y="114" class="d" text-anchor="end">18 Eki</text><text x="354" y="127" class="k" text-anchor="end">KESİM</text>
+      <text x="354" y="56" class="n" text-anchor="end">Akbank Axess</text>
+    </svg>
+  </section>
+
+  <section class="cards">
+    <div class="card" style="--c:var(--green)"><span class="rd"></span><span class="nm">Garanti Bonus</span><span class="am"><b>31.200</b> / 45.000 ₺</span><div class="bar"><i style="width:69%"></i></div></div>
+    <div class="card" style="--c:var(--red)"><span class="rd"></span><span class="nm">Akbank Axess</span><span class="am"><b>21.800</b> / 60.000 ₺</span><div class="bar"><i style="width:36%"></i></div></div>
+    <div class="card" style="--c:var(--cobalt)"><span class="rd"></span><span class="nm">İş Maximum</span><span class="am"><b>4.100</b> / 25.000 ₺</span><div class="bar"><i style="width:16%"></i></div></div>
+  </section>
+
+  <nav class="tabs">
+    <a class="tab on"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/></svg>Özet</a>
+    <a class="tab"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Harcamalar</a>
+    <a class="tab"><span class="plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></a>
+    <a class="tab"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Takvim</a>
+    <a class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Ayarlar</a>
+  </nav>
+  <div class="home"></div>
+</div>
+</body>
+</html>

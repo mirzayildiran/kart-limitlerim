@@ -1,6 +1,7 @@
 import type { TargetedEvent } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { formatShort, fromIso } from '../../domain/dates'
+import { figure } from '../../ui/components/Amount'
 import { formatTLExact } from '../../domain/money'
 import type { Account, IsoDate, Kurus } from '../../domain/types'
 import {
@@ -402,7 +403,7 @@ export function ImportSheet(_props: ImportSheetProps) {
                     <li key={i} class="import-credit">
                       <span>{c.date ? formatShort(fromIso(c.date)) : 'Tarihsiz'}</span>
                       <span class="import-credit-desc">{c.description}</span>
-                      <span class="num">{formatTLExact(c.amount)}</span>
+                      <span class="num">{figure(formatTLExact(c.amount))}</span>
                     </li>
                   ))}
                 </ul>

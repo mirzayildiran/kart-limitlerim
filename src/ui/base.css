@@ -62,6 +62,21 @@ textarea {
   display: none !important;
 }
 
+::selection {
+  background: var(--accent-tint);
+  color: var(--ink);
+}
+
+input,
+textarea {
+  caret-color: var(--accent);
+}
+
+html {
+  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-width: thin;
+}
+
 .num {
   font-variant-numeric: tabular-nums;
 }
