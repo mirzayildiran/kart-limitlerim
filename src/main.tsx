@@ -11,6 +11,7 @@ import { App } from './app.tsx'
 import { startReminders } from './platform/reminders'
 import { startLock } from './platform/lock'
 import { LockScreen } from './features/lock/LockScreen'
+import { startPhoneSetup } from './features/onboarding/phoneSetup'
 
 // Initialize data store (don't await before first render)
 init().catch(() => {})
@@ -18,6 +19,7 @@ init().catch(() => {})
 applySavedTheme()
 startReminders()
 startLock()
+startPhoneSetup()
 
 render(<App />, document.getElementById('app')!)
 

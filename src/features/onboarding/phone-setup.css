@@ -1,0 +1,89 @@
+.phone-setup-intro {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.phone-setup-list {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.phone-setup-row + .phone-setup-row {
+  border-top: 1px solid var(--line);
+}
+
+.phone-setup-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-4);
+}
+
+/* Large text: the button wraps under the text instead of squeezing it. */
+.phone-setup-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.phone-setup-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.phone-setup-text {
+  flex: 1 1 10rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.phone-setup-title {
+  font-weight: 600;
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+.phone-setup-why {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.phone-setup-main .btn {
+  flex: none;
+  margin-left: auto;
+  min-width: 72px;
+}
+
+.phone-setup-on {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  min-height: var(--tap);
+  padding: 0 var(--s-2);
+  font-weight: 600;
+  color: var(--ok);
+}
+
+.phone-setup-note {
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--warn-soft);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}

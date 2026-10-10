@@ -209,6 +209,15 @@ export async function importBackupText(text: string): Promise<void> {
   hydrate(await repo.loadAll(requireDb()))
 }
 
+/** One-time flags (onboarding prompts) kept in the meta store, so they travel with a backup reset. */
+export async function getFlag(key: string): Promise<boolean> {
+  return db ? (await repo.getMeta<boolean>(db, key)) === true : false
+}
+
+export async function setFlag(key: string): Promise<void> {
+  if (db) await repo.setMeta(db, key, true)
+}
+
 /** Replaces this device's data with the sample data, dated relative to today. Loaded on demand. */
 export async function loadDemoData(): Promise<void> {
   const [{ default: raw }, { shiftDemoBackup }] = await Promise.all([import('./demo-backup.json'), import('./demo')])
