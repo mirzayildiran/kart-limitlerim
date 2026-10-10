@@ -190,9 +190,12 @@
 }
 
 .settings-rate {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  /* Label and value share a row; with large text the value wraps under the label. */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   column-gap: var(--s-3);
+  row-gap: 2px;
   align-items: baseline;
   min-height: var(--tap);
   padding: var(--s-3) var(--s-4);
@@ -214,7 +217,7 @@
 }
 
 .settings-rate-value {
-  margin: 0;
+  margin: 0 0 0 auto;
   font-family: var(--font-display);
   font-size: var(--text-md);
   font-weight: 600;
@@ -224,7 +227,9 @@
 
 .settings-rate-line {
   display: block;
-  white-space: nowrap;
+  /* One line each at normal size; with large text a line may wrap rather than widen the page. */
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
 .settings-captions {

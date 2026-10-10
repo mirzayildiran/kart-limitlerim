@@ -245,3 +245,30 @@
   --night-action-ink: #0a0a11;
   --night-crit: #ff5c7a;
 }
+
+/* Increase Contrast (iOS) / prefers-contrast: more: secondary text, hints and hairlines move toward the ink. */
+@media (prefers-contrast: more) {
+  :root {
+    --muted: #3f3f4f;
+    --faint: #55556a;
+    --line: #b4b4c2;
+    --line-strong: #85859a;
+    --night-muted: #d6d6e2;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --muted: #d0d0de;
+      --faint: #a6a6ba;
+      --line: #4a4a60;
+      --line-strong: #6c6c84;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    --muted: #d0d0de;
+    --faint: #a6a6ba;
+    --line: #4a4a60;
+    --line-strong: #6c6c84;
+  }
+}

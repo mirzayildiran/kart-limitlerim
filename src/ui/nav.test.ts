@@ -183,6 +183,15 @@ describe('route change', () => {
     expect(t.updateCallbackDone.catch).toHaveBeenCalled()
   })
 
+  it('with Reduce Motion a tab change starts no transition', () => {
+    reducedMotion = true
+    doc = makeDocument(true)
+    vi.stubGlobal('document', doc)
+    navigate('#/harcamalar')
+    expect(doc.startViewTransition).not.toHaveBeenCalled()
+    expect(nav.route.value).toBe('expenses')
+  })
+
   it('the same tab does not start a transition', () => {
     doc = makeDocument(true)
     vi.stubGlobal('document', doc)
