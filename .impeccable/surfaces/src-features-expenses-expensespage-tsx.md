@@ -36,3 +36,12 @@ FORM:
 Filtering is pure and tested: `filterExpenses(expenses, { categoryId?, accountId? })` and `dayTotals` in `expenseModel.ts`; filter state is page-local signals reset when the month changes.
 
 FINISH: dual-agent critique on captures, fix round, finish reviewer verdict, DESIGN.md Rollout status updated.
+
+## As built (lead, 2026-10-10) — supersedes FORM where they differ
+
+- Category preview is 4, not 6: the FIRST VIEWPORT promises the start of the account tiles, and six category rows push them below 780 px.
+- One list container for the month with day divider rows on a toned band (`--surface-2`), not one container per day: with sparse days a per-day container reads as a box per expense, and the band keeps the light theme from reading as a stack of white rows.
+- Unselected filter items are not dimmed (dimming broke text contrast on the wallet fills); selection is a ring plus a check icon, and the chosen account tile glows in its own colour (Self-Lit). The ring sits outside the fill (`outline-offset: 2px`): an inset ring vanished on the yellow and orange slots.
+- Filters are faceted: tiles and rows narrow to the other filter, and options whose intersection is empty are disabled (`aria-disabled`, 0.4 opacity, exempt as inactive controls); the empty-filter text names the filters ("Eğlence ve Axess için harcama yok").
+- The status line reads "Ekim toplamı · N harcama" or the filter names; a filter tap gives an 8 ms haptic tick where supported.
+- Section titles "Hesaba göre" (the product's word is hesap) and "Tüm harcamalar"; "Dokunarak süz" caption beside "Kategoriler".

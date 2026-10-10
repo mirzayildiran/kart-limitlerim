@@ -161,8 +161,10 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--s-3);
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 var(--s-4);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
 }
 
 .calendar-day + .calendar-day .calendar-day-head {

@@ -50,11 +50,13 @@ function setSelectedMonth(key: string) {
 }
 
 function toggleCategory(id: string) {
+  navigator.vibrate?.(8)
   categoryFilter.value = categoryFilter.value === id ? null : id
   listSwap.value++
 }
 
 function toggleAccount(id: string) {
+  navigator.vibrate?.(8)
   accountFilter.value = accountFilter.value === id ? null : id
   listSwap.value++
 }
