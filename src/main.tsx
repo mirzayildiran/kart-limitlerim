@@ -10,6 +10,8 @@ import { applySavedTheme } from './ui/theme'
 import { App } from './app.tsx'
 import { startReminders } from './platform/reminders'
 import { startLock } from './platform/lock'
+import { startDeepLinks } from './platform/deeplinks'
+import { startTextSize } from './platform/textSize'
 import { LockScreen } from './features/lock/LockScreen'
 
 // Initialize data store (don't await before first render)
@@ -18,6 +20,8 @@ init().catch(() => {})
 applySavedTheme()
 startReminders()
 startLock()
+startDeepLinks()
+startTextSize()
 
 // Same task as the render, so no frame is painted between the boot screen and the app.
 document.getElementById('boot')?.remove()
