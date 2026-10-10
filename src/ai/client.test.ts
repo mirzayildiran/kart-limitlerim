@@ -58,22 +58,29 @@ afterEach(() => {
 })
 
 describe('askAssistant', () => {
+  it('sends nothing without consent, even with a URL', async () => {
+    const { fetchImpl, calls } = fakeFetch(() => json({ text: 'x', provider: 'gemini' }))
+    const err = await errorOf(askAssistant(summary, messages, { consented: false, url: URL, fetchImpl }))
+    expect(err.code).toBe('no_consent')
+    expect(calls).toHaveLength(0)
+  })
+
   it('throws not_configured when the URL is null', async () => {
     const { fetchImpl, calls } = fakeFetch(() => json({ text: 'x', provider: 'gemini' }))
-    const err = await errorOf(askAssistant(summary, messages, { url: null, fetchImpl }))
+    const err = await errorOf(askAssistant(summary, messages, { consented: true, url: null, fetchImpl }))
     expect(err.code).toBe('not_configured')
     expect(calls).toHaveLength(0)
   })
 
   it('throws not_configured when the URL is empty', async () => {
     const { fetchImpl } = fakeFetch(() => json({ text: 'x', provider: 'gemini' }))
-    const err = await errorOf(askAssistant(summary, messages, { url: '', fetchImpl }))
+    const err = await errorOf(askAssistant(summary, messages, { consented: true, url: '', fetchImpl }))
     expect(err.code).toBe('not_configured')
   })
 
   it('POSTs v, summary and trimmed messages as JSON', async () => {
     const { fetchImpl, calls } = fakeFetch(() => json({ text: 'Tamam', provider: 'groq' }))
-    await askAssistant(summary, messages, { url: URL, fetchImpl })
+    await askAssistant(summary, messages, { consented: true, url: URL, fetchImpl })
 
     expect(calls).toHaveLength(1)
     const { url, init } = calls[0]
@@ -85,96 +92,96 @@ describe('askAssistant', () => {
 
   it('returns text and provider on success', async () => {
     const { fetchImpl } = fakeFetch(() => json({ text: 'Şu an 24.500 ₺ harcayabilirsin.', provider: 'gemini' }))
-    const reply = await askAssistant(summary, messages, { url: URL, fetchImpl })
+    const reply = await askAssistant(summary, messages, { consented: true, url: URL, fetchImpl })
     expect(reply).toEqual({ text: 'Şu an 24.500 ₺ harcayabilirsin.', provider: 'gemini' })
   })
 
   it('sends the timeout signal', async () => {
     const { fetchImpl, calls } = fakeFetch(() => json({ text: 'x', provider: 'gemini' }))
-    await askAssistant(summary, messages, { url: URL, fetchImpl })
+    await askAssistant(summary, messages, { consented: true, url: URL, fetchImpl })
     expect(calls[0].init?.signal).toBeInstanceOf(AbortSignal)
   })
 
   it('maps HTTP 429 to rate_limited', async () => {
     const { fetchImpl } = fakeFetch(() => json({ error: 'rate_limited' }, 429))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('rate_limited')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('rate_limited')
   })
 
   it('maps HTTP 400 to bad_request', async () => {
     const { fetchImpl } = fakeFetch(() => json({ error: 'bad_request' }, 400))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('bad_request')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('bad_request')
   })
 
   it('maps HTTP 403 (origin not allowed) to not_configured, not bad_request', async () => {
     const { fetchImpl } = fakeFetch(() => json({ error: 'bad_request' }, 403))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('not_configured')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('not_configured')
   })
 
   it('uses a known error code from the body for other failures', async () => {
     const { fetchImpl } = fakeFetch(() => json({ error: 'not_configured' }, 503))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('not_configured')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('not_configured')
   })
 
   it('maps an unknown error code in the body to unavailable', async () => {
     const { fetchImpl } = fakeFetch(() => json({ error: 'something_else' }, 500))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('unavailable')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('unavailable')
   })
 
   it('maps a non-OK response without a JSON body to unavailable', async () => {
     const { fetchImpl } = fakeFetch(() => new Response('<html>Bad gateway</html>', { status: 502 }))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('unavailable')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('unavailable')
   })
 
   it('maps an OK body without a string text to unavailable', async () => {
     const { fetchImpl } = fakeFetch(() => json({ provider: 'gemini' }))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('unavailable')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('unavailable')
   })
 
   it('maps an OK body with empty text to unavailable', async () => {
     const { fetchImpl } = fakeFetch(() => json({ text: '   ', provider: 'gemini' }))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('unavailable')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('unavailable')
   })
 
   it('maps an OK body without a string provider to unavailable', async () => {
     const { fetchImpl } = fakeFetch(() => json({ text: 'x', provider: 3 }))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('unavailable')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('unavailable')
   })
 
   it('maps an OK body that is not an object to unavailable', async () => {
     const { fetchImpl } = fakeFetch(() => json(['x']))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('unavailable')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('unavailable')
   })
 
   it('maps an OK body that is not JSON to unavailable', async () => {
     const { fetchImpl } = fakeFetch(() => new Response('plain text', { status: 200 }))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('unavailable')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('unavailable')
   })
 
   it('maps a TypeError from fetch to offline', async () => {
     const { fetchImpl } = fakeFetch(() => {
       throw new TypeError('Failed to fetch')
     })
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('offline')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('offline')
   })
 
   it('maps any other error from fetch to unavailable', async () => {
     const { fetchImpl } = fakeFetch(() => {
       throw new Error('boom')
     })
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('unavailable')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('unavailable')
   })
 
   it('does not call fetch and maps to offline when navigator reports offline', async () => {
     vi.stubGlobal('navigator', { onLine: false })
     const { fetchImpl, calls } = fakeFetch(() => json({ text: 'x', provider: 'gemini' }))
-    expect((await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl }))).code).toBe('offline')
+    expect((await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl }))).code).toBe('offline')
     expect(calls).toHaveLength(0)
   })
 
   it('calls fetch when navigator reports online', async () => {
     vi.stubGlobal('navigator', { onLine: true })
     const { fetchImpl, calls } = fakeFetch(() => json({ text: 'x', provider: 'gemini' }))
-    await askAssistant(summary, messages, { url: URL, fetchImpl })
+    await askAssistant(summary, messages, { consented: true, url: URL, fetchImpl })
     expect(calls).toHaveLength(1)
   })
 
@@ -183,7 +190,7 @@ describe('askAssistant', () => {
       new Promise<Response>((_resolve, reject) => {
         init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')))
       })) as typeof fetch
-    const err = await errorOf(askAssistant(summary, messages, { url: URL, fetchImpl: hang, timeoutMs: 5 }))
+    const err = await errorOf(askAssistant(summary, messages, { consented: true, url: URL, fetchImpl: hang, timeoutMs: 5 }))
     expect(err.code).toBe('timeout')
   })
 
@@ -193,7 +200,7 @@ describe('askAssistant', () => {
       new Promise<Response>((_resolve, reject) => {
         init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')))
       })) as typeof fetch
-    const pending = askAssistant(summary, messages, { url: URL, fetchImpl: hang, signal: controller.signal })
+    const pending = askAssistant(summary, messages, { consented: true, url: URL, fetchImpl: hang, signal: controller.signal })
     controller.abort()
     const reason = await pending.then(
       () => null,
@@ -212,7 +219,7 @@ describe('askAssistant', () => {
       seen.push(init?.signal?.aborted === true)
       return Promise.reject(new DOMException('aborted', 'AbortError'))
     }) as typeof fetch
-    const reason = await askAssistant(summary, messages, { url: URL, fetchImpl, signal: controller.signal }).then(
+    const reason = await askAssistant(summary, messages, { consented: true, url: URL, fetchImpl, signal: controller.signal }).then(
       () => null,
       (e: unknown) => e,
     )
