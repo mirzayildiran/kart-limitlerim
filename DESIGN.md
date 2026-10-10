@@ -258,7 +258,7 @@ Category colours are derived from each category's stored hue at neon saturation:
 - **Night Line** (night-line) and **Strong Line** (night-line-strong): hairline borders and dividers; strong line for inactive dots, switch-off, the dashed add-card outline.
 - **Moon Ink** (moon-ink): primary text and figures.
 - **Mist** (mist-muted): secondary text, the ₺ sign, captions, inactive tab labels.
-- **Dusk** (dusk-faint): hints and input suffixes only.
+- **Dusk** (dusk-faint): input suffixes, placeholders, disabled controls and decorative chevrons only. It is under 4.5:1 on the panels, so readable text (field hints included) uses muted.
 
 ### Semantic
 - **Neon Green** (ok-neon), **Amber** (warn-amber, with warn-amber-soft wash and warn-bar for low-limit fills), **Neon Rose** (crit-neon, with crit-soft wash). Status notes use the soft wash as background with ink text; only the figure or pill text takes the strong semantic colour.

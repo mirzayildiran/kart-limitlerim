@@ -18,7 +18,9 @@
     "ios:release": "node scripts/ios-version.mjs && npm run ios:build",
     "check:csp": "node scripts/check-csp.mjs",
     "test:unit": "vitest run --project unit",
-    "test:components": "vitest run --project components"
+    "test:components": "vitest run --project components",
+    "e2e:build": "VITE_ASSISTANT_PROXY_URL=https://asistan.e2e.test vite build",
+    "e2e": "npm run e2e:build && playwright test"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
@@ -39,7 +41,9 @@
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@capacitor/cli": "^8.5.3",
+    "@playwright/test": "^1.64.0",
     "@preact/preset-vite": "^2.10.6",
     "@testing-library/preact": "^3.2.4",
     "@types/node": "^24.13.3",
