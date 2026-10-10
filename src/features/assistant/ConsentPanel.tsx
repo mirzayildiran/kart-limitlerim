@@ -1,6 +1,7 @@
 import type { BudgetSummary } from '../../domain/insightsTypes'
 import { Button } from '../../ui/components/controls'
 import { PROVIDERS } from './assistantModel'
+import { PRIVACY_URL } from '../../links'
 import './consent-panel.css'
 
 interface Props {
@@ -75,7 +76,11 @@ export function ConsentPanel({ summary, onAccept }: Props) {
       </details>
 
       <p class="consent-note">
-        Onayını istediğin an buradan ya da Ayarlar'dan geri alabilirsin. Ayrıntılar uygulamanın gizlilik politikasında.
+        Onayını istediğin an buradan ya da Ayarlar'dan geri alabilirsin. Ayrıntılar uygulamanın{' '}
+        <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer">
+          gizlilik politikasında
+        </a>
+        .
       </p>
 
       <Button variant="primary" block onClick={onAccept}>

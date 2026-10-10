@@ -209,6 +209,14 @@ export async function importBackupText(text: string): Promise<void> {
   hydrate(await repo.loadAll(requireDb()))
 }
 
+/** Replaces this device's data with the sample data, dated relative to today. Loaded on demand. */
+export async function loadDemoData(): Promise<void> {
+  const [{ default: raw }, { shiftDemoBackup }] = await Promise.all([import('./demo-backup.json'), import('./demo')])
+  const backup = shiftDemoBackup(parseBackup(JSON.stringify(raw)), new Date())
+  await restoreBackup(requireDb(), backup)
+  hydrate(await repo.loadAll(requireDb()))
+}
+
 // ---- settings: categories, reset ----
 /** Delete a user category. Refuses while any expense or recurring payment still uses it. */
 export async function removeCategory(id: string): Promise<void> {
