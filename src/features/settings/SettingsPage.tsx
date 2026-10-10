@@ -264,7 +264,7 @@ export function SettingsPage() {
     <div class="settings-page">
       <header class="settings-header">
         <h1>Ayarlar</h1>
-        <p class="settings-caption">Hesap yok, sunucu yok. Verilerin bu cihazda kalır.</p>
+        <p class="settings-caption">Hesap yok. Verilerin bu cihazda kalır.</p>
       </header>
       <AppearanceSection />
       <CategoriesSection />
