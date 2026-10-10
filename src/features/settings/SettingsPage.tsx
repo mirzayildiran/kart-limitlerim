@@ -12,7 +12,7 @@ import { setTheme, themePref, type ThemePref } from '../../ui/theme'
 import { backupFileName, rateGroups, sourceLines, type RateRow } from './settingsModel'
 import { isNativeApp, saveTextFile } from '../../platform/files'
 import { InstallGuide } from './InstallGuide'
-import { RemindersSection } from './RemindersSection'
+import { PhoneSection } from './PhoneSection'
 import './settings-page.css'
 
 function Section({ title, id, children }: { title: string; id: string; children: ComponentChildren }) {
@@ -261,7 +261,7 @@ export function SettingsPage() {
         <p class="settings-caption">Hesap yok. Verilerin bu cihazda kalır.</p>
       </header>
       <AppearanceSection />
-      <RemindersSection />
+      <PhoneSection />
       <CategoriesSection />
       <BackupSection />
       <RatesSection />
