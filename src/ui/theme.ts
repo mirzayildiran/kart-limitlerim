@@ -54,3 +54,27 @@ export function setTheme(p: ThemePref): void {
 export function applySavedTheme(): void {
   apply(themePref.value)
 }
+
+const BOOT_FADE_MS = 320
+
+/**
+ * Takes down index.html's boot screen. Call right before the first render, in the same task,
+ * so no frame shows the page without either the boot screen or the app. Over a light theme
+ * it fades (data-boot="fade"); over the dark theme it is the same ground, so it goes at once,
+ * as it does with reduced motion.
+ */
+export function dismissBoot(): void {
+  const root = document.documentElement
+  const boot = document.getElementById('boot')
+  const fade = root.getAttribute('data-boot') === 'fade' && !matchMedia('(prefers-reduced-motion: reduce)').matches
+  root.removeAttribute('data-boot')
+  if (!boot) return
+  if (!fade) {
+    boot.remove()
+    return
+  }
+  boot.classList.add('is-leaving')
+  boot.addEventListener('transitionend', () => boot.remove(), { once: true })
+  // If the transition never runs (page hidden, animations paused), drop it anyway.
+  setTimeout(() => boot.remove(), BOOT_FADE_MS + 380)
+}

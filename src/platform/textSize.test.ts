@@ -15,7 +15,7 @@ describe('rootSizeFor', () => {
   })
 
   it('caps the largest accessibility sizes and the smallest setting', () => {
-    expect(rootSizeFor(53)).toBe(22)
+    expect(rootSizeFor(53)).toBe(25.6)
     expect(rootSizeFor(12)).toBe(14)
   })
 

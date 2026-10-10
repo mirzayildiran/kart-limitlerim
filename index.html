@@ -12,13 +12,32 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <title>Kart Limitlerim</title>
+    <!--
+      Boot screen and theme before first paint. The native splash and the default theme are
+      dark (#0a0a11). #boot covers the page on that ground until the first render; then
+      dismissBoot() in src/ui/theme.ts takes it down: a short fade over a light theme
+      (data-boot="fade", set below), at once over the dark theme or with reduced motion.
+      The theme logic mirrors src/ui/theme.ts.
+    -->
+    <script>
+      ;(function () {
+        try {
+          var t = localStorage.getItem('kl:theme') || 'dark'
+          var root = document.documentElement
+          if (t === 'light' || t === 'dark') root.setAttribute('data-theme', t)
+          var light = t === 'light' || (t === 'system' && matchMedia('(prefers-color-scheme: light)').matches)
+          if (light) root.setAttribute('data-boot', 'fade')
+        } catch (e) {}
+      })()
+    </script>
     <style>
-      /* Boot screen: painted as soon as this HTML is parsed, before the CSS and JS arrive.
-         Same night ground as the iOS launch screen and src/ui/tokens.css --night-ground.
-         main.tsx removes it right before the first render. */
+      html {
+        background: #0a0a11;
+      }
       #boot {
         position: fixed;
         inset: 0;
+        z-index: 2147483646;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -26,6 +45,16 @@
         color: #f5f5fa;
         font: 600 20px/1.2 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
         letter-spacing: -0.01em;
+        pointer-events: none;
+        transition: opacity 320ms ease-out;
+      }
+      #boot.is-leaving {
+        opacity: 0;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot {
+          transition: none;
+        }
       }
     </style>
   </head>
