@@ -2,7 +2,7 @@ import { dailyInterestCost, lifetimeInterest, projectedInterest } from '../../do
 import { viewStatement } from '../../domain/statement'
 import type { CardAccount, KmhAccount, Kurus } from '../../domain/types'
 import { formatShort } from '../../domain/dates'
-import { CURRENT_RATES } from '../../domain/rates'
+import { CURRENT_RATES, withTaxes } from '../../domain/rates'
 
 export interface InterestPanelData {
   totalInterest: Kurus
@@ -98,7 +98,7 @@ export function kmhDailyCost(account: Pick<KmhAccount, 'limit' | 'available' | '
   if (used <= 0) return null
 
   const rate = account.rateOverride?.contractual ?? CURRENT_RATES.cash.contractual
-  const daily = Math.round((used * rate) / 100 / 30 * 1.3)
+  const daily = Math.round(withTaxes((used * rate) / 100 / 30))
   return daily
 }
 

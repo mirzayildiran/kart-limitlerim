@@ -1,7 +1,7 @@
 import { budgetProgress, monthPace as paceOfMonth, PACE_MIN_DAYS, type BudgetRow } from './budget'
 import { cycleKeyOf, daysBetween, fromIso, formatShort, shiftMonth } from './dates'
 import { projectedInterest } from './interest'
-import { CURRENT_RATES } from './rates'
+import { CURRENT_RATES, withTaxes } from './rates'
 import { isCard, isKmh, limitHealth, outlook, statementItems, type StatementItem } from './power'
 import { estimatedDueDate, nextCut, viewStatement } from './statement'
 import { formatTL } from './money'
@@ -27,8 +27,6 @@ const MONTH_PACE_NUM = 11
 const MONTH_PACE_DEN = 10
 /** Same minimum day count as the budget pace check: earlier estimates are too noisy. */
 
-/** Taxes on interest (KKDF + BSMV = 15% + 15%), applied on top of the rate. */
-const TAX_FACTOR = 1.3
 
 /** "Akbank" or, for a card with several lines, "Akbank Dijital". */
 const lineName = (a: CardAccount, lineIndex: number): string =>
@@ -116,7 +114,7 @@ function kmhInterest(input: InsightInput): Insight[] {
     const used = a.limit - a.available
     if (used <= 0) continue
     const rate = a.rateOverride?.contractual ?? CURRENT_RATES.cash.contractual
-    const daily = Math.round(((used * rate) / 100 / 30) * TAX_FACTOR)
+    const daily = Math.round(withTaxes((used * rate) / 100 / 30))
     if (daily <= 0) continue
     out.push(kmhInterestInsight(a, used, daily))
   }

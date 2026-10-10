@@ -85,7 +85,7 @@ Sohbet geçmişi yalnızca bellekte tutulur. Worker, `main` dalına her gönderi
 - **Oranlar:** Yüzde olarak tutulur (`3.25` = aylık %3,25). Günlük oran aylık oran / 30 ile bulunur.
 - **Tarih:** Yerel takvim günüdür ve `YYYY-MM-DD` metni olarak saklanır (`IsoDate`). `fromIso` ve `toIso` bu dönüşümü yapar. `daysBetween` gün farkını UTC üzerinden hesaplar; yaz saati geçişi sonucu bozmaz.
 - **Ekstre dönemi:** `CycleKey` (`YYYY-MM`) ekstrenin kesim ayıdır. Kesim günü 31 ise kısa aylarda ayın son günü kullanılır.
-- **Son ödeme:** Kesen tarih ile kesim sonrası gün sayısından (`dueOffsetDays`) bulunur; cumartesi ya da pazara denk gelirse pazartesiye kayar. Resmi tatiller hesaba katılmaz. Kullanıcı ekstredeki kesin tarihi girerse o kullanılır.
+- **Son ödeme:** Kesen tarih ile kesim sonrası gün sayısından (`dueOffsetDays`) bulunur; hafta sonuna ya da resmi tatile denk gelirse bir sonraki iş gününe kayar (`src/domain/holidays.ts`, 2026–2028 tablosu; arifeler kaydırmaz). Kullanıcı ekstredeki kesin tarihi girerse o kullanılır.
 
 ## Domain modülleri
 

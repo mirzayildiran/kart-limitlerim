@@ -2,6 +2,15 @@
 
 Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izler ve sürüm numaraları [Semantic Versioning](https://semver.org/lang/tr/) ile verilir.
 
+## [Unreleased]
+
+### Fixed
+
+- Son ödeme tarihi resmi tatile denk gelince bir sonraki iş gününe kayıyor (önceden yalnızca hafta sonu). 2026–2028 için resmi tatil tablosu (dini bayramlar ve arifeler dahil, kaynak: 2429 sayılı Kanun ve Diyanet); arife yarım gün olduğu için tarih kaydırılmaz.
+- KMH'de yalnızca gecikme oranı girilince akdi oran kart oranıyla (%3,25) dolduruluyordu; artık nakit/KMH azami oranı (%4,25). Kart için en düşük dilim kullanılır.
+- Harcama ekranındaki faiz uyarısı faiz dilimini tek harcamanın tutarına göre seçiyordu; artık kartta kullanılan tutar artı harcamaya (dönem borcu tahmini) göre seçiyor.
+- KKDF ve BSMV çarpanı (1,30) dört yerde elle yazılıydı; tek yerden (`src/domain/rates.ts`) hesaplanıyor.
+
 ## [1.0.0] - 2026-10-10
 
 ### Added
