@@ -10,7 +10,7 @@ export { accountColors } from '../../ui/accountColor'
 import './wallet.css'
 
 const KIND_LABEL = { card: 'Kredi kartı', kmh: 'KMH', bank: 'Banka hesabı', cash: 'Nakit' } as const
-const CAPTION = { card: 'Kullanılabilir', kmh: 'KMH · Kullanılabilir', bank: 'Banka · Bakiye', cash: 'Nakit' } as const
+const CAPTION = { card: 'Kullanılabilir', kmh: 'KMH kullanılabilir', bank: 'Banka bakiyesi', cash: 'Nakit' } as const
 const cutFmt = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' })
 
 function nextDate(items: StatementItem[]): { text: string; urgent: boolean } | null {
@@ -58,18 +58,16 @@ function WalletCard({ account, slot, items }: { account: Account; slot: number; 
       {hasLimit && <span class="wallet-card-chip" aria-hidden="true" />}
 
       <span class="wallet-card-bottom">
-        <span class="wallet-card-caption">{CAPTION[account.kind]}</span>
         <Amount value={free} size="xl" />
         {hasLimit && (
-          <>
-            <span class="wallet-card-track" aria-hidden="true">
-              <span class="wallet-card-fill" style={{ width: `${share * 100}%` }} />
-            </span>
-            <span class="wallet-card-meta">
-              {account.limit > 0 ? `Limit ${formatTL(account.limit)} · %${Math.round(share * 100)} boş` : 'Limit girilmedi'}
-            </span>
-          </>
+          <span class="wallet-card-track" aria-hidden="true">
+            <span class="wallet-card-fill" style={{ width: `${share * 100}%` }} />
+          </span>
         )}
+        <span class="wallet-card-meta">
+          {CAPTION[account.kind]}
+          {hasLimit && (account.limit > 0 ? ` · ${formatTL(account.limit)} limit` : ' · limit girilmedi')}
+        </span>
       </span>
     </button>
   )
