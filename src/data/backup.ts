@@ -18,7 +18,11 @@ const isArr = (x: unknown): x is unknown[] => Array.isArray(x)
 const hasId = (x: unknown) => typeof x === 'object' && x !== null && typeof (x as { id?: unknown }).id === 'string'
 
 /** Validate untrusted JSON text and return a backup, or throw BackupError with a user-facing message. */
+/** Far above any real backup (years of data are well under 5 MB); stops a huge file freezing the app. */
+export const MAX_BACKUP_CHARS = 20_000_000
+
 export function parseBackup(text: string): BackupFile {
+  if (text.length > MAX_BACKUP_CHARS) throw new BackupError('Dosya bir Kart Limitlerim yedeği için fazla büyük.')
   let raw: unknown
   try {
     raw = JSON.parse(text)
