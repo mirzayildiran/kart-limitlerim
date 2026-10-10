@@ -90,7 +90,8 @@
 
 .home-status.is-warn .home-status-dot {
   background: var(--warn);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--warn) 22%, transparent);
+  /* The halo uses the warning wash: amber in dark, near-neutral in light (no peach disc). */
+  box-shadow: 0 0 0 4px var(--warn-soft);
 }
 
 .home-status.is-crit .home-status-dot {
