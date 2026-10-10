@@ -2,7 +2,7 @@ import type { ComponentChildren, JSX } from 'preact'
 import { useEffect, useId, useState } from 'preact/hooks'
 import { formatInput, parseTL } from '../../domain/money'
 import type { Kurus } from '../../domain/types'
-import { dismissToast, toastMsg } from './toast'
+import { dismissToast, toastMsg, type ToastMsg } from './toast'
 import './controls.css'
 
 type BtnProps = JSX.HTMLAttributes<HTMLButtonElement> & {
@@ -209,23 +209,40 @@ export function ConfirmButton({ label, confirmLabel, onConfirm }: { label: strin
   )
 }
 
+/** Matches the 160ms exit in controls.css. */
+const TOAST_OUT_MS = 160
+
 export function ToastHost() {
   const t = toastMsg.value
+  // The last message stays mounted for its exit after the signal clears.
+  const [shown, setShown] = useState<ToastMsg | null>(null)
+  useEffect(() => {
+    if (t) {
+      setShown(t)
+      return
+    }
+    const id = setTimeout(() => setShown(null), TOAST_OUT_MS)
+    return () => clearTimeout(id)
+  }, [t])
+  // A new message replaces the old one at once; a cleared one leaves with the exit class.
+  const view = t ?? shown
+  const leaving = t === null && shown !== null
   return (
     <div class="toast-host" aria-live="polite">
-      {t && (
-        <div class="toast" key={t.id}>
-          <span>{t.text}</span>
-          {t.action && (
+      {view && (
+        <div class={leaving ? 'toast is-leaving' : 'toast'} key={view.id}>
+          <span>{view.text}</span>
+          {view.action && (
             <button
               type="button"
               class="toast-action"
+              disabled={leaving}
               onClick={() => {
-                t.action!.run()
+                view.action!.run()
                 dismissToast()
               }}
             >
-              {t.action.label}
+              {view.action.label}
             </button>
           )}
         </div>

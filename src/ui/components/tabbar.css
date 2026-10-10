@@ -1,3 +1,4 @@
+/* The bar is excluded from the page transition (see app.css), so it stays put while the content moves. */
 .tabbar {
   position: fixed;
   bottom: 0;
@@ -8,6 +9,7 @@
   height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 30;
+  view-transition-name: tabbar;
 }
 
 .tabbar-inner {
@@ -41,7 +43,7 @@
   font-size: 11px;
   font-weight: 500;
   line-height: 1;
-  transition: color 0.2s var(--ease);
+  transition: color var(--dur-state) var(--ease);
   padding: 0;
   -webkit-user-select: none;
   user-select: none;
@@ -89,32 +91,26 @@
   box-shadow: 0 0 0 5px var(--bg), var(--shadow-2);
   flex-direction: column;
   gap: 0;
-}
-
-.tab-fab {
-  transition: transform 0.15s var(--ease), box-shadow 0.2s var(--ease);
+  transition: transform var(--dur-tap) var(--ease-out-expo), box-shadow var(--dur-state) var(--ease);
 }
 
 .tab-fab:active {
   transform: scale(0.92);
+  transition-timing-function: var(--ease);
 }
 
 .tab-item svg {
-  transition: transform 0.25s var(--ease-out-expo);
+  transition: transform var(--dur-state) var(--ease-out-expo);
 }
 
 .tab-item:active svg {
   transform: scale(0.88);
+  transition-timing-function: var(--ease);
 }
 
+/* The active icon carries a shared element name: when the tab changes, the highlight glides to the new icon. */
 .tab-item[aria-current="page"] svg {
-  animation: tab-pop 0.35s var(--ease-out-expo);
-}
-
-@keyframes tab-pop {
-  from {
-    transform: scale(0.8);
-  }
+  view-transition-name: tab-active;
 }
 
 .tab-fab:focus-visible {
@@ -122,11 +118,16 @@
   outline-offset: 2px;
 }
 
+/* Reduced motion: presses change colour but do not scale. */
 @media (prefers-reduced-motion: reduce) {
-  .tab-item,
-  .tab-fab,
   .tab-item svg {
     transition: none;
-    animation: none;
+  }
+  .tab-item:active svg,
+  .tab-fab:active {
+    transform: none;
+  }
+  .tab-fab {
+    transition-property: box-shadow;
   }
 }
