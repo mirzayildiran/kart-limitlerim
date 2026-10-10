@@ -2,16 +2,25 @@ import { useEffect } from 'preact/hooks'
 import { route } from './ui/nav'
 import { ready, loadError } from './data/store'
 import { HomePage } from './features/home/HomePage'
-import { ExpensesPage } from './features/expenses/ExpensesPage'
-import { CalendarPage } from './features/calendar/CalendarPage'
-import { SettingsPage } from './features/settings/SettingsPage'
-import { AssistantPage } from './features/assistant/AssistantPage'
+import { lazy, preloadLazy } from './lazy'
 import { TabBar } from './ui/components/TabBar'
 import { SheetHost } from './features/SheetHost'
 import { ToastHost } from './ui/components/controls'
 import { toast } from './ui/components/toast'
 
+// Only the home screen is in the first chunk; the rest load on demand (and are preloaded when idle).
+const ExpensesPage = lazy(() => import('./features/expenses/ExpensesPage').then((m) => m.ExpensesPage))
+const CalendarPage = lazy(() => import('./features/calendar/CalendarPage').then((m) => m.CalendarPage))
+const SettingsPage = lazy(() => import('./features/settings/SettingsPage').then((m) => m.SettingsPage))
+const AssistantPage = lazy(() => import('./features/assistant/AssistantPage').then((m) => m.AssistantPage))
+
 export function App() {
+  const isReady = ready.value
+  // After the data is in, so the chunk downloads do not compete with opening IndexedDB.
+  useEffect(() => {
+    if (isReady) preloadLazy()
+  }, [isReady])
+
   useEffect(() => {
     // Register service worker with PWA updates
     try {
@@ -35,7 +44,6 @@ export function App() {
     }
   }, [])
 
-  const isReady = ready.value
   const hasError = loadError.value
 
   if (!isReady) {
