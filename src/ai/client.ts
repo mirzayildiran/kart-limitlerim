@@ -110,6 +110,8 @@ export function errorMessage(code: AssistantErrorCode): string {
 async function errorCodeOf(res: Response): Promise<AssistantErrorCode> {
   if (res.status === 429) return 'rate_limited'
   if (res.status === 400) return 'bad_request'
+  // The proxy does not accept this app's origin: a setup problem, not something the user can fix.
+  if (res.status === 403) return 'not_configured'
   const body: unknown = await res.json()
   const code = isRecord(body) ? body.error : undefined
   return isErrorCode(code) ? code : 'unavailable'
