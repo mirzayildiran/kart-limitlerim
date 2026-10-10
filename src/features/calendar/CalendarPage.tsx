@@ -193,28 +193,33 @@ export function CalendarPage() {
           <>
             <p class="calendar-caption">
               {summary.payments} ödeme · {summary.cuts} kesim
+              {summary.unknown > 0 && ` · ${summary.unknown} ödemenin tutarı girilmedi`}
             </p>
-            {days.map((day) => {
-              const total = dayTotal(day)
-              const hasAmount = day.events.some((e) => e.amount != null)
-              return (
-                <section key={day.iso} class="calendar-day">
-                  <div class="calendar-day-head">
-                    <h3 class={`calendar-day-title${day.label === 'Bugün' ? ' is-today' : ''}`}>{day.label}</h3>
-                    {hasAmount && (
-                      <span class="calendar-day-total num">{figure(amountText(total.total, total.estimated))}</span>
-                    )}
-                  </div>
-                  <div class="calendar-card">
-                    <ul class="calendar-card-list">
+            {/* One slate container for the whole agenda; each day is a labelled section inside it. */}
+            <div class="calendar-list-box">
+              {days.map((day) => {
+                const total = dayTotal(day)
+                const hasAmount = day.events.some((e) => e.amount != null)
+                const headId = `calendar-day-${day.iso}`
+                return (
+                  <section key={day.iso} class="calendar-day" aria-labelledby={headId}>
+                    <div class="calendar-day-head">
+                      <h3 id={headId} class={`calendar-day-title${day.label === 'Bugün' ? ' is-today' : ''}`}>
+                        {day.label}
+                      </h3>
+                      {hasAmount && (
+                        <span class="calendar-day-total num">{figure(amountText(total.total, total.estimated))}</span>
+                      )}
+                    </div>
+                    <ul class="calendar-day-rows">
                       {day.events.map((e) => (
                         <EventRow key={e.id} e={e} now={now} slot={colors.get(e.accountId) ?? 1} onOpen={() => openEvent(e)} />
                       ))}
                     </ul>
-                  </div>
-                </section>
-              )
-            })}
+                  </section>
+                )
+              })}
+            </div>
           </>
         )}
       </section>

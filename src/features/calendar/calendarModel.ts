@@ -147,8 +147,8 @@ export function buildTimeline(
         date,
         iso: toIso(date),
         accountId: r.accountId,
-        title: `${r.name} · ${byId.get(r.accountId)?.name ?? 'Hesap yok'}`,
-        detail: null,
+        title: r.name,
+        detail: `Düzenli ödeme · ${byId.get(r.accountId)?.name ?? 'Hesap yok'}`,
         amount: r.amount,
         estimated: false,
         soon: false,
@@ -211,11 +211,15 @@ export function dayTotal(day: TimelineDay): MoneyOut {
   return sumAmounts(day.events)
 }
 
-/** Known money out over the whole agenda, with the number of payments and statement cuts in it. */
-export function periodSummary(days: TimelineDay[]): MoneyOut & { payments: number; cuts: number } {
+/**
+ * Known money out over the whole agenda, with the number of payments and statement cuts in it.
+ * `unknown` counts the due dates whose amount was not entered; they are not in `total`.
+ */
+export function periodSummary(days: TimelineDay[]): MoneyOut & { payments: number; cuts: number; unknown: number } {
   const events = days.flatMap((d) => d.events)
   const cuts = events.filter((e) => e.kind === 'cut').length
-  return { ...sumAmounts(events), payments: events.length - cuts, cuts }
+  const unknown = events.filter((e) => e.kind === 'due' && e.amount == null).length
+  return { ...sumAmounts(events), payments: events.length - cuts, cuts, unknown }
 }
 
 export function accountName(accounts: Account[], id: string): string {
