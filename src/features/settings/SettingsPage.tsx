@@ -16,6 +16,7 @@ import {
   sourceLine,
   taxLine,
 } from './settingsModel'
+import { isNativeApp, saveTextFile } from '../../platform/files'
 import { InstallGuide } from './InstallGuide'
 import './settings-page.css'
 
@@ -98,16 +99,8 @@ function BackupSection() {
   async function download() {
     try {
       const text = await exportBackupText()
-      const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
-      const a = document.createElement('a')
-      a.href = url
-      a.download = backupFileName(new Date())
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      // Revoke after the click has started the download; some browsers read the URL late.
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-      toast('Yedek indirildi')
+      const saved = await saveTextFile(backupFileName(new Date()), text, 'application/json')
+      if (saved) toast(isNativeApp ? 'Yedek hazır' : 'Yedek indirildi')
     } catch {
       toast('Yedek hazırlanamadı. Tekrar dene.')
     }
