@@ -3,6 +3,7 @@ import { useEffect, useId, useRef } from 'preact/hooks'
 import { sheetClosing } from '../nav'
 import { lockScroll, unlockScroll } from '../scrollLock'
 import { FOCUSABLE, trapTarget } from '../focusTrap'
+import { inertOutside, type InertNode } from '../inertOutside'
 import { Icon } from './Icon'
 import './sheet.css'
 
@@ -29,6 +30,10 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
     if (!open) return
     opener.current = document.activeElement
     lockScroll()
+    // VoiceOver and Tab stay in the sheet: the page behind it becomes inert until it closes.
+    const appRoot = document.getElementById('app')
+    const scrim = panel.current?.parentElement
+    const releaseInert = scrim && appRoot ? inertOutside(scrim as unknown as InertNode, appRoot as unknown as InertNode) : () => {}
     const first =
       panel.current?.querySelector<HTMLElement>('[data-autofocus]') ??
       panel.current?.querySelector<HTMLElement>('input, select, textarea, button:not([data-close])')
@@ -58,6 +63,7 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
     return () => {
       vv?.removeEventListener('resize', keepFocusedInView)
       document.removeEventListener('keydown', onKey)
+      releaseInert()
       unlockScroll()
       ;(opener.current as HTMLElement | null)?.focus?.({ preventScroll: true })
     }
