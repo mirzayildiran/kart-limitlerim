@@ -6,13 +6,14 @@ import type { AccountKind, Expense } from '../domain/types'
  * Pages are hash routes; editors are bottom sheets opened through `openSheet`.
  */
 
-export type Route = 'home' | 'expenses' | 'calendar' | 'settings'
+export type Route = 'home' | 'expenses' | 'calendar' | 'settings' | 'assistant'
 
 export const ROUTES: Record<Route, string> = {
   home: '#/',
   expenses: '#/harcamalar',
   calendar: '#/takvim',
   settings: '#/ayarlar',
+  assistant: '#/asistan',
 }
 
 /** Tab order. A move to a later tab is "forward" and slides the page in from the right. */
