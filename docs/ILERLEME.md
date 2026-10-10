@@ -11,7 +11,7 @@ Yöntem: Opus yönetir (brief, karar, inceleme, commit); uygulama, ekran görün
 | Özet | ✅ | ✅ | ✅ 3 tur | **ship** |
 | Hareket sistemi (sayfa geçişleri, pencereler, basma, toast) | ✅ | ✅ | ✅ kare kontrolü | uygulandı |
 | Harcamalar | ✅ | ✅ | ✅ 24/40 → 2 tur | **ship** |
-| Takvim | ✅ | ✅ | ✅ 24/40 → 3 tur | son puanlama |
+| Takvim | ✅ | ✅ | ✅ 24/40 → 3 tur | **ship** |
 | Ayarlar | ✅ | ✅ | ✅ 27/40 → 2 tur | segment düzeltmesini bekliyor |
 | Alt pencereler (7 adet) | ✅ | ⏳ Opus: ortak bileşenler + 2 pencere | ⏳ | ⏳ |
 | Bütün uygulama: harden, onboard, adapt, audit, polish | ⏳ | ⏳ | ⏳ | ⏳ |
