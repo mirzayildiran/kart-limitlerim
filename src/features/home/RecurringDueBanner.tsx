@@ -21,7 +21,7 @@ export function RecurringDueBanner() {
       <span class="recurring-due-banner-text">
         <span class="recurring-due-banner-title">Bugün {due.length} düzenli ödeme var</span>
         <span class="recurring-due-banner-sub">
-          <span class="num">{figure(formatTL(total))}</span> henüz düşülmedi · Takvimde gör
+          <span class="num">{figure(formatTL(total))}</span> henüz düşülmedi · {'Takvimde gör'}
         </span>
       </span>
       <Icon name="chevron" size={18} class="recurring-due-banner-chevron" />
