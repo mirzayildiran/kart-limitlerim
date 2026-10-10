@@ -31,11 +31,24 @@
   gap: 0.75rem;
 }
 
+/* The two quick payments stay one line each at 360 px. */
+.statement-sheet-actions .btn {
+  padding: 0 var(--s-2);
+  white-space: nowrap;
+}
+
+/* Interest box: rose only on the figure; title and breakdown stay ink and muted on the rose wash. */
 .statement-interest {
   padding: 12px 14px;
   background-color: var(--crit-soft);
-  color: var(--crit);
+  color: var(--ink);
   border-radius: var(--r-md);
+}
+
+.statement-interest-figure {
+  color: var(--crit);
+  font-family: var(--font-display);
+  font-weight: 700;
 }
 
 .statement-interest-ok {
@@ -52,13 +65,13 @@
 .statement-interest-detail {
   margin: 0.25rem 0;
   font-size: 0.8125rem;
-  color: var(--ink);
+  color: var(--muted);
   line-height: 1.4;
 }
 
 .statement-interest-minimum {
   margin: 0.5rem 0 0 0;
   font-size: 0.8125rem;
-  color: var(--ink);
+  color: var(--muted);
   line-height: 1.4;
 }

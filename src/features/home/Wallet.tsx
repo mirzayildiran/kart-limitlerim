@@ -1,4 +1,5 @@
 import { useRef, useState } from 'preact/hooks'
+import { daysBetween, startOfDay } from '../../domain/dates'
 import { formatTL } from '../../domain/money'
 import type { StatementItem } from '../../domain/power'
 import type { Account } from '../../domain/types'
@@ -9,6 +10,8 @@ export { accountColors } from '../../ui/accountColor'
 import './wallet.css'
 
 const KIND_LABEL = { card: 'Kredi kartı', kmh: 'KMH', bank: 'Banka hesabı', cash: 'Nakit' } as const
+const CAPTION = { card: 'Kullanılabilir', kmh: 'KMH kullanılabilir', bank: 'Banka bakiyesi', cash: 'Nakit' } as const
+const cutFmt = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' })
 
 function nextDate(items: StatementItem[]): { text: string; urgent: boolean } | null {
   const open = items.filter((i) => i.view.status !== 'paid')
@@ -21,8 +24,10 @@ function nextDate(items: StatementItem[]): { text: string; urgent: boolean } | n
   }
   const cut = items.map((i) => i.view.nextCut).sort((a, b) => +a - +b)[0]
   if (!cut) return null
-  const days = Math.round((+cut - Date.now()) / 86_400_000)
-  return { text: days <= 0 ? 'Kesim bugün' : `Kesim ${days} gün`, urgent: false }
+  const days = daysBetween(cut, startOfDay(new Date()))
+  if (days <= 0) return { text: 'Kesim bugün', urgent: false }
+  if (days === 1) return { text: 'Kesim yarın', urgent: false }
+  return { text: `Kesim ${cutFmt.format(cut)}`, urgent: false }
 }
 
 function WalletCard({ account, slot, items }: { account: Account; slot: number; items: StatementItem[] }) {
@@ -46,29 +51,23 @@ function WalletCard({ account, slot, items }: { account: Account; slot: number; 
       </svg>
 
       <span class="wallet-card-top">
-        <span class="wallet-card-kind">{KIND_LABEL[account.kind]}</span>
-        {date ? (
-          <span class={`wallet-card-date${date.urgent ? ' is-urgent' : ''}`}>{date.text}</span>
-        ) : (
-          account.kind !== 'cash' && account.kind !== 'bank' && <span class="wallet-card-chip" />
-        )}
+        <span class="wallet-card-name">{account.name}</span>
+        {date && <span class={`wallet-card-date${date.urgent ? ' is-urgent' : ''}`}>{date.text}</span>}
       </span>
 
-      <span class="wallet-card-name">{account.name}</span>
+      {hasLimit && <span class="wallet-card-chip" aria-hidden="true" />}
 
       <span class="wallet-card-bottom">
-        <span class="wallet-card-caption">{hasLimit ? 'Kullanılabilir' : 'Bakiye'}</span>
         <Amount value={free} size="xl" />
         {hasLimit && (
-          <>
-            <span class="wallet-card-track" aria-hidden="true">
-              <span class="wallet-card-fill" style={{ width: `${share * 100}%` }} />
-            </span>
-            <span class="wallet-card-meta">
-              {account.limit > 0 ? `Limit ${formatTL(account.limit)} · %${Math.round(share * 100)} boş` : 'Limit girilmedi'}
-            </span>
-          </>
+          <span class="wallet-card-track" aria-hidden="true">
+            <span class="wallet-card-fill" style={{ width: `${share * 100}%` }} />
+          </span>
         )}
+        <span class="wallet-card-meta">
+          {CAPTION[account.kind]}
+          {hasLimit && (account.limit > 0 ? ` · ${formatTL(account.limit)} limit` : ' · limit girilmedi')}
+        </span>
       </span>
     </button>
   )
@@ -91,13 +90,10 @@ export function Wallet({ accounts, colors, statements }: Props) {
     const first = el?.firstElementChild as HTMLElement | null
     if (!el || !first) return
     const step = first.offsetWidth + 12
-    setActive(Math.min(count - 1, Math.round(el.scrollLeft / step)))
-  }
-
-  const goTo = (i: number) => {
-    const el = rail.current
-    const target = el?.children[i] as HTMLElement | undefined
-    if (el && target) el.scrollTo({ left: target.offsetLeft - el.offsetLeft - 16, behavior: 'smooth' })
+    const next = Math.min(count - 1, Math.round(el.scrollLeft / step))
+    // A light tick as the active card changes (Android; ignored elsewhere).
+    if (next !== active) navigator.vibrate?.(8)
+    setActive(next)
   }
 
   return (
@@ -117,16 +113,9 @@ export function Wallet({ accounts, colors, statements }: Props) {
           </button>
         </div>
       </div>
-      <div class="wallet-dots">
+      <div class="wallet-dots" aria-hidden="true">
         {Array.from({ length: count }, (_, i) => (
-          <button
-            key={i}
-            type="button"
-            class={`wallet-dot${i === active ? ' is-active' : ''}`}
-            aria-label={i < accounts.length ? `${accounts[i].name} kartına git` : 'Ekleme kartına git'}
-            aria-current={i === active ? 'true' : undefined}
-            onClick={() => goTo(i)}
-          />
+          <span key={i} class={`wallet-dot${i === active ? ' is-active' : ''}`} />
         ))}
       </div>
     </section>

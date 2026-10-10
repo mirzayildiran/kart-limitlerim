@@ -2,7 +2,7 @@
 .expense-sheet {
   display: flex;
   flex-direction: column;
-  gap: var(--s-4);
+  gap: var(--s-5);
 }
 
 .expense-sheet-footer {
@@ -11,156 +11,190 @@
   gap: var(--s-3);
 }
 
-/* Account selection */
+/* No account yet: the label, one line and the way to add one. */
 .expense-account-empty {
-  text-align: center;
-  padding: var(--s-4) 0;
-}
-
-.expense-account-empty p {
-  margin: 0 0 var(--s-3) 0;
-  color: var(--muted);
-}
-
-.expense-account-scroll {
-  display: flex;
-  gap: var(--s-2);
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  overscroll-behavior-x: contain;
-  padding: 2px 2px var(--s-2);
-  scrollbar-width: none;
-}
-
-.expense-account-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.expense-chip {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  flex-shrink: 0;
-  min-width: 128px;
-  min-height: 44px;
-  padding: var(--s-2) var(--s-3);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-2);
-  color: var(--ink);
-  cursor: pointer;
-  text-align: left;
-  scroll-snap-align: start;
-  transition: background-color 150ms, border-color 150ms;
+  align-items: flex-start;
+  gap: var(--s-2);
 }
 
-/* Native radio stays in the tab order and keyboard flow; it is only visually hidden. */
-.expense-chip input {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
-  margin: 0;
-  pointer-events: none;
-}
-
-.expense-chip:focus-within {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.expense-chip.is-selected {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
-}
-
-.expense-chip:hover:not(.is-disabled):not(.is-selected) {
-  border-color: var(--line-strong);
-}
-
-.expense-chip.is-disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.expense-chip-name {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-}
-
-.expense-chip-balance {
-  font-size: var(--text-xs);
+.expense-account-empty p:not(.field-error) {
   color: var(--muted);
-  line-height: 1.3;
+  font-size: var(--text-sm);
 }
 
-.expense-chip.is-selected .expense-chip-balance {
-  color: var(--accent-ink);
+/* Category chips and the inline "new category" form under them. */
+.expense-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
 }
 
-/* New category inline form */
 .expense-new-category {
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
   padding: var(--s-3);
   background: var(--surface-2);
-  border-radius: var(--r-md);
-  margin-top: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
 }
 
-/* Date and note row */
-.expense-date-note {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s-3);
-}
-
-@media (max-width: 480px) {
-  .expense-date-note {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Preview line */
-.expense-preview {
+/* Date: "Bugün" / "Dün" quick chips, then the native picker filling the rest of the row. */
+.expense-date {
   display: flex;
   align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.expense-date-quick {
+  display: flex;
+  gap: var(--s-2);
+  flex: none;
+}
+
+.expense-date-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-state) var(--ease),
+    border-color var(--dur-state) var(--ease),
+    color var(--dur-state) var(--ease),
+    transform var(--dur-tap) var(--ease-out-expo);
+}
+
+.expense-date-chip:active {
+  transform: scale(var(--press));
+  transition-timing-function: var(--ease);
+}
+
+.expense-date-chip:focus-visible {
+  border-radius: var(--r-pill);
+}
+
+/* Same "you are here" wash as the selected category. */
+.expense-date-chip.is-selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--ink);
+  padding-left: 10px;
+}
+
+.expense-date-check {
+  flex: none;
+  color: var(--accent);
+}
+
+.expense-date-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Installments: the switch, and the count chips under it once it is on. */
+.expense-installments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+/* Count chips at the 44 px target, numerals centred. */
+.expense-installments .choice-item span {
+  min-height: var(--tap);
+  min-width: 52px;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+}
+
+/* The account switch and the preview of what it does. */
+.expense-effect {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.expense-preview {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--s-3);
-  padding: var(--s-3);
-  background: var(--ok-soft);
-  border-radius: var(--r-md);
+  gap: var(--s-1) var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   font-size: var(--text-sm);
 }
 
 .expense-preview.is-negative {
   background: var(--crit-soft);
+  border-color: transparent;
 }
 
-.expense-preview .num {
+.expense-preview-label {
+  min-width: 0;
+  color: var(--muted);
+}
+
+.expense-preview-figures {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
   margin-left: auto;
-  font-weight: 600;
+  white-space: nowrap;
+  font-family: var(--font-display);
 }
 
-/* Interest nudge */
-.expense-interest-nudge {
-  padding: var(--s-3);
-  background: var(--surface-2);
-  border-radius: var(--r-md);
+.expense-preview-before {
+  color: var(--muted);
+}
+
+.expense-preview-after {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.expense-preview.is-negative .expense-preview-after {
+  color: var(--crit);
+}
+
+.expense-preview .pill {
+  align-self: center;
+  font-family: var(--font-body);
+}
+
+/* Interest nudge: rose wash, ink sentence; only the figure is rose. */
+.expense-interest {
+  padding: var(--s-3) var(--s-4);
+  background: var(--crit-soft);
+  border-radius: var(--r-lg);
   font-size: var(--text-sm);
-  line-height: 1.4;
+  line-height: 1.45;
+  color: var(--ink);
 }
 
-.expense-interest-nudge .pill {
-  display: block;
-  width: 100%;
-  text-align: center;
+.expense-interest-figure {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--crit);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expense-date-chip:active {
+    transform: none;
+  }
 }

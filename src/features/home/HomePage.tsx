@@ -2,15 +2,19 @@ import { computed } from '@preact/signals'
 import type { JSX } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { cycleKeyOf, formatShort } from '../../domain/dates'
+import { displayHue } from '../../domain/categories'
 import { formatTL, formatTLExact } from '../../domain/money'
 import { byMostAvailable } from '../../domain/power'
 import type { Account, Kurus } from '../../domain/types'
 import {
   accounts,
   accountById,
+  budgets,
+  categories,
   categoryById,
   forecast,
   power,
+  recurring,
   runwayDays,
   statements,
   today,
@@ -19,6 +23,9 @@ import {
 import { openSheet, go } from '../../ui/nav'
 import { Button, Pill } from '../../ui/components/controls'
 import { Amount, figure } from '../../ui/components/Amount'
+import { Icon } from '../../ui/components/Icon'
+import { computeInsights } from '../../domain/insights'
+import { assistantInput } from '../assistant/assistantModel'
 import { RecurringDueBanner } from './RecurringDueBanner'
 import { Runway } from './Runway'
 import { Wallet, accountColors } from './Wallet'
@@ -33,18 +40,50 @@ function greeting(hour: number): string {
   return 'İyi akşamlar'
 }
 
-function renderTopbar(status?: { text: string; tone: 'ok' | 'warn' | 'crit' }): JSX.Element {
+/** Number of budget suggestions, from the same input the assistant page uses. */
+const assistantCount = computed(
+  () =>
+    computeInsights(
+      assistantInput({
+        accounts: accounts.value,
+        expenses: expenses.value,
+        categories: categories.value,
+        recurring: recurring.value,
+        budgets: budgets.value,
+        today: today.value,
+      }),
+    ).length,
+)
+
+/** The status line opens the budget assistant; it names the suggestion count when there is more than one. */
+function renderTopbar(status: { text: string; tone: 'ok' | 'warn' | 'crit' } | undefined, suggestions: number): JSX.Element {
+  const chevron = (
+    <span class="home-status-chevron" aria-hidden="true">
+      <Icon name="chevron" size={16} />
+    </span>
+  )
   return (
     <header class="home-topbar">
       <h1 class="home-greeting">{greeting(new Date().getHours())}</h1>
       <time class="home-date" dateTime={today.value.toISOString()}>
         {dateFormatter.format(today.value)}
       </time>
-      {status && (
-        <p class={`home-status is-${status.tone}`}>
+      {status ? (
+        <button type="button" class={`home-status is-${status.tone}`} onClick={() => go('assistant')}>
           <span class="home-status-dot" aria-hidden="true" />
-          {status.text}
-        </p>
+          <span class="home-status-text">
+            {status.text}
+            {suggestions > 1 && ` · ${suggestions} öneri`}
+          </span>
+          {chevron}
+        </button>
+      ) : (
+        suggestions > 0 && (
+          <button type="button" class="home-status is-muted" onClick={() => go('assistant')}>
+            <span class="home-status-text">Bütçe asistanı · {suggestions} öneri</span>
+            {chevron}
+          </button>
+        )
       )}
     </header>
   )
@@ -202,7 +241,7 @@ function renderExpenseSection(): JSX.Element | null {
               if (!cat) return null
               const shareOfTotal = monthTotalValue > 0 ? amount / monthTotalValue : 0
               return (
-                <li key={catId} class="home-expenses-category cat-color" style={{ '--h': cat.hue }}>
+                <li key={catId} class="home-expenses-category cat-color" style={{ '--h': displayHue(cat.hue) }}>
                   <span class="home-expenses-category-label">{cat.name}</span>
                   <span class="home-expenses-category-amount num">{figure(formatTL(amount))}</span>
                   <span class="home-expenses-category-bar" aria-hidden="true">
@@ -319,7 +358,7 @@ export function HomePage() {
   if (accountsValue.length === 0) {
     return (
       <div class="home-page">
-        {renderTopbar()}
+        {renderTopbar(undefined, assistantCount.value)}
         <section class="home-welcome" aria-labelledby="home-welcome-title">
           <div class="home-welcome-fan" aria-hidden="true">
             <span class="home-welcome-card" data-slot="2" />
@@ -356,7 +395,7 @@ export function HomePage() {
 
   return (
     <div class="home-page">
-      {renderTopbar(homeStatus())}
+      {renderTopbar(homeStatus(), assistantCount.value)}
 
       <section class="home-hero" aria-labelledby="home-hero-label">
         <h2 id="home-hero-label" class="home-hero-label">

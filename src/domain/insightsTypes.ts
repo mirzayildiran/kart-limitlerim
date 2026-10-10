@@ -43,6 +43,8 @@ export interface Insight {
   body: string
   /** Main figure behind the insight, in kuruş, when there is one. */
   amount?: Kurus
+  /** The account (card, KMH) the insight concerns; absent for budget-wide notes. */
+  accountId?: string
 }
 
 /**

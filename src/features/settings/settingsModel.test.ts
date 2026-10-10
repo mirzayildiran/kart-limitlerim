@@ -2,15 +2,13 @@ import { describe, it, expect } from 'vitest'
 import {
   backupFileName,
   canDeleteCategory,
-  cardRateLines,
-  cashRateLine,
   checkCategoryName,
   formatLongDate,
   formatPercent,
   isCategoryInUse,
-  minimumLine,
+  rateGroups,
   sourceLine,
-  taxLine,
+  sourceLines,
 } from './settingsModel'
 import type { RateTable } from '../../domain/rates'
 
@@ -43,16 +41,22 @@ describe('formatLongDate', () => {
   })
 })
 
-describe('rate rows', () => {
-  it('formats the three card tiers with open, closed and unbounded ranges', () => {
-    expect(cardRateLines()).toEqual([
-      '30.000 ₺ altı: akdi %3,25 · gecikme %3,55',
-      '30.000 ₺ – 180.000 ₺ arası: akdi %3,75 · gecikme %4,05',
-      '180.000 ₺ üzeri: akdi %4,25 · gecikme %4,55',
+describe('rateGroups', () => {
+  it('splits the rows into the interest rates and the charges, in order', () => {
+    const { interest, charges } = rateGroups()
+    expect(interest).toEqual([
+      { label: 'Limit 30.000 ₺ altı', lines: ['akdi %3,25', 'gecikme %3,55'] },
+      { label: 'Limit 30.000 ₺ – 180.000 ₺', lines: ['akdi %3,75', 'gecikme %4,05'] },
+      { label: 'Limit 180.000 ₺ üzeri', lines: ['akdi %4,25', 'gecikme %4,55'] },
+      { label: 'Nakit çekim ve KMH', lines: ['akdi %4,25', 'gecikme %4,55'] },
+    ])
+    expect(charges).toEqual([
+      { label: 'KKDF + BSMV', lines: ['%15 + %15'] },
+      { label: 'Asgari ödeme', lines: ['%20 · limit 100.000 ₺ üstü %40'] },
     ])
   })
 
-  it('handles a table with a single unbounded tier', () => {
+  it('labels a table with a single unbounded tier as all limits', () => {
     const table: RateTable = {
       effective: '2026-01-01',
       source: 'test',
@@ -61,25 +65,63 @@ describe('rate rows', () => {
       cash: { contractual: 3, late: 3.5 },
       foreignCurrency: { contractual: 1, late: 1 },
     }
-    expect(cardRateLines(table)).toEqual(['Tüm limitler: akdi %2 · gecikme %2,5'])
+    expect(rateGroups(table).interest[0]).toEqual({ label: 'Tüm limitler', lines: ['akdi %2', 'gecikme %2,5'] })
   })
 
-  it('formats the cash and KMH line', () => {
-    expect(cashRateLine()).toBe('Nakit çekim ve KMH: akdi %4,25 · gecikme %4,55')
+  it('labels a two-tier table with an open lower and upper bound', () => {
+    const table: RateTable = {
+      effective: '2026-01-01',
+      source: 'test',
+      reference: 1,
+      cardTiers: [
+        { upTo: 1_000_000, inclusive: false, contractual: 2, late: 2.5 },
+        { upTo: null, inclusive: false, contractual: 3, late: 3.5 },
+      ],
+      cash: { contractual: 3, late: 3.5 },
+      foreignCurrency: { contractual: 1, late: 1 },
+    }
+    const rows = rateGroups(table).interest
+    expect(rows[0].label).toBe('Limit 10.000 ₺ altı')
+    expect(rows[1].label).toBe('Limit 10.000 ₺ üzeri')
   })
 
-  it('formats the interest tax line', () => {
-    expect(taxLine()).toBe('KKDF %15 + BSMV %15')
+  it('writes the tax rates from the given percentages with a decimal comma', () => {
+    expect(rateGroups(undefined, { kkdf: 0.1, bsmv: 0.025 }).charges[0]).toEqual({ label: 'KKDF + BSMV', lines: ['%10 + %2,5'] })
   })
 
-  it('formats the minimum payment rule with the 100.000 ₺ threshold', () => {
-    expect(minimumLine()).toBe("Asgari ödeme: limit 100.000 ₺'ye kadar %20, üstü %40")
+  it('states the minimum-payment threshold from the rule', () => {
+    const rule = { effective: '2026-10-01', source: 'test', threshold: 50_000_000, lowRatio: 0.2, highRatio: 0.4 }
+    expect(rateGroups(undefined, undefined, rule).charges[1]).toEqual({
+      label: 'Asgari ödeme',
+      lines: ['%20 · limit 500.000 ₺ üstü %40'],
+    })
   })
 
+  it('keeps every row label unique so it can serve as a list key', () => {
+    const { interest, charges } = rateGroups()
+    const labels = [...interest, ...charges].map((r) => r.label)
+    expect(new Set(labels).size).toBe(labels.length)
+  })
+})
+
+describe('app version', () => {
+  it('is defined in the test environment from package.json', () => {
+    expect(__APP_VERSION__).toBe('0.1.0')
+  })
+})
+
+describe('source lines', () => {
   it('formats the source line with the effective date', () => {
     expect(sourceLine('BDDK karar no. 11581', '2026-10-01')).toBe(
       'Kaynak: BDDK karar no. 11581, 1 Ekim 2026 itibarıyla geçerli',
     )
+  })
+
+  it('gives the card table source first and the minimum-rule source second', () => {
+    expect(sourceLines()).toEqual([
+      'Kaynak: TCMB azami kredi kartı faiz oranları, 1 Ekim 2026 itibarıyla geçerli',
+      'Kaynak: BDDK karar no. 11581, 1 Ekim 2026 itibarıyla geçerli',
+    ])
   })
 })
 

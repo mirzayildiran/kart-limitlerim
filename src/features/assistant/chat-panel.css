@@ -61,9 +61,10 @@
   font-size: var(--text-md);
 }
 
+/* Slate, not lime: lime is for the action buttons only */
 .chat-bubble-user {
   align-self: flex-end;
-  background: var(--accent-soft);
+  background: var(--surface-3);
   color: var(--ink);
 }
 

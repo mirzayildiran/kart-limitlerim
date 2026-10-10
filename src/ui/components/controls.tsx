@@ -2,7 +2,7 @@ import type { ComponentChildren, JSX } from 'preact'
 import { useEffect, useId, useState } from 'preact/hooks'
 import { formatInput, parseTL } from '../../domain/money'
 import type { Kurus } from '../../domain/types'
-import { dismissToast, toastMsg } from './toast'
+import { dismissToast, toastMsg, type ToastMsg } from './toast'
 import './controls.css'
 
 type BtnProps = JSX.HTMLAttributes<HTMLButtonElement> & {
@@ -54,13 +54,15 @@ interface MoneyFieldProps {
   error?: string | null
   placeholder?: string
   autofocus?: boolean
+  /** "hero": the sheet's primary amount, display face at 2.5rem/800 (ExpenseSheet). Default: 22px. */
+  size?: 'default' | 'hero'
 }
 
 /**
  * Amount input that accepts Turkish formatting ("1.234,56") and keeps the
  * user's own text while they type; the parsed value is reported upward.
  */
-export function MoneyField({ label, value, onChange, hint, error, placeholder = '0', autofocus }: MoneyFieldProps) {
+export function MoneyField({ label, value, onChange, hint, error, placeholder = '0', autofocus, size = 'default' }: MoneyFieldProps) {
   const [text, setText] = useState(value == null ? '' : formatInput(value))
   useEffect(() => {
     // Sync when the value is changed from outside (e.g. form reset).
@@ -70,7 +72,7 @@ export function MoneyField({ label, value, onChange, hint, error, placeholder = 
   return (
     <Field label={label} hint={hint} error={error}>
       {(id, desc) => (
-        <div class="money-input">
+        <div class={size === 'hero' ? 'money-input money-input-hero' : 'money-input'}>
           <input
             id={id}
             class="input input-money num"
@@ -167,7 +169,7 @@ interface ChoiceProps<T extends string> {
   options: ChoiceOption<T>[]
   value: T | null
   onChange: (v: T) => void
-  /** "chips" wraps; "segment" is an equal-width row. */
+  /** "chips" wraps; "segment" is an equal-width row of ≥44 px options whose labels never wrap (keep them short). */
   look?: 'chips' | 'segment'
   hideLegend?: boolean
 }
@@ -209,23 +211,40 @@ export function ConfirmButton({ label, confirmLabel, onConfirm }: { label: strin
   )
 }
 
+/** Matches the 160ms exit in controls.css. */
+const TOAST_OUT_MS = 160
+
 export function ToastHost() {
   const t = toastMsg.value
+  // The last message stays mounted for its exit after the signal clears.
+  const [shown, setShown] = useState<ToastMsg | null>(null)
+  useEffect(() => {
+    if (t) {
+      setShown(t)
+      return
+    }
+    const id = setTimeout(() => setShown(null), TOAST_OUT_MS)
+    return () => clearTimeout(id)
+  }, [t])
+  // A new message replaces the old one at once; a cleared one leaves with the exit class.
+  const view = t ?? shown
+  const leaving = t === null && shown !== null
   return (
     <div class="toast-host" aria-live="polite">
-      {t && (
-        <div class="toast" key={t.id}>
-          <span>{t.text}</span>
-          {t.action && (
+      {view && (
+        <div class={leaving ? 'toast is-leaving' : 'toast'} key={view.id}>
+          <span>{view.text}</span>
+          {view.action && (
             <button
               type="button"
               class="toast-action"
+              disabled={leaving}
               onClick={() => {
-                t.action!.run()
+                view.action!.run()
                 dismissToast()
               }}
             >
-              {t.action.label}
+              {view.action.label}
             </button>
           )}
         </div>

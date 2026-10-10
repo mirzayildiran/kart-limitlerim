@@ -1,15 +1,25 @@
+/* Ayarlar: one slate container per group, hairline rows, section titles that stand on their own. */
+
 .settings-page {
   display: flex;
   flex-direction: column;
-  gap: var(--s-6);
-  padding-bottom: var(--s-4);
+  padding: var(--s-2) 0 var(--s-4);
+}
+
+.settings-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-2) var(--s-1) 0;
 }
 
 .settings-header h1 {
   font-size: var(--text-2xl);
   font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
+/* Section: real h2, 24px above the title and 8px between title and content. */
 .settings-section {
   display: flex;
   flex-direction: column;
@@ -17,10 +27,13 @@
 }
 
 .settings-section-title {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--muted);
+  margin: var(--s-6) 0 0;
   padding: 0 var(--s-1);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--ink);
 }
 
 .settings-card {
@@ -50,8 +63,9 @@
   color: var(--ink);
 }
 
-.settings-note {
-  font-size: var(--text-sm);
+.settings-caption {
+  font-size: var(--text-xs);
+  line-height: 1.35;
   color: var(--muted);
 }
 
@@ -59,7 +73,13 @@
   color: var(--muted);
 }
 
-/* Tappable rows: iOS-style, 52px tall */
+/* Theme: the segmented control's own label sits above the track. */
+.settings-theme legend {
+  padding: 0;
+  margin: 0 0 var(--s-2);
+}
+
+/* Rows: at least 48px tall, pressed to 0.985 with the row press token. */
 .settings-row {
   display: flex;
   align-items: center;
@@ -70,8 +90,15 @@
   text-align: left;
 }
 
+.settings-row-tap {
+  transition:
+    transform var(--dur-tap) var(--ease),
+    background var(--dur-state) var(--ease);
+}
+
 .settings-row-tap:active {
   background: var(--surface-2);
+  transform: scale(var(--press-row));
 }
 
 .settings-row-label {
@@ -94,75 +121,139 @@
   flex: none;
   width: 12px;
   height: 12px;
-  border-radius: 50%;
-}
-
-.settings-dot {
+  border-radius: var(--r-pill);
   background: var(--cat);
 }
 
-.settings-archived {
-  margin-top: var(--s-2);
-}
-
-.settings-archived-summary {
-  min-height: var(--tap);
-  display: flex;
-  align-items: center;
-  padding: 0 var(--s-1);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--muted);
+/* Archived categories: a collapsed row that opens into its own hairline list. */
+.settings-archived summary {
+  list-style: none;
   cursor: pointer;
-  list-style-position: inside;
 }
 
-.settings-archived > .settings-card {
-  margin-top: var(--s-2);
+.settings-archived summary::-webkit-details-marker {
+  display: none;
 }
 
-/* Backup */
-.settings-confirm {
+.settings-archived details[open] > summary .settings-chev {
+  transform: rotate(90deg);
+}
+
+.settings-archived-list {
+  border-top: 1px solid var(--line);
+}
+
+.settings-archived-list > * + * {
+  border-top: 1px solid var(--line);
+}
+
+/* Backup: the two secondary buttons stack at every width. */
+.settings-actions {
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
-  padding: var(--s-3);
-  border-radius: var(--r-md);
-  background: var(--warn-soft);
+}
+
+.settings-confirm {
+  /* Part of the backup card, not a box inside it: a hairline sets it apart. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--line);
 }
 
 .settings-error {
+  /* Part of the backup card like the confirmation: a hairline, not a box inside the box. */
   font-size: var(--text-sm);
   color: var(--crit);
-  padding: var(--s-3);
-  border-radius: var(--r-md);
-  background: var(--crit-soft);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--line);
 }
 
-/* Rates */
-.settings-rate-list {
-  list-style: none;
+/* Lead line above the interest table: the same ink and size as running text, aligned with the titles. */
+.settings-lead {
+  padding: 0 var(--s-1);
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+/* Interest: label left, figures right and tabular; the label wraps before the figures do. */
+.settings-rates {
   margin: 0;
-  padding: 0;
+}
+
+.settings-rate {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--s-3);
+  align-items: baseline;
+  min-height: var(--tap);
+  padding: var(--s-3) var(--s-4);
+}
+
+.settings-rate + .settings-rate {
+  border-top: 1px solid var(--line);
+}
+
+/* The charges group sits after a hairline with 8px more air above its first row. */
+.settings-rates-charges {
+  padding-top: var(--s-2);
+}
+
+.settings-rate-label {
+  margin: 0;
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+.settings-rate-value {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink);
+  text-align: right;
+}
+
+.settings-rate-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.settings-captions {
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
+  padding: 0 var(--s-1);
 }
 
-.settings-rate-item {
-  font-size: var(--text-sm);
-  font-variant-numeric: tabular-nums;
-  padding-bottom: var(--s-2);
-  border-bottom: 1px solid var(--line);
+/* Danger zone: a status note on the rose wash, no border. Only the button text takes the critical colour.
+   Declared after .settings-pad so the 12px / 16px note padding wins. */
+.settings-danger {
+  padding: var(--s-3) var(--s-4);
+  border: 0;
+  border-radius: var(--r-lg);
+  background: var(--crit-soft);
+  box-shadow: none;
 }
 
-.settings-rate-item:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
+.settings-danger .btn-danger,
+.settings-danger .btn-danger.is-armed {
+  background: transparent;
 }
 
 .settings-foot {
+  padding-top: var(--s-6);
   text-align: center;
   font-size: var(--text-xs);
-  color: var(--faint);
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-row-tap,
+  .settings-row-tap:active {
+    transition: none;
+    transform: none;
+  }
 }
