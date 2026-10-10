@@ -51,7 +51,7 @@ describe('canSend', () => {
 
 describe('static copy', () => {
   it('has four quick prompts', () => {
-    expect(QUICK_PROMPTS).toHaveLength(4)
+    expect(QUICK_PROMPTS).toHaveLength(5)
     expect(QUICK_PROMPTS.every((p) => p.trim().length > 0)).toBe(true)
   })
 
