@@ -7,6 +7,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* iOS rubber-band overscroll shows the html background: keep it the app ground, never white. */
+  background: var(--bg);
 }
 
 body {
@@ -43,6 +45,7 @@ button {
   cursor: pointer;
   text-align: inherit;
   touch-action: manipulation;
+  -webkit-touch-callout: none;
 }
 
 input,
