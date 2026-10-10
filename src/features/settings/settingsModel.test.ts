@@ -45,9 +45,9 @@ describe('rateGroups', () => {
   it('splits the rows into the interest rates and the charges, in order', () => {
     const { interest, charges } = rateGroups()
     expect(interest).toEqual([
-      { label: 'Limit 30.000 ₺ altı', lines: ['akdi %3,25', 'gecikme %3,55'] },
-      { label: 'Limit 30.000 ₺ – 180.000 ₺', lines: ['akdi %3,75', 'gecikme %4,05'] },
-      { label: 'Limit 180.000 ₺ üzeri', lines: ['akdi %4,25', 'gecikme %4,55'] },
+      { label: 'Limit 30.000 ₺ altı', spoken: 'Limit 30.000 lira altı', lines: ['akdi %3,25', 'gecikme %3,55'] },
+      { label: 'Limit 30.000 ₺ – 180.000 ₺', spoken: 'Limit 30.000 ile 180.000 lira arası', lines: ['akdi %3,75', 'gecikme %4,05'] },
+      { label: 'Limit 180.000 ₺ üzeri', spoken: 'Limit 180.000 lira üzeri', lines: ['akdi %4,25', 'gecikme %4,55'] },
       { label: 'Nakit çekim ve KMH', lines: ['akdi %4,25', 'gecikme %4,55'] },
     ])
     expect(charges).toEqual([
@@ -83,6 +83,7 @@ describe('rateGroups', () => {
     const rows = rateGroups(table).interest
     expect(rows[0].label).toBe('Limit 10.000 ₺ altı')
     expect(rows[1].label).toBe('Limit 10.000 ₺ üzeri')
+    expect(rows.map((r) => r.spoken)).toEqual(['Limit 10.000 lira altı', 'Limit 10.000 lira üzeri', undefined])
   })
 
   it('writes the tax rates from the given percentages with a decimal comma', () => {
