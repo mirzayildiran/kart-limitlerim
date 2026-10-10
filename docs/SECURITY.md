@@ -2,6 +2,22 @@
 
 Yayın öncesi denetim, 2026-10-10. Dal: `claude/security-pass`. Bulgular önem sırasıyla; her birinde durum yazıyor.
 
+## Yapılanlar
+
+- Asistan onayı kodda zorunlu; onay geri alınınca istek iptal (bulgu 1).
+- Derlenen sayfada Content-Security-Policy (bulgu 3).
+- Derin bağlantıda prototip anahtarı ve uzunluk sınırı (bulgu 5).
+- Yedek dosyasında 20 milyon karakter sınırı (bulgu 6).
+- Derlemede sır taraması: temiz (bulgu 7).
+
+## Açık kalanlar
+
+1. **Worker özetinin alan alan doğrulanması (orta, bulgu 2):** Bilinen anahtarlar, metin ve dizi sınırları; bilinmeyen alanlar atılsın. Gerekirse Turnstile ya da App Attest.
+2. **Yedek kayıt şeması (düşük, bulgu 4):** En azından `accounts` için tür, kuruş ve tarih denetimi.
+3. **iOS'ta CSP doğrulaması:** WKWebView'da `capacitor://localhost` için `'self'` ve Capacitor köprüsü (bulgu 3). Chromium'da doğrulandı, cihazda denenmedi.
+
+## Bulgular
+
 | # | Önem | Bulgu | Durum |
 |---|---|---|---|
 | 1 | Yüksek | Asistan onayı yalnızca arayüzde uygulanıyordu | Düzeltildi |
