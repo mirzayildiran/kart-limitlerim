@@ -13,6 +13,7 @@ import { backupFileName, rateGroups, sourceLines, type RateRow } from './setting
 import { isNativeApp, saveTextFile } from '../../platform/files'
 import { InstallGuide } from './InstallGuide'
 import { PhoneSection } from './PhoneSection'
+import { PRIVACY_URL } from '../../links'
 import './settings-page.css'
 
 function Section({ title, id, children }: { title: string; id: string; children: ComponentChildren }) {
@@ -213,6 +214,10 @@ function PrivacySection() {
         <p class="settings-text">Kart numaran ya da banka şifren hiçbir zaman sorulmaz.</p>
         <p class="settings-text">Ekran görüntüsü içe aktarma cihazda okunur ve hiçbir yerde saklanmaz.</p>
         <p class="settings-text">Tek istisna bütçe asistanı sohbetidir: açarsan, onay ekranında gösterilen özet ve mesajların bir yapay zekâ servisine gönderilir.</p>
+        {/* target=_blank: in the iOS app the page opens in Safari instead of replacing the app. */}
+        <a class="btn btn-secondary btn-block settings-link" href={PRIVACY_URL} target="_blank" rel="noopener noreferrer">
+          Gizlilik politikası
+        </a>
       </div>
     </Section>
   )

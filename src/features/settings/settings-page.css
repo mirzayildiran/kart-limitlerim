@@ -63,6 +63,12 @@
   color: var(--ink);
 }
 
+/* A link styled as a secondary button: drop the browser's link colour and underline. */
+.settings-link {
+  color: var(--ink);
+  text-decoration: none;
+}
+
 .settings-caption {
   font-size: var(--text-xs);
   line-height: 1.35;
