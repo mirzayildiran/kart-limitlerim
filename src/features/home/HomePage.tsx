@@ -85,7 +85,12 @@ function renderTopbar(status: Status | null, suggestions: number): JSX.Element {
           <span class="home-status-dot" aria-hidden="true" />
           <span class="home-status-text">
             {status.text}
-            {suggestions > 0 && ` · asistanda ${suggestions} öneri`}
+            {suggestions > 0 && (
+              <>
+                {' '}
+                <span class="home-status-count">· asistanda {suggestions} öneri</span>
+              </>
+            )}
           </span>
           {chevron}
         </button>
