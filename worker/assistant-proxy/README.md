@@ -7,7 +7,7 @@ Kart Limitlerim'deki bütçe asistanı, mesajlarını doğrudan bir LLM sağlay�
 - `POST /` (ya da `POST /chat`) isteğini alır. Gövde `{ v: 1, summary, messages }` biçimindedir.
 - İsteği doğrular: biçim, mesaj sayısı, metin uzunlukları ve gövde boyutu.
 - Kaynak (Origin) sitesini `ALLOWED_ORIGINS` listesiyle sınırlar.
-- IP başına saatlik kaba bir sınır uygular (varsayılan 30 istek).
+- IP başına dakikada 10 istek (LIMITER binding) ve saatlik kaba bir fren uygular (varsayılan 30 istek).
 - Bütçe özetini ve sohbeti sağlayıcıya gönderir. Sağlayıcı hata verirse ya da boş yanıt dönerse bir sonrakini dener.
 - Başarıda `{ text, provider }` döner.
 
@@ -68,7 +68,12 @@ Yerelde geliştirmek için `wrangler dev` çalıştır. Anahtarları `.dev.vars`
 
 ## Hız sınırı hakkında
 
-Sınır bellekte, her Worker isolate'i için ayrı tutulur. Bu yüzden gerçek sınır, tek bir IP için tahmin edilenden gevşek olabilir. Sert bir sınır için Cloudflare panelinde **WAF → Rate limiting rules** kuralı ekle. Örneğin `http.request.method eq "POST"` koşuluyla IP başına saatte 30 istek gibi bir kural tanımla.
+İki katman var:
+
+- **LIMITER** (`wrangler.toml` içindeki `[[ratelimits]]` binding'i): IP başına dakikada 10 istek. Cloudflare Workers Rate Limiting binding'i olduğu için ücretsiz planda çalışır. Sayaç, aynı Cloudflare lokasyonundaki isolate'ler arasında ortaktır. Binding hata verirse istek geçer ve yalnızca `assistant: limiter failed` loglanır.
+- **Bellek içi saatlik fren** (`RATE_LIMIT_PER_HOUR`, varsayılan 30): her isolate kendi sayacını tutar. Bu yüzden sıkı bir sınır değil, ani patlamalara karşı bir frendir.
+
+Cloudflare'in **WAF → Rate limiting rules** kuralları yalnızca özel alan adlarında (custom domain) çalışır; `workers.dev` adresinde çalışmaz. Bu yüzden bu worker için WAF kuralına güvenme; sınır LIMITER binding'inden gelir.
 
 ## CORS hakkında
 

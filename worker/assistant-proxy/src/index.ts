@@ -8,6 +8,11 @@ import { parseAssistantRequest } from '../../../src/ai/validate.ts'
  * provider that answers. Request bodies and summaries are never logged.
  */
 
+/** Workers Rate Limiting binding, declared as [[ratelimits]] in wrangler.toml. */
+interface RateLimiter {
+  limit(options: { key: string }): Promise<{ success: boolean }>
+}
+
 interface Env {
   GEMINI_API_KEY?: string
   GROQ_API_KEY?: string
@@ -15,6 +20,8 @@ interface Env {
   /** Comma-separated list of origins allowed to call the proxy. */
   ALLOWED_ORIGINS: string
   RATE_LIMIT_PER_HOUR?: string
+  /** Per-IP, per-minute limit shared across isolates in a location. Absent in local tests. */
+  LIMITER?: RateLimiter
 }
 
 type ProviderName = 'gemini' | 'groq' | 'openrouter'
@@ -83,6 +90,9 @@ export default {
 
     const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown'
     if (isRateLimited(ip, rateLimitOf(env), Date.now())) {
+      return reply(429, { error: 'rate_limited' }, origin)
+    }
+    if (env.LIMITER && !(await withinLimiter(env.LIMITER, ip))) {
       return reply(429, { error: 'rate_limited' }, origin)
     }
 
@@ -259,8 +269,22 @@ function rateLimitOf(env: Env): number {
 }
 
 /**
+ * Per-IP check against the Workers Rate Limiting binding. Fails open: if the
+ * binding throws, the request goes through and only the failure is logged.
+ */
+async function withinLimiter(limiter: RateLimiter, ip: string): Promise<boolean> {
+  try {
+    const { success } = await limiter.limit({ key: ip })
+    return success
+  } catch {
+    console.warn('assistant: limiter failed')
+    return true
+  }
+}
+
+/**
  * Fixed hourly window per IP, kept in memory. Each isolate has its own map, so
- * this is only a brake on bursts. Use a Cloudflare WAF rate limiting rule for a real limit.
+ * this is only a brake on bursts. The LIMITER binding is the real per-minute limit.
  */
 function isRateLimited(ip: string, limit: number, now: number): boolean {
   if (hits.size > RATE_MAP_PRUNE_AT) {
