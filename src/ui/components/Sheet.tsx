@@ -35,7 +35,17 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
       if (e.key === 'Escape' && !sheetClosing.value) onClose()
     }
     document.addEventListener('keydown', onKey)
+    // iOS: when the keyboard opens, the viewport shrinks after focus; bring the field back into view.
+    const vv = window.visualViewport
+    const keepFocusedInView = () => {
+      const el = document.activeElement
+      if (el instanceof HTMLElement && panel.current?.contains(el) && el.matches('input, textarea, select')) {
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      }
+    }
+    vv?.addEventListener('resize', keepFocusedInView)
     return () => {
+      vv?.removeEventListener('resize', keepFocusedInView)
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = prevOverflow
       ;(opener.current as HTMLElement | null)?.focus?.({ preventScroll: true })
