@@ -40,9 +40,9 @@ export function formatLongDate(iso: IsoDate): string {
 }
 
 export interface RateRow {
-  /** What the figures apply to, e.g. "Limit 30.000 ₺ altı". */
+  /** What the figures apply to, e.g. "Dönem borcu 30.000 ₺ altı". */
   label: string
-  /** The label as a screen reader should say it, when it differs: "Limit 30.000 lira altı". */
+  /** The label as a screen reader should say it, when it differs: "Dönem borcu 30.000 lira altı". */
   spoken?: string
   /** The figures, one line each, e.g. ["akdi %3,25", "gecikme %3,55"]. */
   lines: string[]
@@ -67,13 +67,13 @@ export function rateGroups(
   const cards = table.cardTiers.map((t, i): RateRow => {
     const lower = i > 0 ? table.cardTiers[i - 1].upTo : null
     const lines = [`akdi %${formatPercent(t.contractual)}`, `gecikme %${formatPercent(t.late)}`]
-    if (t.upTo === null && lower === null) return { label: 'Tüm limitler', lines }
-    if (t.upTo === null) return { label: `Limit ${formatTL(lower!)} üzeri`, spoken: `Limit ${spokenTL(lower!)} üzeri`, lines }
-    if (lower === null) return { label: `Limit ${formatTL(t.upTo)} altı`, spoken: `Limit ${spokenTL(t.upTo)} altı`, lines }
+    if (t.upTo === null && lower === null) return { label: 'Tüm dönem borçları', lines }
+    if (t.upTo === null) return { label: `Dönem borcu ${formatTL(lower!)} üzeri`, spoken: `Dönem borcu ${spokenTL(lower!)} üzeri`, lines }
+    if (lower === null) return { label: `Dönem borcu ${formatTL(t.upTo)} altı`, spoken: `Dönem borcu ${spokenTL(t.upTo)} altı`, lines }
     return {
-      label: `Limit ${formatTL(lower)} – ${formatTL(t.upTo)}`,
+      label: `Dönem borcu ${formatTL(lower)} – ${formatTL(t.upTo)}`,
       // "30.000 ile 180.000 lira arası": the dash and two lira signs read badly aloud.
-      spoken: `Limit ${spokenTL(lower).replace(/ lira$/, '')} ile ${spokenTL(t.upTo)} arası`,
+      spoken: `Dönem borcu ${spokenTL(lower).replace(/ lira$/, '')} ile ${spokenTL(t.upTo)} arası`,
       lines,
     }
   })
