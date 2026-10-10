@@ -5,6 +5,7 @@ import { HomePage } from './features/home/HomePage'
 import { ExpensesPage } from './features/expenses/ExpensesPage'
 import { CalendarPage } from './features/calendar/CalendarPage'
 import { SettingsPage } from './features/settings/SettingsPage'
+import { AssistantPage } from './features/assistant/AssistantPage'
 import { TabBar } from './ui/components/TabBar'
 import { SheetHost } from './features/SheetHost'
 import { ToastHost } from './ui/components/controls'
@@ -71,6 +72,8 @@ export function App() {
         return <CalendarPage />
       case 'settings':
         return <SettingsPage />
+      case 'assistant':
+        return <AssistantPage />
       default:
         return <HomePage />
     }
