@@ -91,6 +91,9 @@ export function StatementSheet({ request }: StatementSheetProps) {
   const minimumLow = minimumBelowEstimate(formState, account.limit)
   const preview = statementInterestPreview(formState, account, view)
 
+  // The row name is often the account name itself ("Garanti" · "Garanti"): say it once then.
+  const sheetSubtitle = line.label === account.name ? account.name : `${account.name} · ${line.label}`
+
   const footer = (
     <Button variant="primary" block type="button" disabled={viewState !== 'form'} onClick={handleSave}>
       {viewState === 'saving' ? 'Kaydediliyor…' : 'Kaydet'}
@@ -98,7 +101,7 @@ export function StatementSheet({ request }: StatementSheetProps) {
   )
 
   return (
-    <Sheet open title="Ekstre" subtitle={`${account.name} · ${line.label}`} onClose={closeSheet} footer={footer}>
+    <Sheet open title="Ekstre" subtitle={sheetSubtitle} onClose={closeSheet} footer={footer}>
       <div class="statement-sheet">
         <div class="statement-summary">
           <p>

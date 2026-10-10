@@ -59,8 +59,18 @@ interface MoneyFieldProps {
 }
 
 /**
+ * The text a money field shows once it loses focus: a valid amount in Turkish grouping
+ * ("1.250", "1.250,50"); text that is not an amount stays as typed, so nothing is lost.
+ */
+export function moneyTextOnBlur(text: string): string {
+  const k = parseTL(text)
+  return k === null ? text : formatInput(k)
+}
+
+/**
  * Amount input that accepts Turkish formatting ("1.234,56") and keeps the
  * user's own text while they type; the parsed value is reported upward.
+ * Unfocused, a valid amount is shown with its thousands separators.
  */
 export function MoneyField({ label, value, onChange, hint, error, placeholder = '0', autofocus, size = 'default' }: MoneyFieldProps) {
   const [text, setText] = useState(value == null ? '' : formatInput(value))
@@ -89,6 +99,7 @@ export function MoneyField({ label, value, onChange, hint, error, placeholder = 
               setText(t)
               onChange(t.trim() === '' ? null : parseTL(t))
             }}
+            onBlur={() => setText((t) => moneyTextOnBlur(t))}
           />
           <span class="money-suffix" aria-hidden="true">
             ₺

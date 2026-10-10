@@ -262,6 +262,38 @@ describe('detailModel', () => {
     })
   })
 
+  describe('repeatsTotal', () => {
+    it('is set when the only open statement is the whole figure (no history)', () => {
+      const today = new Date(2026, 9, 20)
+      const line = testLine('Main', { statementDebt: 1_000_00, minimumDue: 200_00, payment: 'unpaid', cycle: '2026-10' })
+      const data = cardInterestPanelData(testCard([line]), today)
+      expect(data).not.toBe(null)
+      if (data) {
+        expect(data.historyCycles).toBe(0)
+        expect(data.lineProjections.length).toBe(1)
+        expect(data.lineProjections[0].repeatsTotal).toBe(true)
+      }
+    })
+
+    it('is clear for a line that is only part of the figure (history adds to it)', () => {
+      const today = new Date(2026, 9, 20)
+      const line = testLine('Main', {
+        statementDebt: 1_000_00,
+        minimumDue: 200_00,
+        payment: 'unpaid',
+        cycle: '2026-10',
+        interestHistory: [{ cycle: '2026-09', amount: 50_00, source: 'statement' }],
+      } as Partial<CardLine>)
+      const data = cardInterestPanelData(testCard([line]), today)
+      expect(data).not.toBe(null)
+      if (data) {
+        expect(data.totalInterest).toBe(50_00)
+        expect(data.lineProjections.length).toBe(1)
+        expect(data.lineProjections[0].repeatsTotal).toBe(false)
+      }
+    })
+  })
+
   describe('interestSourceLine', () => {
     it('reads naturally without history', () => {
       expect(interestSourceLine(0, true)).toBe('Bu ekstrenin tahmini')

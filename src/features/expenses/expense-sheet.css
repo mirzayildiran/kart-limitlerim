@@ -167,6 +167,13 @@
   color: var(--muted);
 }
 
+/* Drawn chevron between before and after (the icon set has no arrow). */
+.expense-preview-arrow {
+  flex: none;
+  align-self: center;
+  color: var(--muted);
+}
+
 .expense-preview-after {
   font-size: var(--text-md);
   font-weight: 700;

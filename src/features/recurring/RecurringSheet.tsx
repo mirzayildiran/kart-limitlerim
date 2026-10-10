@@ -5,6 +5,7 @@ import {
   accounts,
   activeCategories,
   cards,
+  createCategory,
   kmhAccounts,
   liquidAccounts,
   newId,
@@ -17,6 +18,7 @@ import { accountColors } from '../../ui/accountColor'
 import { closeSheet } from '../../ui/nav'
 import type { SheetRequest } from '../../ui/nav'
 import { Button, Choice, ConfirmButton, MoneyField, Switch, TextField } from '../../ui/components/controls'
+import { validateCategoryName } from '../expenses/expenseModel'
 import { AccountPicker } from '../../ui/components/AccountPicker'
 import { CategoryPicker } from '../../ui/components/CategoryPicker'
 import { Sheet } from '../../ui/components/Sheet'
@@ -64,6 +66,9 @@ export function RecurringSheet({ request }: RecurringSheetProps) {
   const [draft, setDraft] = useState<RecurringDraft>(() => initialDraft(existing))
   const [attempted, setAttempted] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [newCatName, setNewCatName] = useState('')
+  const [showNewCat, setShowNewCat] = useState(false)
+  const [newCatError, setNewCatError] = useState<string | null>(null)
 
   // The payment was removed elsewhere while the sheet was open.
   useEffect(() => {
@@ -83,6 +88,29 @@ export function RecurringSheet({ request }: RecurringSheetProps) {
     createdAt: existing?.createdAt ?? 0,
     handledThrough: existing?.handledThrough ?? null,
   })
+
+  // Same inline "new category" form as ExpenseSheet: the new one is picked at once.
+  const handleCategoryChange = (id: string) => {
+    patch({ categoryId: id })
+    setShowNewCat(false)
+  }
+
+  const handleAddCategory = async () => {
+    setNewCatError(null)
+    const validation = validateCategoryName(newCatName, activeCategories.value.map((c) => c.name))
+    if (!validation.valid) {
+      setNewCatError(validation.error)
+      return
+    }
+    try {
+      const newCat = await createCategory(newCatName)
+      patch({ categoryId: newCat.id })
+      setNewCatName('')
+      setShowNewCat(false)
+    } catch {
+      setNewCatError('Kategori oluşturulamadı.')
+    }
+  }
 
   const handleSave = async () => {
     setAttempted(true)
@@ -167,14 +195,37 @@ export function RecurringSheet({ request }: RecurringSheetProps) {
           />
         )}
 
-        {/* No "Yeni" chip here: a recurring payment picks an existing category. */}
-        <CategoryPicker
-          label="Kategori"
-          categories={activeCategories.value}
-          value={draft.categoryId}
-          onChange={(v) => patch({ categoryId: v })}
-          error={shown.category ?? null}
-        />
+        <div class="recurring-category">
+          <CategoryPicker
+            label="Kategori"
+            categories={activeCategories.value}
+            value={draft.categoryId}
+            onChange={handleCategoryChange}
+            onNew={() => setShowNewCat(!showNewCat)}
+            newOpen={showNewCat}
+            error={shown.category ?? null}
+          />
+          {showNewCat && (
+            <div class="recurring-new-category">
+              <TextField
+                label="Yeni kategori adı"
+                value={newCatName}
+                onChange={setNewCatName}
+                placeholder="Örn. Spor"
+                error={newCatError}
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                block
+                onClick={handleAddCategory}
+                disabled={newCatName.trim().length === 0}
+              >
+                Kategoriyi ekle
+              </Button>
+            </div>
+          )}
+        </div>
 
         <div class="recurring-row">
           <TextField
