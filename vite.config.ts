@@ -62,7 +62,13 @@ export default defineConfig({
     }),
   ],
   test: {
-    environment: 'node',
-    include: ['src/**/*.test.ts', 'worker/**/*.test.ts'],
+    projects: [
+      { extends: true, test: { name: 'unit', environment: 'node', include: ['src/**/*.test.ts', 'worker/**/*.test.ts'] } },
+      // Component tests: Preact in a DOM (happy-dom), driven with Testing Library.
+      {
+        extends: true,
+        test: { name: 'components', environment: 'happy-dom', include: ['src/**/*.test.tsx'], setupFiles: ['src/test/setup.ts'] },
+      },
+    ],
   },
 })
