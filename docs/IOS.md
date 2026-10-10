@@ -40,6 +40,17 @@ npm run ios:build
 
 Sonra Xcode'da Run. `ios:dev` sonrası bu komut çalıştırılmadan yapılan sürüm Mac'e bağlı kalır.
 
+## Yalnızca uygulamada olanlar
+
+Ayarlar → **Bu iPhone** (tarayıcıda görünmez):
+
+- **Face ID ile kilitle**: uygulama arka plana geçince kilitlenir, dönüşte Face ID ya da cihaz şifresi ister.
+  Uygulama değiştiricide içerik örtülür.
+- **Son ödeme hatırlatması**: ödenmemiş her ekstre için iki gün önce ve son gün 10:00'da bildirim.
+  Kilit ekranında görüneceği için tutar yazmaz. Ekstreyi ödendi işaretleyince hatırlatmalar silinir.
+
+Yedek indirme uygulamada paylaşım menüsünü açar (Dosyalar'a kaydet, AirDrop). Kart kaydırırken ve filtre seçerken hafif titreşim olur.
+
 ## Verileri Safari'deki PWA'dan taşıma
 
 Uygulama farklı bir adreste (`capacitor://localhost`) çalıştığı için PWA'daki veriler otomatik gelmez.
