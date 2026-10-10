@@ -49,10 +49,11 @@
   --kmh: #6b55b0;
 
   /* Semantic */
-  --ok: #0f8a5f;
+  --ok: #0d7c55;
   --ok-soft: #dff5ea;
   --warn: #9a5a0c;
-  --warn-soft: #f8ebd6;
+  --warn-soft: #f3f1e8;
+  --warn-line: #e3d29c;
   --warn-bar: #d38b2a;
   --crit: #b3372a;
   --crit-soft: #f7e0da;
@@ -95,8 +96,22 @@
   --tabbar-h: 64px;
   --tap: 44px;
 
+  /* Motion (see .impeccable/surfaces/motion-system.md). Transform and opacity only. */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  --dur-tap: 120ms;
+  --dur-state: 200ms;
+  --dur-page: 300ms;
+  --dur-page-out: 130ms;
+  --dur-page-gap: 50ms;
+  --dur-sheet: 380ms;
+  --dur-sheet-out: 220ms;
+
+  /* Press scale: 0.97 for buttons and large surfaces, 0.985 for rows and cards. */
+  --press: 0.97;
+  --press-row: 0.985;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -128,6 +143,7 @@
     --ok-soft: #0c2a1d;
     --warn: #ffc24d;
     --warn-soft: #2e2309;
+    --warn-line: #4a3a12;
     --warn-bar: #ffb020;
     --crit: #ff5c7a;
     --crit-soft: #36101c;
@@ -166,6 +182,7 @@
   --ok-soft: #0c2a1d;
   --warn: #ffc24d;
   --warn-soft: #2e2309;
+  --warn-line: #4a3a12;
   --warn-bar: #ffb020;
   --crit: #ff5c7a;
   --crit-soft: #36101c;
@@ -177,7 +194,7 @@
 
 /* Category colour from its hue (0–359), readable in both themes. */
 .cat-color {
-  --cat: hsl(var(--h) 68% 50%);
+  --cat: hsl(var(--h) 72% 40%);
 }
 
 :root[data-theme='dark'] .cat-color {

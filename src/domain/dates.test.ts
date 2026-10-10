@@ -189,6 +189,7 @@ describe('dates', () => {
       const d = new Date(2026, 9, 15)
       const result = formatShort(d)
       expect(result).toMatch(/15.*[Ee]k[ik]/)
+      expect(result).toBe('15 Eki')
     })
   })
 

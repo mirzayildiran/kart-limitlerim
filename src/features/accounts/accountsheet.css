@@ -13,6 +13,7 @@
 .card-sheet-warning {
   padding: 0.75rem;
   background-color: var(--warn-soft);
+  border: 1px solid var(--warn-line);
   color: var(--warn);
   border-radius: 0.5rem;
   font-size: 0.875rem;
@@ -61,6 +62,10 @@
 }
 
 .card-line-add {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
   padding: 0.75rem 1rem;
   margin-top: 0.5rem;
   background: none;
@@ -76,40 +81,13 @@
   background-color: var(--surface-2);
 }
 
+/* Faiz oranı block: a hairline box around the Disclosure row (the chevron is the only marker). */
 .rate-override {
   border: 1px solid var(--line);
   border-radius: 0.5rem;
-  padding: 1rem;
-  cursor: pointer;
+  padding: 0 var(--s-4);
 }
 
-.rate-override summary {
-  font-weight: 600;
-  color: var(--ink);
-  outline: none;
-  user-select: none;
-}
-
-.rate-override summary::-webkit-details-marker {
-  display: none;
-}
-
-.rate-override summary::before {
-  content: '▶ ';
-  display: inline-block;
-  transition: transform 0.2s;
-  margin-right: 0.25rem;
-}
-
-.rate-override[open] summary::before {
-  transform: rotate(90deg);
-}
-
-.rate-override-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--line);
+.rate-override .disclosure-content {
+  padding-bottom: var(--s-4);
 }

@@ -1,3 +1,4 @@
+/* Entrance: scrim fades in, panel rises from below. Exit (.is-closing, set by closeSheet in nav.ts): the reverse, faster. */
 .sheet-scrim {
   position: fixed;
   inset: 0;
@@ -6,6 +7,12 @@
   align-items: flex-end;
   justify-content: center;
   background: var(--scrim);
+  animation: sheet-scrim-in 240ms var(--ease) both;
+}
+
+.sheet-scrim.is-closing {
+  pointer-events: none;
+  animation: sheet-scrim-out var(--dur-sheet-out) var(--ease-in) forwards;
 }
 
 .sheet-backdrop {
@@ -30,17 +37,50 @@
   background: var(--surface);
   border-radius: var(--r-xl) var(--r-xl) 0 0;
   box-shadow: var(--shadow-2);
+  animation: sheet-in var(--dur-sheet) var(--ease-out-expo) both;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .sheet {
-    animation: sheet-in 0.24s var(--ease);
+.sheet-scrim.is-closing .sheet {
+  animation: sheet-out var(--dur-sheet-out) var(--ease-in) forwards;
+}
+
+@keyframes sheet-scrim-in {
+  from {
+    opacity: 0;
   }
-  @keyframes sheet-in {
-    from {
-      transform: translateY(28px);
-      opacity: 0.6;
-    }
+}
+
+@keyframes sheet-scrim-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* Reduced motion: no spatial movement. The scrim still fades, and the exit is only a fade. */
+@media (prefers-reduced-motion: reduce) {
+  .sheet-scrim {
+    animation-duration: 120ms;
+  }
+  .sheet {
+    animation: none;
+  }
+  .sheet-scrim.is-closing {
+    animation-duration: 120ms;
+  }
+  .sheet-scrim.is-closing .sheet {
+    animation: none;
   }
 }
 
@@ -48,7 +88,7 @@
   width: 40px;
   height: 4px;
   margin: 8px auto 0;
-  border-radius: 2px;
+  border-radius: var(--r-pill);
   background: var(--line-strong);
   flex: none;
 }
@@ -75,6 +115,18 @@
   border-radius: var(--r-md);
   background: var(--surface-2);
   color: var(--muted);
+  transition: transform var(--dur-tap) var(--ease-out-expo);
+}
+
+.sheet-close:active {
+  transform: scale(var(--press));
+  transition-timing-function: var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-close:active {
+    transform: none;
+  }
 }
 
 .sheet-body {

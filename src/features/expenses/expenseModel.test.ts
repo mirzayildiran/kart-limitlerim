@@ -7,7 +7,12 @@ import {
   previewAvailable,
   validateCategoryName,
   interestNudge,
+  interestNudgeAmount,
   monthNavigation,
+  filterExpenses,
+  facetTotals,
+  isFacetDisabled,
+  dayTotal,
 } from './expenseModel'
 import type { Expense, CardAccount, KmhAccount, Kurus, IsoDate } from '../../domain/types'
 
@@ -229,6 +234,24 @@ describe('expenseModel', () => {
     })
   })
 
+  describe('interestNudgeAmount', () => {
+    it('returns null for zero or negative amounts', () => {
+      expect(interestNudgeAmount(mockCardAccount(), 0)).toBeNull()
+      expect(interestNudgeAmount(mockKmhAccount(), -1000)).toBeNull()
+    })
+
+    it('applies the override rate with taxes (1.30)', () => {
+      const account = mockCardAccount({ rateOverride: { contractual: 5, late: 6 } })
+      // 1000 ₺ × 5% × 1.30 = 65 ₺
+      expect(interestNudgeAmount(account, 100000)).toBe(6500)
+    })
+
+    it('matches the figure inside the sentence', () => {
+      const account = mockKmhAccount({ rateOverride: { contractual: 5, late: 6 } })
+      expect(interestNudge(account, 100000)).toContain('~65 ₺')
+    })
+  })
+
   describe('monthNavigation', () => {
     it('returns previous month and next month', () => {
       const nav = monthNavigation('2026-09')
@@ -241,6 +264,125 @@ describe('expenseModel', () => {
       const currentKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`
       const nav = monthNavigation(currentKey)
       expect(nav.next).toBeNull()
+    })
+  })
+  describe('filterExpenses', () => {
+    const list = [
+      mockExpense({ id: 'a', categoryId: 'cat_food', accountId: 'acc_1' }),
+      mockExpense({ id: 'b', categoryId: 'cat_food', accountId: 'acc_2' }),
+      mockExpense({ id: 'c', categoryId: 'cat_fun', accountId: 'acc_1' }),
+    ]
+
+    it('returns every expense when no filter is given', () => {
+      expect(filterExpenses(list).map((e) => e.id)).toEqual(['a', 'b', 'c'])
+      expect(filterExpenses(list, {}).map((e) => e.id)).toEqual(['a', 'b', 'c'])
+    })
+
+    it('filters by category', () => {
+      expect(filterExpenses(list, { categoryId: 'cat_food' }).map((e) => e.id)).toEqual(['a', 'b'])
+    })
+
+    it('filters by account', () => {
+      expect(filterExpenses(list, { accountId: 'acc_1' }).map((e) => e.id)).toEqual(['a', 'c'])
+    })
+
+    it('combines category and account with AND', () => {
+      expect(filterExpenses(list, { categoryId: 'cat_food', accountId: 'acc_1' }).map((e) => e.id)).toEqual(['a'])
+    })
+
+    it('returns an empty list when nothing matches', () => {
+      expect(filterExpenses(list, { categoryId: 'cat_missing' })).toEqual([])
+    })
+
+    it('does not mutate the input', () => {
+      const copy = [...list]
+      filterExpenses(list, { accountId: 'acc_2' })
+      expect(list).toEqual(copy)
+    })
+  })
+
+  describe('isFacetDisabled', () => {
+    it('disables an unselected row with nothing under the other filter', () => {
+      expect(isFacetDisabled(0 as Kurus, false)).toBe(true)
+    })
+
+    it('keeps rows with an amount enabled', () => {
+      expect(isFacetDisabled(1 as Kurus, false)).toBe(false)
+    })
+
+    it('never disables a selected row, even at zero', () => {
+      expect(isFacetDisabled(0 as Kurus, true)).toBe(false)
+      expect(isFacetDisabled(500 as Kurus, true)).toBe(false)
+    })
+  })
+
+  describe('facetTotals', () => {
+    const list = [
+      mockExpense({ id: 'a', amount: 1000 as Kurus, categoryId: 'cat_food', accountId: 'acc_1' }),
+      mockExpense({ id: 'b', amount: 2000 as Kurus, categoryId: 'cat_food', accountId: 'acc_2' }),
+      mockExpense({ id: 'c', amount: 4000 as Kurus, categoryId: 'cat_fun', accountId: 'acc_1' }),
+    ]
+
+    it('with no filter, both breakdowns cover the whole list', () => {
+      const { byCategory, byAccount } = facetTotals(list)
+      expect(byCategory.get('cat_food')).toBe(3000)
+      expect(byCategory.get('cat_fun')).toBe(4000)
+      expect(byAccount.get('acc_1')).toBe(5000)
+      expect(byAccount.get('acc_2')).toBe(2000)
+    })
+
+    it('a category filter narrows the account breakdown only', () => {
+      const { byCategory, byAccount } = facetTotals(list, { categoryId: 'cat_food' })
+      expect(byAccount.get('acc_1')).toBe(1000)
+      expect(byAccount.get('acc_2')).toBe(2000)
+      // The selected category does not narrow the category rows themselves
+      expect(byCategory.get('cat_food')).toBe(3000)
+      expect(byCategory.get('cat_fun')).toBe(4000)
+    })
+
+    it('an account filter narrows the category breakdown only', () => {
+      const { byCategory, byAccount } = facetTotals(list, { accountId: 'acc_1' })
+      expect(byCategory.get('cat_food')).toBe(1000)
+      expect(byCategory.get('cat_fun')).toBe(4000)
+      expect(byAccount.get('acc_1')).toBe(5000)
+      expect(byAccount.get('acc_2')).toBe(2000)
+    })
+
+    it('omits rows with no expenses under the other filter', () => {
+      const { byCategory } = facetTotals(list, { accountId: 'acc_2' })
+      expect(byCategory.get('cat_food')).toBe(2000)
+      expect(byCategory.has('cat_fun')).toBe(false)
+    })
+
+    it('each breakdown ignores its own filter and keeps the other one', () => {
+      const { byCategory, byAccount } = facetTotals(list, { categoryId: 'cat_food', accountId: 'acc_1' })
+      // Category rows are limited by the account (acc_1): food 1000, fun 4000
+      expect(byCategory.get('cat_food')).toBe(1000)
+      expect(byCategory.get('cat_fun')).toBe(4000)
+      // Account tiles are limited by the category (food): acc_1 1000, acc_2 2000
+      expect(byAccount.get('acc_1')).toBe(1000)
+      expect(byAccount.get('acc_2')).toBe(2000)
+    })
+
+    it('returns empty maps for an empty list', () => {
+      const { byCategory, byAccount } = facetTotals([], { categoryId: 'cat_food' })
+      expect(byCategory.size).toBe(0)
+      expect(byAccount.size).toBe(0)
+    })
+  })
+
+  describe('dayTotal', () => {
+    it('sums amounts in kuruş', () => {
+      const day = [
+        mockExpense({ amount: 12345 as Kurus }),
+        mockExpense({ amount: 1 as Kurus }),
+        mockExpense({ amount: 99900 as Kurus }),
+      ]
+      expect(dayTotal(day)).toBe(112246)
+    })
+
+    it('is zero for an empty day', () => {
+      expect(dayTotal([])).toBe(0)
     })
   })
 })
