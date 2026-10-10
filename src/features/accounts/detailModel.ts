@@ -1,8 +1,9 @@
-import { dailyInterestCost, lifetimeInterest, projectedInterest } from '../../domain/interest'
+import { carriedStatementBalance, dailyInterestCost, lifetimeInterest, projectedInterest } from '../../domain/interest'
 import { viewStatement } from '../../domain/statement'
 import type { CardAccount, KmhAccount, Kurus } from '../../domain/types'
 import { formatShort } from '../../domain/dates'
 import { CURRENT_RATES } from '../../domain/rates'
+import { formatPercent } from '../../domain/money'
 
 export interface InterestPanelData {
   totalInterest: Kurus
@@ -164,20 +165,36 @@ export function interestSourceLine(historyCycles: number, hasCurrentEstimate: bo
   return 'Henüz faiz kaydı yok'
 }
 
-/** A monthly rate as Turkish text: 4.25 → "%4,25". */
-export function formatRate(rate: number): string {
-  return `%${rate.toLocaleString('tr-TR', { maximumFractionDigits: 2 })}`
-}
-
 /**
  * Where the rate behind an interest estimate comes from. `override` is the user's own
  * monthly contractual rate; otherwise the TCMB ceiling in force (`effective` date) is used.
  */
 export function rateCaption(opts: { override: number | null; contractual: number; effective: string; cash?: boolean }): string {
   const tail = 'KKDF ve BSMV dahil. Tahmindir; kesin tutar ekstrendedir.'
-  if (opts.override !== null) return `Oran: senin girdiğin aylık ${formatRate(opts.override)} akdi. ${tail}`
+  if (opts.override !== null) return `Oran: senin girdiğin aylık ${formatPercent(opts.override)} akdi. ${tail}`
   const source = opts.cash ? 'TCMB azami nakit çekme oranı' : 'TCMB azami oranları'
-  return `Oran: ${source} (${opts.effective}), aylık ${formatRate(opts.contractual)} akdi. ${tail}`
+  return `Oran: ${source} (${opts.effective}), aylık ${formatPercent(opts.contractual)} akdi. ${tail}`
+}
+
+/**
+ * The daily interest figure is computed on the unpaid statement balance (statement debt
+ * minus what the payment state says was paid), not on "Kullanılan". When that balance is
+ * larger than what the card shows as used, the user has most likely paid at the bank and
+ * not marked it here. Returns the first line still carrying a balance (to open its
+ * statement), or null when the figures agree.
+ */
+export function staleStatementLine(account: CardAccount, today: Date): number | null {
+  const used = Math.max(0, account.limit - account.available)
+  let carried = 0
+  let first: number | null = null
+  for (let i = 0; i < account.lines.length; i++) {
+    const c = carriedStatementBalance(account, i, today)
+    if (c > 0) {
+      carried += c
+      first ??= i
+    }
+  }
+  return carried > used ? first : null
 }
 
 /** Primary action of the detail sheet: add an expense paid from this account. */

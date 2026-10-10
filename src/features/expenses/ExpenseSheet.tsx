@@ -26,7 +26,7 @@ import { Sheet } from '../../ui/components/Sheet'
 import { Icon } from '../../ui/components/Icon'
 import { figure } from '../../ui/components/Amount'
 import { toast } from '../../ui/components/toast'
-import { interestNudgeAmount, previewAvailable, validateCategoryName } from './expenseModel'
+import { installmentPreview, interestNudgeAmount, previewAvailable, validateCategoryName } from './expenseModel'
 import './expense-sheet.css'
 
 export interface ExpenseSheetProps {
@@ -215,6 +215,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
     }
   }
 
+  const installmentText = isInstallment ? installmentPreview(amount, parseInt(installments, 10), affectsAccount) : null
   const afterIsNegative = (availableAfter ?? 0) < 0
   const hasLimit = selectedAccount?.kind === 'card' || selectedAccount?.kind === 'kmh'
 
@@ -240,7 +241,8 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
           </Button>
         )}
 
-        <MoneyField label="Tutar" value={amount} onChange={setAmount} error={amountError} size="hero" autofocus />
+        {/* Only a new expense opens on the keyboard; editing opens on the heading. */}
+        <MoneyField label="Tutar" value={amount} onChange={setAmount} error={amountError} size="hero" autofocus={!isEdit} />
 
         {accountList.length === 0 ? (
           <div class="expense-account-empty">
@@ -346,6 +348,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
                 look="chips"
               />
             )}
+            {installmentText && <p class="expense-installment-preview num">{installmentText}</p>}
           </div>
         )}
 
@@ -371,7 +374,8 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
         {monthlyInterest !== null && (
           <p class="expense-interest">
             Bu harcamayı ödemeyip taşırsan ayda{' '}
-            <strong class="expense-interest-figure num">~{figure(formatTLExact(monthlyInterest))}</strong> faiz işler.
+            <strong class="expense-interest-figure num">~{figure(formatTLExact(monthlyInterest))}</strong> faiz işler (vergiler
+            dahil).
           </p>
         )}
       </div>

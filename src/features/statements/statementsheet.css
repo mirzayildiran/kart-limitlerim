@@ -15,63 +15,99 @@
   flex-direction: column;
   gap: 0.5rem;
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 
-.statement-sheet-footer {
+.statement-minimum-warn {
+  /* Pulled up toward the field it is about (status note as footnote, DESIGN.md Layout). */
+  margin-top: calc(var(--s-3) * -1);
+  padding: var(--s-3) var(--s-4);
+  background: var(--warn-soft);
+  border: 1px solid var(--warn-line);
+  color: var(--ink);
+  border-radius: var(--r-lg);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+/* Interest box: rose only on the figure; title and rows stay ink and muted on the rose wash. */
+.statement-interest {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.statement-sheet-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-/* The two quick payments stay one line each at 360 px. */
-.statement-sheet-actions .btn {
-  padding: 0 var(--s-2);
-  white-space: nowrap;
-}
-
-/* Interest box: rose only on the figure; title and breakdown stay ink and muted on the rose wash. */
-.statement-interest {
-  padding: 12px 14px;
+  gap: var(--s-2);
+  padding: var(--s-4);
   background-color: var(--crit-soft);
   color: var(--ink);
-  border-radius: var(--r-md);
-}
-
-.statement-interest-figure {
-  color: var(--crit);
-  font-family: var(--font-display);
-  font-weight: 700;
+  border-radius: var(--r-lg);
 }
 
 .statement-interest-ok {
   background-color: var(--accent-soft);
-  color: var(--ok);
+  color: var(--ink);
+  font-size: var(--text-sm);
 }
 
 .statement-interest-title {
-  margin: 0 0 0.5rem 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
   font-weight: 600;
-  line-height: 1.4;
+  letter-spacing: 0;
+  line-height: 1.35;
 }
 
-.statement-interest-detail {
-  margin: 0.25rem 0;
-  font-size: 0.8125rem;
-  color: var(--muted);
-  line-height: 1.4;
+.statement-interest-figure {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--crit);
 }
 
-.statement-interest-minimum {
-  margin: 0.5rem 0 0 0;
-  font-size: 0.8125rem;
+.statement-interest-rows {
+  display: flex;
+  flex-direction: column;
+  margin: var(--s-1) 0 0;
+  font-size: var(--text-sm);
+}
+
+.statement-interest-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: 6px 0;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.statement-interest-row dt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.statement-interest-row dd {
+  margin: 0;
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statement-interest-when {
+  font-size: var(--text-xs);
   color: var(--muted);
-  line-height: 1.4;
+}
+
+.statement-interest-alt dt,
+.statement-interest-alt dd {
+  color: var(--muted);
+}
+
+.statement-interest-reassure {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  line-height: 1.45;
 }

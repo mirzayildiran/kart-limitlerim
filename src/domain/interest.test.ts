@@ -4,6 +4,7 @@ import {
   rateFor,
   projectedInterest,
   dailyInterestCost,
+  carriedStatementBalance,
   closeCycle,
   lifetimeInterest,
 } from './interest'
@@ -348,6 +349,56 @@ describe('interest calculations', () => {
       const tierRate = 3.25 // tier 1 rate for debt < 30.000 ₺
       const expected = Math.round(((carried * tierRate) / 100 / 30) * 1.3)
       expect(result).toBe(expected)
+    })
+  })
+
+  describe('dailyInterestCost follows the payment state', () => {
+    // Cut Jan 10, due Jan 20 (offset 10, a Tuesday), next cut Feb 10. Debt 1.000 ₺, minimum 400 ₺, tier 1 (%3,25 / %3,55).
+    const card = (line: Partial<CardLine>): CardAccount => ({
+      id: 'test',
+      kind: 'card',
+      name: 'Test',
+      limit: 500000,
+      available: 250000,
+      lines: [{ id: 'line1', label: 'Main', cutDay: 10, dueOffsetDays: 10, cycle: '2026-01', statementDebt: 100000, minimumDue: 40000, payment: 'unpaid', ...line }],
+      updatedAt: 0,
+      createdAt: 0,
+    })
+    const beforeDue = new Date(2026, 0, 15)
+    const afterDue = new Date(2026, 0, 25)
+    const daily = (carriedContractual: number, carriedLate = 0) =>
+      Math.round(((carriedContractual * 3.25 + carriedLate * 3.55) / 100 / 30) * 1.3)
+
+    it('counts the minimum as paid when the state is "minimum" (was: whole debt)', () => {
+      // Before the fix paidAmount (null) was read, so the whole 1.000 ₺ looked carried.
+      expect(dailyInterestCost(card({ payment: 'minimum', paidAmount: null }), 0, beforeDue)).toBe(daily(60000))
+    })
+
+    it('uses the estimated minimum when none is stated', () => {
+      // Limit 5.000 ₺ ≤ 100.000 ₺ → %20 of 1.000 ₺ = 200 ₺ paid.
+      expect(dailyInterestCost(card({ payment: 'minimum', minimumDue: null }), 0, beforeDue)).toBe(daily(80000))
+    })
+
+    it('ignores a stale paidAmount when the state is "unpaid"', () => {
+      expect(dailyInterestCost(card({ payment: 'unpaid', paidAmount: 30000 }), 0, beforeDue)).toBe(daily(100000))
+    })
+
+    it('charges the unpaid minimum at the late rate once the due date has passed', () => {
+      // Unpaid: 400 ₺ of the minimum runs late, the other 600 ₺ contractual.
+      expect(dailyInterestCost(card({ payment: 'unpaid' }), 0, afterDue)).toBe(daily(60000, 40000))
+      // Partial 100 ₺: 300 ₺ of the minimum is still short.
+      expect(dailyInterestCost(card({ payment: 'partial', paidAmount: 10000 }), 0, afterDue)).toBe(daily(60000, 30000))
+      // Minimum paid: nothing runs late.
+      expect(dailyInterestCost(card({ payment: 'minimum' }), 0, afterDue)).toBe(daily(60000))
+    })
+
+    it('carriedStatementBalance is debt minus what the state says was paid', () => {
+      expect(carriedStatementBalance(card({ payment: 'unpaid', paidAmount: 30000 }), 0, beforeDue)).toBe(100000)
+      expect(carriedStatementBalance(card({ payment: 'partial', paidAmount: 30000 }), 0, beforeDue)).toBe(70000)
+      expect(carriedStatementBalance(card({ payment: 'minimum' }), 0, beforeDue)).toBe(60000)
+      expect(carriedStatementBalance(card({ payment: 'full' }), 0, beforeDue)).toBe(0)
+      expect(carriedStatementBalance(card({ statementDebt: null }), 0, beforeDue)).toBe(0)
+      expect(carriedStatementBalance(card({}), 3, beforeDue)).toBe(0)
     })
   })
 

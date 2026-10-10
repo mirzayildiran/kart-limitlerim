@@ -6,6 +6,8 @@ import {
   updateStatementLine,
   getMinimumHint,
   statementInterestPreview,
+  minimumBelowEstimate,
+  interestBoxTitle,
   type StatementFormState,
 } from './statementForm'
 import type { CardLine, CardAccount } from '../../domain/types'
@@ -167,6 +169,54 @@ describe('statementForm', () => {
       expect(updated.label).toBe(mockLine.label)
       expect(updated.cutDay).toBe(mockLine.cutDay)
     })
+
+    it('keeps paidAmount only for a partial payment', () => {
+      const base: StatementFormState = {
+        statementDebt: 100000,
+        minimumDue: 20000,
+        dueDate: null,
+        payment: 'partial',
+        paidAmount: 30000,
+        interestCharged: null,
+      }
+      expect(updateStatementLine(mockLine, { ...base, payment: 'unpaid' }, '2026-10').paidAmount).toBeNull()
+      expect(updateStatementLine(mockLine, { ...base, payment: 'minimum' }, '2026-10').paidAmount).toBeNull()
+      expect(updateStatementLine(mockLine, { ...base, payment: 'full' }, '2026-10').paidAmount).toBeNull()
+      expect(updateStatementLine(mockLine, base, '2026-10').paidAmount).toBe(30000)
+    })
+  })
+
+  describe('minimumBelowEstimate', () => {
+    // Limit 1.000 ₺ ≤ 100.000 ₺ → estimate is %20 of the debt.
+    it('is false without a debt or a typed minimum', () => {
+      expect(minimumBelowEstimate({ statementDebt: null, minimumDue: 100 }, 100000)).toBe(false)
+      expect(minimumBelowEstimate({ statementDebt: 0, minimumDue: 0 }, 100000)).toBe(false)
+      expect(minimumBelowEstimate({ statementDebt: 500000, minimumDue: null }, 100000)).toBe(false)
+    })
+
+    it('is true when the typed minimum is clearly under the estimate', () => {
+      // 5.000 ₺ debt → estimate 1.000 ₺; 500 ₺ typed.
+      expect(minimumBelowEstimate({ statementDebt: 500000, minimumDue: 50000 }, 100000)).toBe(true)
+    })
+
+    it('tolerates up to 1 ₺ of rounding and any higher minimum', () => {
+      expect(minimumBelowEstimate({ statementDebt: 500000, minimumDue: 99900 }, 100000)).toBe(false)
+      expect(minimumBelowEstimate({ statementDebt: 500000, minimumDue: 99899 }, 100000)).toBe(true)
+      expect(minimumBelowEstimate({ statementDebt: 500000, minimumDue: 150000 }, 100000)).toBe(false)
+    })
+
+    it('uses the %40 ratio above a 100.000 ₺ limit', () => {
+      // 5.000 ₺ debt on a 200.000 ₺ limit → estimate 2.000 ₺.
+      expect(minimumBelowEstimate({ statementDebt: 500000, minimumDue: 150000 }, 20_000_000)).toBe(true)
+    })
+  })
+
+  describe('interestBoxTitle', () => {
+    it('names the scenario the figure was computed for', () => {
+      expect(interestBoxTitle('unpaid')).toBe('Ödemezsen bu ekstrede işleyecek faiz')
+      expect(interestBoxTitle('partial')).toBe('Kalanı ödemezsen bu ekstrede işleyecek faiz')
+      expect(interestBoxTitle('minimum')).toBe('Yalnız asgariyi ödersen bu ekstrede işleyecek faiz')
+    })
   })
 
   describe('getMinimumHint', () => {
@@ -183,6 +233,10 @@ describe('statementForm', () => {
       expect(hint).toContain('Tahmini')
       expect(hint).toContain('₺')
       expect(hint).toContain('BDDK')
+    })
+
+    it('writes the BDDK ratios as Turkish percentages', () => {
+      expect(getMinimumHint(500000, 100000)).toBe("Tahmini: 1.000 ₺ (BDDK: limit 100.000 ₺'ye kadar %20, üstü %40)")
     })
 
     it('includes estimate in hint', () => {
@@ -329,5 +383,11 @@ describe('statementInterestPreview — bank example', () => {
     expect(p.contractual + p.late).toBe(3580)
     expect(p.taxes).toBe(1074) // 15% KKDF + 15% BSMV
     expect(p.total).toBe(4654)
+    // The box names this scenario and the two rates behind the rows.
+    expect(p.scenario).toBe('unpaid')
+    expect(p.rate).toBe(3.5)
+    expect(p.lateRate).toBe(3.8)
+    // Paying only the 400 ₺ minimum: no late interest; 600 ₺ carried for 30 days at %3,5 → 2.100 + %30 tax.
+    expect(p.minimumScenario).toBe(2730)
   })
 })

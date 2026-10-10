@@ -1,6 +1,6 @@
 import { daysBetween, cycleKeyOf, fromIso, dayInMonth } from './dates'
 import { estimateMinimum, INTEREST_TAXES, cardTierFor, CURRENT_RATES } from './rates'
-import { viewStatement, lastCut, estimatedDueDate, rollToCurrentCycle } from './statement'
+import { viewStatement, lastCut, estimatedDueDate, rollToCurrentCycle, type StatementView } from './statement'
 import type { CardAccount, CardLine, Kurus } from './types'
 
 /**
@@ -135,24 +135,7 @@ export function projectedInterest(
   const rate = rateFor(account, debt)
 
   // Determine paid amount based on scenario
-  let paid: Kurus
-  if (scenario === 'none') {
-    paid = 0
-  } else if (scenario === 'minimum') {
-    paid = minimum
-  } else {
-    // 'asEntered': use the view's payment state
-    if (view.payment === 'full') {
-      paid = debt
-    } else if (view.payment === 'minimum') {
-      paid = minimum
-    } else if (view.payment === 'partial') {
-      paid = view.paidAmount ?? 0
-    } else {
-      // 'unpaid'
-      paid = 0
-    }
-  }
+  const paid = scenario === 'none' ? 0 : scenario === 'minimum' ? minimum : paidAsEntered(view, minimum)
 
   return statementInterest({
     debt,
@@ -166,9 +149,35 @@ export function projectedInterest(
 }
 
 /**
- * Calculate the daily cost of carrying the current balance.
- * Returns interest + taxes that one day of the carried balance costs.
- * Returns null when carried balance <= 0 or debt unknown.
+ * What the payment state says has been paid toward the statement. Only a partial
+ * payment reads `paidAmount`; "minimum" counts the (stated or estimated) minimum and
+ * "unpaid" counts nothing, so a stale `paidAmount` left from an earlier state is ignored.
+ */
+export function paidAsEntered(view: Pick<StatementView, 'statementDebt' | 'payment' | 'paidAmount'>, minimum: Kurus): Kurus {
+  if (view.payment === 'full') return view.statementDebt ?? 0
+  if (view.payment === 'minimum') return minimum
+  if (view.payment === 'partial') return view.paidAmount ?? 0
+  return 0
+}
+
+/**
+ * The part of the current statement that is still unpaid on this line, as the
+ * payment state says (statement debt − what was paid). 0 when unknown or settled.
+ */
+export function carriedStatementBalance(account: CardAccount, lineIndex: number, today: Date): Kurus {
+  const line = account.lines[lineIndex]
+  if (!line) return 0
+  const view = viewStatement(line, today)
+  if (view.statementDebt == null) return 0
+  const minimum = view.minimumDue ?? estimateMinimum(view.statementDebt, account.limit)
+  return Math.max(0, view.statementDebt - paidAsEntered(view, minimum))
+}
+
+/**
+ * The daily cost (interest + KKDF + BSMV) of the unpaid statement balance, on the same
+ * basis as statementInterest: contractual rate on the carried balance; once the due date
+ * has passed, the unpaid part of the minimum runs at the late rate instead.
+ * Returns null when nothing is carried or the debt is unknown.
  */
 export function dailyInterestCost(
   account: CardAccount,
@@ -181,21 +190,19 @@ export function dailyInterestCost(
   const view = viewStatement(line, today)
   if (view.statementDebt == null) return null
 
-  // Carried balance = debt - paid so far
-  let paidSoFar: Kurus
-  if (view.payment === 'full') {
-    paidSoFar = view.statementDebt
-  } else {
-    paidSoFar = view.paidAmount ?? 0
-  }
-
-  const carried = view.statementDebt - paidSoFar
+  const debt = view.statementDebt
+  const minimum = view.minimumDue ?? estimateMinimum(debt, account.limit)
+  const paid = paidAsEntered(view, minimum)
+  const carried = debt - paid
   if (carried <= 0) return null
 
-  const rate = rateFor(account, view.statementDebt)
-  // Daily cost: carried × a/100 / 30 × 1.30 (includes taxes)
-  const value = Math.round(((carried * rate.contractual) / 100 / 30) * 1.3)
-  return value
+  const rate = rateFor(account, debt)
+  const pastDue = daysBetween(today, view.due) > 0
+  const lateBase = pastDue ? Math.min(carried, Math.max(0, minimum - paid)) : 0
+  const interest = ((carried - lateBase) * rate.contractual + lateBase * rate.late) / 100 / 30
+  // Taxes as whole percent (30) so 1 + 0.15 + 0.15 does not drift below 1.30 in floating point.
+  const taxPercent = Math.round((INTEREST_TAXES.kkdf + INTEREST_TAXES.bsmv) * 100)
+  return Math.round((interest * (100 + taxPercent)) / 100)
 }
 
 /**

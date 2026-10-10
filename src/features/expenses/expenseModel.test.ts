@@ -7,6 +7,7 @@ import {
   previewAvailable,
   validateCategoryName,
   interestNudge,
+  installmentPreview,
   interestNudgeAmount,
   monthNavigation,
   filterExpenses,
@@ -196,7 +197,32 @@ describe('expenseModel', () => {
     })
   })
 
+  describe('installmentPreview', () => {
+    it('splits the total and says the whole amount leaves the limit', () => {
+      expect(installmentPreview(960000, 12, true)).toBe('12 × 800 ₺ · tamamı 9.600 ₺ limitten düşer')
+    })
+
+    it('marks an uneven split as approximate', () => {
+      expect(installmentPreview(100000, 3, true)).toBe('3 × ~333,33 ₺ · tamamı 1.000 ₺ limitten düşer')
+    })
+
+    it('does not claim the limit drops when the switch is off', () => {
+      expect(installmentPreview(960000, 12, false)).toBe('12 × 800 ₺ · toplam 9.600 ₺')
+    })
+
+    it('is null without an amount or a split', () => {
+      expect(installmentPreview(null, 6, true)).toBeNull()
+      expect(installmentPreview(0, 6, true)).toBeNull()
+      expect(installmentPreview(960000, 1, true)).toBeNull()
+      expect(installmentPreview(960000, Number.NaN, true)).toBeNull()
+    })
+  })
+
   describe('interestNudge', () => {
+    it('ends by saying taxes are included', () => {
+      expect(interestNudge(mockCardAccount(), 100000)).toMatch(/faiz işler \(vergiler dahil\)\.$/)
+    })
+
     it('returns null for zero or negative amounts', () => {
       const account = mockCardAccount()
       expect(interestNudge(account, 0)).toBeNull()

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatInput, formatNumberTL, formatNumberTLExact, formatTL, formatTLExact, parseTL, toLira, toKurus } from './money'
+import { formatInput, formatNumberTL, formatPercent, formatNumberTLExact, formatTL, formatTLExact, parseTL, toLira, toKurus } from './money'
 
 describe('money', () => {
   describe('toKurus', () => {
@@ -186,6 +186,23 @@ describe('money', () => {
       expect(formatInput(1250)).toBe('12,50')
       expect(formatInput(123400)).toBe('1.234')
       expect(parseTL(formatInput(1250))).toBe(1250)
+    })
+  })
+
+  describe('formatPercent', () => {
+    it('puts the sign first and uses a decimal comma', () => {
+      expect(formatPercent(3.25)).toBe('%3,25')
+      expect(formatPercent(4.55)).toBe('%4,55')
+    })
+
+    it('drops a zero fraction and keeps at most two digits', () => {
+      expect(formatPercent(20)).toBe('%20')
+      expect(formatPercent(3.5)).toBe('%3,5')
+      expect(formatPercent(3.333)).toBe('%3,33')
+    })
+
+    it('groups thousands the Turkish way', () => {
+      expect(formatPercent(1250)).toBe('%1.250')
     })
   })
 })

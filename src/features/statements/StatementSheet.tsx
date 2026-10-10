@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useId, useState } from 'preact/hooks'
 import { computed } from '@preact/signals'
 import type { SheetRequest } from '../../ui/nav'
 import { closeSheet } from '../../ui/nav'
@@ -7,7 +7,7 @@ import { Button, MoneyField, TextField, Choice } from '../../ui/components/contr
 import { toast } from '../../ui/components/toast'
 import { saveAccount, today, accountById } from '../../data/store'
 import { formatLong, toIso } from '../../domain/dates'
-import { formatTLExact } from '../../domain/money'
+import { formatPercent, formatTLExact } from '../../domain/money'
 import { viewStatement, rollToCurrentCycle } from '../../domain/statement'
 import { figure } from '../../ui/components/Amount'
 import {
@@ -16,6 +16,8 @@ import {
   isStatementFormValid,
   updateStatementLine,
   getMinimumHint,
+  interestBoxTitle,
+  minimumBelowEstimate,
   statementInterestPreview,
   type StatementFormState,
   type StatementFormErrors,
@@ -37,6 +39,7 @@ export function StatementSheet({ request }: StatementSheetProps) {
   const [formState, setFormState] = useState<StatementFormState>(() => initStatementFormState(currentLine ?? line!))
   const [errors, setErrors] = useState<StatementFormErrors>({})
   const [viewState, setViewState] = useState<ViewState>('form')
+  const interestTitleId = useId()
 
   // Redirect if account or line not found
   useEffect(() => {
@@ -51,32 +54,18 @@ export function StatementSheet({ request }: StatementSheetProps) {
 
   const view = viewStatement(currentLine, today.value)
   const cycle = view.cycle
-  const title = `${account.name} · ${line.label}`
 
-  const handleQuickSave = async (payment: 'minimum' | 'full') => {
-    const newForm: StatementFormState = {
-      ...formState,
-      payment: payment === 'minimum' ? 'minimum' : 'full',
-      paidAmount: payment === 'minimum' ? (formState.minimumDue ?? 0) : (formState.statementDebt ?? 0),
-    }
-    await performSave(newForm)
-  }
-
+  // One commit path: the payment segment sets the state, "Kaydet" validates and saves it.
   const handleSave = async () => {
     const newErrors = validateStatementForm(formState)
     setErrors(newErrors)
 
     if (!isStatementFormValid(newErrors)) return
 
-    await performSave(formState)
-  }
-
-  const performSave = async (form: StatementFormState) => {
     setViewState('saving')
     try {
       const newLines = [...account.lines]
-      const newLine = updateStatementLine(line, form, cycle)
-      newLines[lineIndex] = newLine
+      newLines[lineIndex] = updateStatementLine(line, formState, cycle)
 
       await saveAccount({ ...account, lines: newLines })
       toast('Ekstre kaydedildi')
@@ -99,43 +88,17 @@ export function StatementSheet({ request }: StatementSheetProps) {
   const dueDateString = toIso(estimatedDueDate)
 
   const minimumHint = getMinimumHint(formState.statementDebt, account.limit)
+  const minimumLow = minimumBelowEstimate(formState, account.limit)
+  const preview = statementInterestPreview(formState, account, view)
 
   const footer = (
-    <div class="statement-sheet-footer">
-      <div class="statement-sheet-actions">
-        <Button
-          type="button"
-          block
-          variant="secondary"
-          disabled={viewState !== 'form'}
-          onClick={() => handleQuickSave('minimum')}
-        >
-          Asgariyi ödedim
-        </Button>
-        <Button
-          type="button"
-          block
-          variant="secondary"
-          disabled={viewState !== 'form'}
-          onClick={() => handleQuickSave('full')}
-        >
-          Tamamını ödedim
-        </Button>
-      </div>
-      <Button
-        variant="primary"
-        block
-        type="button"
-        disabled={viewState !== 'form'}
-        onClick={handleSave}
-      >
-        {viewState === 'saving' ? 'Kaydediliyor…' : 'Kaydet'}
-      </Button>
-    </div>
+    <Button variant="primary" block type="button" disabled={viewState !== 'form'} onClick={handleSave}>
+      {viewState === 'saving' ? 'Kaydediliyor…' : 'Kaydet'}
+    </Button>
   )
 
   return (
-    <Sheet open title={title} onClose={closeSheet} footer={footer}>
+    <Sheet open title="Ekstre" subtitle={`${account.name} · ${line.label}`} onClose={closeSheet} footer={footer}>
       <div class="statement-sheet">
         <div class="statement-summary">
           <p>
@@ -158,6 +121,9 @@ export function StatementSheet({ request }: StatementSheetProps) {
           hint={minimumHint || undefined}
           error={errors.minimumDue}
         />
+        {minimumLow && !errors.minimumDue && (
+          <p class="statement-minimum-warn">Girdiğin asgari tahminin altında. Ekstrendeki tutarı kontrol et.</p>
+        )}
 
         <TextField
           label="Son ödeme tarihi"
@@ -191,32 +157,43 @@ export function StatementSheet({ request }: StatementSheetProps) {
           hint="Ekstrende geçen dönemden faiz yazıyorsa gir; toplam faiz hesabı bunu kullanır."
         />
 
-        {(() => {
-          const preview = statementInterestPreview(formState, account, view)
-          if (preview.kind === 'none') return null
-          if (preview.kind === 'paidFull') {
-            return (
-              <div class="statement-interest statement-interest-ok">
-                Tamamını ödediğin için bu ekstrede faiz işlemez.
+        {preview.kind === 'paidFull' && (
+          <p class="statement-interest statement-interest-ok">Tamamını ödediğin için bu ekstrede faiz işlemez.</p>
+        )}
+        {preview.kind === 'charge' && (
+          <section class="statement-interest" aria-labelledby={interestTitleId}>
+            <h3 class="statement-interest-title" id={interestTitleId}>
+              {interestBoxTitle(preview.scenario)}
+            </h3>
+            <p class="statement-interest-figure num">~{figure(formatTLExact(preview.total))}</p>
+            <dl class="statement-interest-rows">
+              <div class="statement-interest-row">
+                <dt>Akdi faiz · aylık {formatPercent(preview.rate)}</dt>
+                <dd class="num">{figure(formatTLExact(preview.contractual))}</dd>
               </div>
-            )
-          }
-          return (
-            <div class="statement-interest">
-              <p class="statement-interest-title">
-                Bu ekstrede işleyecek faiz:{' '}
-                <strong class="statement-interest-figure num">~{figure(formatTLExact(preview.total))}</strong>
-              </p>
-              <p class="statement-interest-detail">
-                Akdi {formatTLExact(preview.contractual)} + gecikme {formatTLExact(preview.late)} + vergiler{' '}
-                {formatTLExact(preview.taxes)} · aylık %{preview.rate}
-              </p>
-              {preview.minimumScenario !== null && (
-                <p class="statement-interest-minimum">Yalnız asgariyi ödersen: ~{formatTLExact(preview.minimumScenario)}</p>
+              {preview.late > 0 && (
+                <div class="statement-interest-row">
+                  <dt>
+                    Gecikme faizi · aylık {formatPercent(preview.lateRate)}
+                    <span class="statement-interest-when">Son ödeme geçer ve asgari eksik kalırsa</span>
+                  </dt>
+                  <dd class="num">{figure(formatTLExact(preview.late))}</dd>
+                </div>
               )}
-            </div>
-          )
-        })()}
+              <div class="statement-interest-row">
+                <dt>KKDF + BSMV</dt>
+                <dd class="num">{figure(formatTLExact(preview.taxes))}</dd>
+              </div>
+              {preview.minimumScenario !== null && (
+                <div class="statement-interest-row statement-interest-alt">
+                  <dt>Yalnız asgariyi ödersen</dt>
+                  <dd class="num">~{figure(formatTLExact(preview.minimumScenario))}</dd>
+                </div>
+              )}
+            </dl>
+            <p class="statement-interest-reassure">Tamamını son ödemeye kadar ödersen faiz işlemez.</p>
+          </section>
+        )}
       </div>
     </Sheet>
   )
