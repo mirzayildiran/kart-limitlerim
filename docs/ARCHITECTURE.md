@@ -9,6 +9,8 @@ Bu belge kodun nasıl düzenlendiğini, verinin nereden nereye aktığını ve i
 | `src/domain/` | Saf iş mantığı: para, tarih, ekstre dönemi, harcama gücü, faiz, oranlar, düzenli ödemeler. UI ve tarayıcı API'si yok. Her dosyanın `*.test.ts` dosyası var. |
 | `src/data/` | `db.ts` IndexedDB şeması ve işlemleri, `backup.ts` yedek biçimi ve doğrulama, `store.ts` uygulama durumu ve eylemler. |
 | `src/ocr/` | Ekran görüntüsünden harcama okuma: önişleme, Tesseract motoru, ikinci okuma, banka ayrıştırıcıları, kategori önerisi. |
+| `src/ai/` | Bütçe asistanı sağlayıcı katmanı: aracıyla konuşma sözleşmesi (`protocol.ts`), istek doğrulama, sistem istemi, tarayıcı istemcisi. |
+| `worker/assistant-proxy/` | Cloudflare Worker: yapay zekâ anahtarlarını tutan aracı sunucu. |
 | `src/ui/` | Tasarım sistemi: `tokens.css` (renkler, boşluklar), `base.css`, `components/` (Sheet, Button, MoneyField, LimitStrip, TabBar…), `nav.ts` (sayfa ve pencere durumu), `theme.ts`. |
 | `src/features/` | Ekranlar. `home/`, `accounts/`, `expenses/`, `statements/`, `calendar/`, `recurring/`, `categories/`, `settings/`, `import/`. `SheetHost.tsx` açık pencereyi gösterir. |
 | `scripts/` | `copy-ocr-assets.mjs` (OCR dosyalarını `public/ocr/` içine kopyalar, `predev` ve `prebuild` sırasında çalışır), `check-css.mjs` (renk kontrolü, `lint` içinde), `ocr-smoke.mjs` (Node'da OCR denemesi; test ve CI'da değil). |
@@ -43,6 +45,22 @@ Tema tercihi tek başına `localStorage` içinde (`kl:theme`) tutulur. Bu, veri 
 - İçe aktarma: önce `parseBackup` dosyayı doğrular (uygulama adı, şema sürümü, beş listenin varlığı ve her kaydın `id`'si). Doğrulama geçerse kullanıcı onaylar, sonra `restoreBackup` beş mağazayı tek işlemde temizleyip yeniden yazar. Yarım kalan geri yükleme olmaz.
 - Şema sürümü 1 dışındaki yedekler reddedilir. Daha yeni bir sürümden alınmış yedek için uygulamanın güncellenmesi istenir.
 - Yedek hiçbir yere gönderilmez; kullanıcı dosyayı kendisi saklar.
+
+## Bütçe asistanı
+
+İki katman var:
+
+1. **Öneriler** (`src/domain/insights.ts`): kurala dayalıdır, cihazda çalışır, ağa çıkmaz. Kesime kadar nakit açığı, yaklaşan ve geciken asgari ödemeler, limiti azalan kart ya da KMH, KMH günlük faizi, asgari ödeme faizi, kategori artışı (bu ayın ilk N günü ile geçen ayın aynı günleri) ve "bugün hangi kartla öde" (bugünkü alışverişin son ödemesine en uzun süre kalan kart). Tutarlar `power.ts`, `interest.ts` ve `statement.ts` hesaplarından gelir.
+2. **Sohbet** (`src/features/assistant/`, `src/ai/`, `worker/assistant-proxy/`): varsayılan kapalıdır. Kullanıcı onay ekranında gönderilecek özeti görüp kabul edince açılır; onay `localStorage`'da (`kl:assistant-consent`, sürümlü) tutulur.
+
+Sohbet akışı:
+
+1. `budgetSummary` (`src/domain/insightsSummary.ts`) toplamları, hesap adlarını, ekstre rakamlarını, kategori karşılaştırmasını ve önerileri hazır biçimlenmiş metinler olarak bir özet nesnesine koyar. Tek tek harcama, not, kimlik ve düzenli ödeme adı girmez.
+2. `askAssistant` (`src/ai/client.ts`) özeti ve son 12 mesajı aracıya gönderir (30 sn zaman aşımı). Aracının adresi derleme sırasında `VITE_ASSISTANT_PROXY_URL` ile verilir; yoksa sohbet kapalıdır.
+3. Worker kaynağı (`ALLOWED_ORIGINS`), boyutu ve biçimi (`parseAssistantRequest`) denetler, IP başına hız sınırı uygular, sistem istemini (`SYSTEM_PROMPT`) ve özeti ekleyip Gemini, Groq ve OpenRouter'ı bu sırayla dener. İstek içeriği günlüğe yazılmaz.
+4. Model yalnızca özetteki rakamları kullanır; yeni hesap yapmaz. Her yanıtın altına "Tahmindir, finansal tavsiye değildir." ibaresini uygulama ekler.
+
+Sohbet geçmişi yalnızca bellekte tutulur. Worker, `main` dalına her gönderimde `deploy.yml` içindeki `scripts/deploy-assistant.sh` ile kurulur (depo gizli değerleri: `CLOUDFLARE_API_TOKEN`, `GEMINI_API_KEY`, `GROQ_API_KEY`, isteğe bağlı `OPENROUTER_API_KEY`).
 
 ## Para ve tarih kuralları
 
