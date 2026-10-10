@@ -219,6 +219,46 @@ describe('providers', () => {
     expect(sent).toMatchObject({ model: 'openai/gpt-oss-120b', reasoning_effort: 'low' })
   })
 
+  it('falls through to OpenRouter with its model fallback list', async () => {
+    const fetchMock = stubFetch((url) =>
+      url.includes('openrouter.ai') ? groqReply('Merhaba') : new Response('down', { status: 503 }),
+    )
+    const res = await worker.fetch(post(nextIp(), validBody()), env())
+
+    expect(await res.json()).toEqual({ text: 'Merhaba', provider: 'openrouter' })
+    const sent = JSON.parse(String(fetchMock.mock.calls[2][1]?.body)) as { model: string; models: string[] }
+    expect(sent.models.length).toBeGreaterThan(1)
+    expect(sent.model).toBe(sent.models[0])
+    expect(sent.models.every((m) => m.endsWith(':free'))).toBe(true)
+  })
+
+  it('times out a hanging provider and answers 503 within the total budget', async () => {
+    vi.useFakeTimers()
+    try {
+      // Every provider hangs until its request is aborted.
+      const fetchMock = stubFetch(
+        (_url, init) =>
+          new Promise<Response>((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')))
+          }),
+      )
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const pending = worker.fetch(post(nextIp(), validBody()), env())
+
+      await vi.advanceTimersByTimeAsync(12_000)
+      expect(fetchMock).toHaveBeenCalledTimes(2) // Gemini gave up after 12 s, Groq started.
+      await vi.advanceTimersByTimeAsync(12_000)
+
+      const res = await pending
+      expect(res.status).toBe(503)
+      expect(await res.json()).toEqual({ error: 'unavailable' })
+      // 1 s of the 25 s budget was left, too little to start OpenRouter.
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('returns 503 unavailable without provider error text when every provider fails', async () => {
     const fetchMock = stubFetch(() => new Response('PROVIDER-DETAIL-SECRET', { status: 500 }))
     const res = await worker.fetch(post(nextIp(), validBody()), env())
