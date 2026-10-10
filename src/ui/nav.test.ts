@@ -166,6 +166,23 @@ describe('route change', () => {
     expect(doc.transitions[0].skipTransition).toHaveBeenCalled()
   })
 
+  it('handles the rejections an aborted transition raises', () => {
+    // A transition skipped by a new tap, or started on first load, rejects these three.
+    const handled = () => ({ catch: vi.fn() })
+    const t = { skipTransition: vi.fn(), ready: handled(), finished: handled(), updateCallbackDone: handled() }
+    doc = makeDocument(true)
+    doc.startViewTransition = vi.fn((cb: () => Promise<void>) => {
+      void cb()
+      return t
+    })
+    vi.stubGlobal('document', doc)
+    navigate('#/ayarlar')
+    expect(nav.route.value).toBe('settings')
+    expect(t.ready.catch).toHaveBeenCalled()
+    expect(t.finished.catch).toHaveBeenCalled()
+    expect(t.updateCallbackDone.catch).toHaveBeenCalled()
+  })
+
   it('the same tab does not start a transition', () => {
     doc = makeDocument(true)
     vi.stubGlobal('document', doc)
