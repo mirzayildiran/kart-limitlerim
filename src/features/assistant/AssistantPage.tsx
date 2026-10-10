@@ -140,7 +140,7 @@ export function AssistantPage() {
       </section>
 
       {PROXY_URL === null ? (
-        <p class="assistant-quiet">Sohbet bu sürümde kapalı. Yukarıdaki öneriler yine de çalışır.</p>
+        <p class="assistant-quiet">Sohbet şu an kullanılamıyor. Yukarıdaki öneriler yine de çalışır.</p>
       ) : (
         <section class="assistant-section" aria-labelledby="assistant-chat">
           <h2 class="assistant-section-title" id="assistant-chat">

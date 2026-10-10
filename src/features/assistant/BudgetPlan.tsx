@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { activeCategories, budgets, categories, categoryById, expenses, saveBudget, today } from '../../data/store'
+import { displayHue } from '../../domain/categories'
 import { budgetProgress, monthPace, type BudgetRow } from '../../domain/budget'
 import { formatTL } from '../../domain/money'
 import type { Kurus } from '../../domain/types'
@@ -150,11 +151,15 @@ export function BudgetPlan() {
       </div>
 
       {rows.length > 0 && (
-        <ul class="budget-plan-list">
+        /* One slate container, hairline rows, as the suggestions list on this page */
+        <ul class="budget-plan-slate">
           {rows.map((row) => (
-            <li key={row.categoryId} class="assistant-card budget-plan-row">
+            <li key={row.categoryId} class="budget-plan-item">
               <div class="budget-plan-head">
-                <span class="budget-plan-name cat-color" style={{ '--h': categoryById.value.get(row.categoryId)?.hue ?? 160 }}>
+                <span
+                  class="budget-plan-name cat-color"
+                  style={{ '--h': displayHue(categoryById.value.get(row.categoryId)?.hue ?? 160) }}
+                >
                   <span class="budget-plan-swatch" aria-hidden="true" />
                   {row.name}
                 </span>
@@ -177,14 +182,16 @@ export function BudgetPlan() {
       )}
 
       {editingCategory !== null && !editingInRows && (
-        <div class="assistant-card budget-plan-row">
-          <BudgetEditor
-            key={editingCategory.id}
-            categoryId={editingCategory.id}
-            name={editingCategory.name}
-            current={editingBudget}
-            onDone={() => setEditingId(null)}
-          />
+        <div class="budget-plan-slate">
+          <div class="budget-plan-item">
+            <BudgetEditor
+              key={editingCategory.id}
+              categoryId={editingCategory.id}
+              name={editingCategory.name}
+              current={editingBudget}
+              onDone={() => setEditingId(null)}
+            />
+          </div>
         </div>
       )}
 
@@ -213,7 +220,7 @@ export function BudgetPlan() {
                   key={c.id}
                   type="button"
                   class="budget-plan-chip cat-color"
-                  style={{ '--h': c.hue }}
+                  style={{ '--h': displayHue(c.hue) }}
                   onClick={() => openEditor(c.id)}
                 >
                   <span class="budget-plan-swatch" aria-hidden="true" />
