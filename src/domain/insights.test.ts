@@ -109,19 +109,19 @@ describe('computeInsights', () => {
     it('warns when the minimum is due in a few days', () => {
       const [s] = byKind(computeInsights(input({ accounts: [cardWith({ dueDate: '2026-10-12' })] })), 'statementDue')
       expect(s).toMatchObject({ id: 'statementDue:c1:0', severity: 'warn', amount: 1_000_000 })
-      expect(s.title).toBe('Akbank asgari ödemesi 2 gün sonra')
+      expect(s.title).toBe('Akbank ekstresinin asgari ödemesi 2 gün sonra')
       expect(s.body).toContain(formatTL(1_000_000))
       expect(s.body).not.toContain('tahmini')
     })
 
     it('warns when the minimum is due today', () => {
       const [s] = byKind(computeInsights(input({ accounts: [cardWith({ dueDate: '2026-10-10' })] })), 'statementDue')
-      expect(s).toMatchObject({ severity: 'warn', title: 'Akbank asgari ödemesi bugün' })
+      expect(s).toMatchObject({ severity: 'warn', title: 'Akbank ekstresinin asgari ödemesi bugün' })
     })
 
     it('is critical when the minimum is overdue', () => {
       const [s] = byKind(computeInsights(input({ accounts: [cardWith({ dueDate: '2026-10-08' })] })), 'statementDue')
-      expect(s).toMatchObject({ severity: 'crit', title: 'Akbank asgari ödemesi gecikti' })
+      expect(s).toMatchObject({ severity: 'crit', title: 'Akbank ekstresinin asgari ödemesi gecikti' })
     })
 
     it('does not fire when the due date is further away', () => {
@@ -153,14 +153,40 @@ describe('computeInsights', () => {
       })
       const items = byKind(computeInsights(input({ accounts: [multi] })), 'statementDue')
       expect(items.map((i) => i.id)).toEqual(['statementDue:c1:0', 'statementDue:c1:1'])
-      expect(items[1].title).toBe('Akbank Dijital asgari ödemesi 2 gün sonra')
+      expect(items[1].title).toBe('Akbank Dijital ekstresinin asgari ödemesi 2 gün sonra')
+    })
+
+    it('carries the statement target and the days until the due date', () => {
+      const multi = card({
+        lines: [
+          withStatement({ id: 'l1', label: 'Ana', dueDate: '2026-10-12' }),
+          withStatement({ id: 'l2', label: 'Dijital', dueDate: '2026-10-08' }),
+        ],
+      })
+      const items = byKind(computeInsights(input({ accounts: [multi] })), 'statementDue')
+      const first = items.find((i) => i.id === 'statementDue:c1:0')!
+      const second = items.find((i) => i.id === 'statementDue:c1:1')!
+      expect(first).toMatchObject({
+        target: { type: 'statement', accountId: 'c1', lineIndex: 0 },
+        dueInDays: 2,
+      })
+      expect(second).toMatchObject({
+        target: { type: 'statement', accountId: 'c1', lineIndex: 1 },
+        dueInDays: -2,
+        severity: 'crit',
+      })
     })
   })
 
   describe('cardNearLimit', () => {
     it('warns when a card has less than 10% of its limit free', () => {
       const [s] = byKind(computeInsights(input({ accounts: [card({ available: 500_000 })] })), 'cardNearLimit')
-      expect(s).toMatchObject({ id: 'cardNearLimit:c1', severity: 'warn', title: 'Akbank limiti azalıyor' })
+      expect(s).toMatchObject({
+        id: 'cardNearLimit:c1',
+        severity: 'warn',
+        title: 'Akbank limitinin büyük kısmı dolu',
+        target: { type: 'accountDetail', accountId: 'c1' },
+      })
       expect(s.body).toContain(formatTL(500_000))
     })
 
@@ -322,7 +348,13 @@ describe('computeInsights', () => {
 
     it('picks the card with the longest interest-free period, even with less free limit', () => {
       const [s] = byKind(computeInsights(input({ accounts: [akbank, yapi] })), 'bestCard')
-      expect(s).toMatchObject({ id: 'bestCard:c1', severity: 'info', title: 'Bugünkü alışveriş için Akbank', amount: 3_000_000 })
+      expect(s).toMatchObject({
+        id: 'bestCard:c1',
+        severity: 'info',
+        title: 'Bugünkü alışverişte en uzun faizsiz süre: Akbank',
+        amount: 3_000_000,
+        target: { type: 'accountDetail', accountId: 'c1' },
+      })
       expect(s.body).toContain('37 gün sonra')
       expect(s.body).toContain(formatTL(3_000_000))
     })
@@ -331,7 +363,25 @@ describe('computeInsights', () => {
       const a = card({ id: 'c1', name: 'Akbank', available: 2_000_000, lines: [line()] })
       const b = card({ id: 'c2', name: 'Yapı Kredi', available: 6_000_000, lines: [line()] })
       const [s] = byKind(computeInsights(input({ accounts: [a, b] })), 'bestCard')
-      expect(s.title).toBe('Bugünkü alışveriş için Yapı Kredi')
+      expect(s.title).toBe('Bugünkü alışverişte en uzun faizsiz süre: Yapı Kredi')
+    })
+
+    it('stays silent when the recommended card has less than a fifth of its limit free', () => {
+      // Akbank: 1.5M of 10M is 15%, below the 20% floor, even though its interest-free period is the longest.
+      const low = card({ id: 'c1', name: 'Akbank', available: 1_500_000, lines: [line({ cutDay: 5, dueOffsetDays: 10 })] })
+      expect(byKind(computeInsights(input({ accounts: [low, yapi] })), 'bestCard')).toHaveLength(0)
+    })
+
+    it('stays silent when the recommended card has less than 1.000 ₺ free', () => {
+      // 900 ₺ free on a 2.000 ₺ limit: half the limit is free, but it is under the 1.000 ₺ floor.
+      const tiny = card({ id: 'c1', name: 'Akbank', limit: 200_000, available: 90_000, lines: [line({ cutDay: 5, dueOffsetDays: 10 })] })
+      expect(byKind(computeInsights(input({ accounts: [tiny, yapi] })), 'bestCard')).toHaveLength(0)
+    })
+
+    it('does not fall back to another card when the best one is too full', () => {
+      // Akbank has the longest period but only 5% free; Yapı Kredi has room, but the rule names only the best card.
+      const full = card({ id: 'c1', name: 'Akbank', available: 500_000, lines: [line({ cutDay: 5, dueOffsetDays: 10 })] })
+      expect(byKind(computeInsights(input({ accounts: [full, yapi] })), 'bestCard')).toHaveLength(0)
     })
 
     it('needs at least two cards with free limit', () => {
@@ -404,8 +454,16 @@ describe('computeInsights', () => {
       const [s] = byKind(computeInsights(input({ expenses: fast })), 'monthPace')
       expect(s).toMatchObject({ id: 'monthPace', severity: 'info', title: 'Bu ay geçen aydan fazla harcıyorsun', amount: 12_400_000 })
       expect(s.body).toBe(
-        `Bu hızla ay sonunda tahmini ${formatTL(12_400_000)} harcarsın. Geçen ay toplam ${formatTL(10_000_000)} idi.`,
+        `Bu hızla giderse ay sonunda yaklaşık ${formatTL(12_400_000)} olabilir. Geçen ay toplam ${formatTL(10_000_000)} idi.`,
       )
+      expect(s.target).toEqual({ type: 'expenses' })
+    })
+
+    it('warns when the estimate is more than twice last month', () => {
+      // 700.000 kuruş in 10 days projects to 2.170.000; last month was 1.000.000 (2× is 2.000.000).
+      const doubled = [exp('yemek', 700_000, '2026-10-03'), exp('yemek', 1_000_000, '2026-09-15')]
+      const [s] = byKind(computeInsights(input({ expenses: doubled })), 'monthPace')
+      expect(s).toMatchObject({ severity: 'warn', amount: 2_170_000 })
     })
 
     it('does not fire at exactly 10% above last month', () => {
@@ -489,14 +547,74 @@ describe('computeInsights', () => {
           ],
         }),
       )
-      expect(result.map((i) => i.kind)).toEqual([
+      // Akbank has the longest interest-free period but only 5% of its limit free, so no bestCard.
+      expect(result.map((i) => i.kind)).toEqual(['cashShortfall', 'statementDue', 'cardNearLimit', 'minimumInterest'])
+      expect(result.map((i) => i.severity)).toEqual(['crit', 'warn', 'warn', 'info'])
+    })
+  })
+
+  describe('targets', () => {
+    it('sends a shortfall to the calendar', () => {
+      const [s] = byKind(
+        computeInsights(input({ accounts: [bank(100_000), card({ lines: [withStatement()] })] })),
         'cashShortfall',
-        'statementDue',
-        'cardNearLimit',
-        'minimumInterest',
-        'bestCard',
-      ])
-      expect(result.map((i) => i.severity)).toEqual(['crit', 'warn', 'warn', 'info', 'info'])
+      )
+      expect(s.target).toEqual({ type: 'calendar' })
+    })
+
+    it('sends limit, KMH and minimum-interest notes to the account', () => {
+      const result = computeInsights(
+        input({
+          accounts: [
+            kmh({ id: 'k1', available: 3_000_000 }),
+            card({ id: 'c1', available: 500_000, lines: [withStatement()] }),
+          ],
+        }),
+      )
+      for (const kind of ['cardNearLimit', 'kmhInterest', 'minimumInterest'] as const) {
+        const items = byKind(result, kind)
+        expect(items.length).toBeGreaterThan(0)
+        for (const i of items) expect(i.target).toEqual({ type: 'accountDetail', accountId: i.accountId })
+      }
+    })
+
+    it('sends spending notes to the expenses page', () => {
+      const result = computeInsights(
+        input({
+          budgets: [{ categoryId: 'yemek', monthly: 100_000 }, { categoryId: 'market', monthly: 300_000 }],
+          expenses: [
+            exp('yemek', 120_000, '2026-10-03'),
+            exp('market', 100_000, '2026-10-03'),
+            exp('ulasim', 60_000, '2026-10-03'),
+            exp('ulasim', 40_000, '2026-09-02'),
+            exp('eglence', 1_000_000, '2026-10-03'),
+            exp('eglence', 10_000, '2026-09-02'),
+          ],
+        }),
+      )
+      const spending = ['categoryIncrease', 'budgetOver', 'budgetPace', 'monthPace'] as const
+      for (const kind of spending) {
+        const items = byKind(result, kind)
+        expect(items.length).toBeGreaterThan(0)
+        for (const i of items) expect(i.target).toEqual({ type: 'expenses' })
+      }
+    })
+
+    it('gives every suggestion a destination', () => {
+      const result = computeInsights(
+        input({
+          accounts: [
+            bank(100_000),
+            kmh({ id: 'k1', available: 3_000_000 }),
+            card({ id: 'c1', available: 500_000, lines: [withStatement({ dueDate: '2026-10-12' })] }),
+            card({ id: 'c2', name: 'Yapı Kredi', available: 8_000_000, lines: [line({ cutDay: 20, dueOffsetDays: 10 })] }),
+          ],
+          budgets: [{ categoryId: 'market', monthly: 100_000 }],
+          expenses: [exp('market', 100_000, '2026-10-03')],
+        }),
+      )
+      expect(result.length).toBeGreaterThan(0)
+      expect(result.filter((i) => i.target === undefined)).toEqual([])
     })
   })
 })

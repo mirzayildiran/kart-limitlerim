@@ -25,6 +25,7 @@ import { Button, Pill } from '../../ui/components/controls'
 import { Amount, figure } from '../../ui/components/Amount'
 import { Icon } from '../../ui/components/Icon'
 import { computeInsights } from '../../domain/insights'
+import type { Insight } from '../../domain/insightsTypes'
 import { assistantInput } from '../assistant/assistantModel'
 import { RecurringDueBanner } from './RecurringDueBanner'
 import { Runway } from './Runway'
@@ -40,23 +41,34 @@ function greeting(hour: number): string {
   return 'İyi akşamlar'
 }
 
-/** Number of budget suggestions, from the same input the assistant page uses. */
-const assistantCount = computed(
-  () =>
-    computeInsights(
-      assistantInput({
-        accounts: accounts.value,
-        expenses: expenses.value,
-        categories: categories.value,
-        recurring: recurring.value,
-        budgets: budgets.value,
-        today: today.value,
-      }),
-    ).length,
+type Status = { text: string; tone: 'ok' | 'warn' | 'crit' }
+
+/** Budget suggestions, most urgent first, from the same input the assistant page uses. */
+const assistantList = computed(() =>
+  computeInsights(
+    assistantInput({
+      accounts: accounts.value,
+      expenses: expenses.value,
+      categories: categories.value,
+      recurring: recurring.value,
+      budgets: budgets.value,
+      today: today.value,
+    }),
+  ),
 )
 
-/** The status line opens the budget assistant; it names the suggestion count when there is more than one. */
-function renderTopbar(status: { text: string; tone: 'ok' | 'warn' | 'crit' } | undefined, suggestions: number): JSX.Element {
+/**
+ * A calm status yields to the most urgent warning among the suggestions, so the line
+ * under the greeting never reads "everything is fine" beside a warning.
+ */
+function shownStatus(status: Status, list: Insight[]): Status {
+  const top = list[0]
+  if (status.tone !== 'ok' || top === undefined || top.severity === 'info') return status
+  return { text: top.title, tone: top.severity }
+}
+
+/** The status line opens the budget assistant and names the suggestion count when there is one or more. */
+function renderTopbar(status: Status | null, suggestions: number): JSX.Element {
   const chevron = (
     <span class="home-status-chevron" aria-hidden="true">
       <Icon name="chevron" size={16} />
@@ -73,7 +85,7 @@ function renderTopbar(status: { text: string; tone: 'ok' | 'warn' | 'crit' } | u
           <span class="home-status-dot" aria-hidden="true" />
           <span class="home-status-text">
             {status.text}
-            {suggestions > 1 && ` · ${suggestions} öneri`}
+            {suggestions > 0 && ` · asistanda ${suggestions} öneri`}
           </span>
           {chevron}
         </button>
@@ -90,7 +102,7 @@ function renderTopbar(status: { text: string; tone: 'ok' | 'warn' | 'crit' } | u
 }
 
 /** One plain sentence on how things stand, most urgent first. */
-function homeStatus(): { text: string; tone: 'ok' | 'warn' | 'crit' } {
+function homeStatus(): Status {
   const items = statements.value
   const overdue = items.filter((i) => i.view.status === 'overdue').length
   if (overdue > 0) return { text: `${overdue} ödemenin tarihi geçti, önce onlara bakalım.`, tone: 'crit' }
@@ -358,7 +370,7 @@ export function HomePage() {
   if (accountsValue.length === 0) {
     return (
       <div class="home-page">
-        {renderTopbar(undefined, assistantCount.value)}
+        {renderTopbar(null, assistantList.value.length)}
         <section class="home-welcome" aria-labelledby="home-welcome-title">
           <div class="home-welcome-fan" aria-hidden="true">
             <span class="home-welcome-card" data-slot="2" />
@@ -395,7 +407,7 @@ export function HomePage() {
 
   return (
     <div class="home-page">
-      {renderTopbar(homeStatus(), assistantCount.value)}
+      {renderTopbar(shownStatus(homeStatus(), assistantList.value), assistantList.value.length)}
 
       <section class="home-hero" aria-labelledby="home-hero-label">
         <h2 id="home-hero-label" class="home-hero-label">
