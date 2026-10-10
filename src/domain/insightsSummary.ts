@@ -19,6 +19,7 @@ import type { Account, Kurus } from './types'
  * recurring payment names here: only totals, account names and formatted figures.
  */
 
+const MAX_ACCOUNTS = 30
 const MAX_CATEGORIES = 8
 const MAX_BUDGETS = 12
 const MAX_INSIGHTS = 10
@@ -47,7 +48,7 @@ export function budgetSummary(input: InsightInput, insights: Insight[]): BudgetS
       cashAfter: formatTL(o.cashAfter),
       shortfall: o.cashAfter < 0,
     },
-    accounts: orderAccounts(accounts).map((a) => summarizeAccount(a, statements)),
+    accounts: orderAccounts(accounts).slice(0, MAX_ACCOUNTS).map((a) => summarizeAccount(a, statements)),
     month: summarizeMonth(input),
     budgets: budgetProgress(input.expenses, input.budgets ?? [], input.categories, today)
       .slice(0, MAX_BUDGETS)
