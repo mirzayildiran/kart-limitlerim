@@ -35,3 +35,31 @@ export async function saveTextFile(name: string, text: string, type: string): Pr
   setTimeout(() => URL.revokeObjectURL(url), 1000)
   return true
 }
+
+/**
+ * Text files in the app's private Library folder (iOS app only): not shown in Files, not
+ * cleared with WebKit website data, included in the phone's own iCloud/Finder backup.
+ * Used by the automatic backup (src/data/autoBackupRuntime.ts).
+ */
+export function libraryFiles() {
+  const fs = () => import('@capacitor/filesystem')
+  return {
+    async read(path: string): Promise<string | null> {
+      const { Filesystem, Directory, Encoding } = await fs()
+      try {
+        const { data } = await Filesystem.readFile({ path, directory: Directory.Library, encoding: Encoding.UTF8 })
+        return typeof data === 'string' ? data : await data.text()
+      } catch {
+        return null // Missing file.
+      }
+    },
+    async write(path: string, text: string): Promise<void> {
+      const { Filesystem, Directory, Encoding } = await fs()
+      await Filesystem.writeFile({ path, data: text, directory: Directory.Library, encoding: Encoding.UTF8, recursive: true })
+    },
+    async remove(path: string): Promise<void> {
+      const { Filesystem, Directory } = await fs()
+      await Filesystem.deleteFile({ path, directory: Directory.Library })
+    },
+  }
+}

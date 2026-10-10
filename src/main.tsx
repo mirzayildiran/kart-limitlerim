@@ -9,6 +9,7 @@ import { init } from './data/store'
 import { applySavedTheme, dismissBoot } from './ui/theme'
 import { App } from './app.tsx'
 import { startReminders } from './platform/reminders'
+import { startAutoBackup } from './data/autoBackupRuntime'
 import { startLock } from './platform/lock'
 import { startDeepLinks } from './platform/deeplinks'
 import { startTextSize } from './platform/textSize'
@@ -20,6 +21,7 @@ init().catch(() => {})
 
 applySavedTheme()
 startReminders()
+startAutoBackup()
 startLock()
 startDeepLinks()
 startTextSize()
