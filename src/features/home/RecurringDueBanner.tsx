@@ -1,7 +1,8 @@
+import { figure } from '../../ui/components/Amount'
 import { formatTL } from '../../domain/money'
 import { recurring, today } from '../../data/store'
 import { go } from '../../ui/nav'
-import { Button } from '../../ui/components/controls'
+import { Icon } from '../../ui/components/Icon'
 import { pendingOccurrences } from '../calendar/calendarModel'
 import './recurring-due-banner.css'
 
@@ -10,22 +11,20 @@ export function RecurringDueBanner() {
   const due = pendingOccurrences(recurring.value, today.value)
   if (due.length === 0) return null
 
-  const shown = due.slice(0, 2)
+  const total = due.reduce((sum, item) => sum + item.amount, 0)
 
   return (
-    <section class="recurring-due-banner" aria-label="Düzenli ödemeler">
-      <p class="recurring-due-banner-title">Bugün işlenecek {due.length} düzenli ödeme var</p>
-      <ul class="recurring-due-banner-list">
-        {shown.map((item) => (
-          <li key={`${item.recurringId}-${item.iso}`} class="recurring-due-banner-item">
-            <span class="recurring-due-banner-name">{item.name}</span>
-            <span class="recurring-due-banner-amount num">{formatTL(item.amount)}</span>
-          </li>
-        ))}
-      </ul>
-      <Button variant="secondary" block onClick={() => go('calendar')}>
-        Takvimde gör
-      </Button>
-    </section>
+    <button type="button" class="recurring-due-banner" onClick={() => go('calendar')}>
+      <span class="recurring-due-banner-icon">
+        <Icon name="repeat" size={18} />
+      </span>
+      <span class="recurring-due-banner-text">
+        <span class="recurring-due-banner-title">Bugün {due.length} düzenli ödeme var</span>
+        <span class="recurring-due-banner-sub">
+          <span class="num">{figure(formatTL(total))}</span> henüz düşülmedi · Takvimde gör
+        </span>
+      </span>
+      <Icon name="chevron" size={18} class="recurring-due-banner-chevron" />
+    </button>
   )
 }

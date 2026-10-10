@@ -3,13 +3,16 @@ import { cycleKeyOf, formatMonth } from '../../domain/dates'
 import { formatTLExact } from '../../domain/money'
 import {
   accountById,
+  accounts,
   categoryById,
   expenses,
   today,
 } from '../../data/store'
 import { openSheet, route } from '../../ui/nav'
 import { Button, EmptyState } from '../../ui/components/controls'
-import { Amount } from '../../ui/components/Amount'
+import { Amount, figure } from '../../ui/components/Amount'
+import { Icon } from '../../ui/components/Icon'
+import { accountColors } from '../../ui/accountColor'
 import {
   expensesByMonth,
   groupExpensesByDay,
@@ -50,7 +53,8 @@ const topCategories = computed(() => {
     .map(([catId, amount]) => ({
       catId,
       amount,
-      name: categoryById.value.get(catId)?.name ?? 'Unknown',
+      name: categoryById.value.get(catId)?.name ?? 'Diğer',
+      hue: categoryById.value.get(catId)?.hue ?? 160,
       ratio: max > 0 ? amount / max : 0,
     }))
 })
@@ -73,6 +77,7 @@ const groupedExpenses = computed(() => {
 })
 
 const nav = computed(() => monthNavigation(selectedMonth.value))
+const colors = computed(() => accountColors(accounts.value))
 
 export function ExpensesPage() {
   // Only render if this is the active route
@@ -89,7 +94,7 @@ export function ExpensesPage() {
             onClick={() => setSelectedMonth(nav.value.prev)}
             aria-label="Önceki ay"
           >
-            ‹
+            <Icon name="back" size={20} />
           </button>
           <span class="expenses-month-label">{formatMonth(selectedMonth.value)}</span>
           <button
@@ -99,7 +104,7 @@ export function ExpensesPage() {
             onClick={() => nav.value.next && setSelectedMonth(nav.value.next)}
             aria-label="Sonraki ay"
           >
-            ›
+            <Icon name="chevron" size={20} />
           </button>
         </div>
       </header>
@@ -135,19 +140,12 @@ export function ExpensesPage() {
               <h2 class="expenses-section-title">Kategoriler</h2>
               <div class="expenses-category-bars">
                 {topCategories.value.map((cat) => (
-                  <div key={cat.catId} class="expenses-category-item">
-                    <div class="expenses-category-bar">
-                      <div
-                        class="expenses-category-fill"
-                        style={{ width: `${cat.ratio * 100}%` }}
-                      />
-                    </div>
-                    <div class="expenses-category-info">
-                      <span class="expenses-category-name">{cat.name}</span>
-                      <span class="expenses-category-amount num">
-                        {formatTLExact(cat.amount)}
-                      </span>
-                    </div>
+                  <div key={cat.catId} class="expenses-category-item cat-color" style={{ '--h': cat.hue }}>
+                    <span class="expenses-category-name">{cat.name}</span>
+                    <span class="expenses-category-amount num">{figure(formatTLExact(cat.amount))}</span>
+                    <span class="expenses-category-bar" aria-hidden="true">
+                      <span class="expenses-category-fill" style={{ width: `${cat.ratio * 100}%` }} />
+                    </span>
                   </div>
                 ))}
               </div>
@@ -160,10 +158,10 @@ export function ExpensesPage() {
               <h2 class="expenses-section-title">Kaynağa göre</h2>
               <div class="expenses-account-list">
                 {accountBreakdown.value.map((acc) => (
-                  <div key={acc.accId} class="expenses-account-item">
+                  <div key={acc.accId} class="expenses-account-item" data-slot={colors.value.get(acc.accId) ?? 1}>
                     <span class="expenses-account-name">{acc.name}</span>
                     <span class="expenses-account-amount num">
-                      {formatTLExact(acc.amount)}
+                      {figure(formatTLExact(acc.amount))}
                     </span>
                   </div>
                 ))}
@@ -178,7 +176,8 @@ export function ExpensesPage() {
                 <h3 class="expenses-day-header">{group.day}</h3>
                 <div class="expenses-day-items">
                   {group.expenses.map((exp) => {
-                    const catName = categoryById.value.get(exp.categoryId)?.name ?? 'Unknown'
+                    const cat = categoryById.value.get(exp.categoryId)
+                    const catName = cat?.name ?? 'Diğer'
                     const accName = accountById.value.get(exp.accountId)?.name ?? 'Silinmiş hesap'
                     const installmentText = exp.installments > 1 ? ` · ${exp.installments} taksit` : ''
 
@@ -189,6 +188,7 @@ export function ExpensesPage() {
                         class="expenses-item"
                         onClick={() => openSheet({ type: 'expense', expense: exp })}
                       >
+                        <span class="expenses-item-dot cat-color" style={{ '--h': cat?.hue ?? 160 }} aria-hidden="true" />
                         <span class="expenses-item-main">
                           <span class="expenses-item-label">
                             {exp.note || catName}
@@ -199,7 +199,7 @@ export function ExpensesPage() {
                           </span>
                         </span>
                         <span class="expenses-item-amount num">
-                          {formatTLExact(exp.amount)}
+                          {figure(formatTLExact(exp.amount))}
                         </span>
                       </button>
                     )

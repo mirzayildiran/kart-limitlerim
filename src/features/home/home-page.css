@@ -1,154 +1,322 @@
 .home-page {
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: var(--s-4);
+  gap: var(--s-6);
+  padding: var(--s-2) 0 var(--s-4);
   max-width: var(--max-w);
   margin: 0 auto;
-  min-height: 100vh;
-  padding-bottom: calc(var(--tabbar-h) + 16px + env(safe-area-inset-bottom, 0px));
 }
 
-/* Top bar: app name and today's date */
+/* Greeting and date */
 .home-topbar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--s-3);
-  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--s-2) var(--s-1) 0;
 }
 
-.home-app-name {
-  font-family: var(--font-display);
-  font-size: 17px;
+.home-greeting {
+  font-size: var(--text-2xl);
   font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
   color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .home-date {
   font-size: var(--text-sm);
   color: var(--muted);
-  white-space: nowrap;
-  flex: 0 0 auto;
 }
 
-/* Hero section */
-.home-hero {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-4);
-}
-
-.home-hero-eyebrow {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Ribbon visualization */
-.home-ribbon {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-3);
-}
-
-.home-ribbon-bar {
-  display: flex;
-  gap: 3px;
-  height: 12px;
-  border-radius: var(--r-pill);
-}
-
-.home-ribbon-segment {
-  flex: 1;
-  height: 100%;
-  min-width: 0;
-  border-radius: var(--r-pill);
-}
-
-.home-ribbon-card {
-  background: var(--accent);
-}
-
-.home-ribbon-kmh {
-  background: var(--kmh);
-}
-
-.home-ribbon-cash {
-  background: var(--cash);
-}
-
-.home-ribbon-legend {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s-2);
-}
-
-.home-ribbon-legend-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: var(--text-xs);
-  min-width: 0;
-}
-
-/* Row 1: dot and label */
-.home-ribbon-legend-head {
-  display: flex;
+/* Status sentence under the greeting */
+.home-status {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--muted);
-  min-width: 0;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink);
+  animation: home-status-in 0.6s var(--ease-out-expo) 0.5s both;
 }
 
-.home-ribbon-legend-dot {
-  display: block;
+.home-status-dot {
   flex: 0 0 auto;
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 22%, transparent);
 }
 
-.home-ribbon-legend-amount {
-  font-weight: 600;
-  font-size: var(--text-sm);
-  color: var(--ink);
+.home-status.is-warn .home-status-dot {
+  background: var(--warn);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--warn) 22%, transparent);
 }
 
-/* Outlook tiles */
-.home-outlook {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s-3);
+.home-status.is-crit .home-status-dot {
+  background: var(--crit);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--crit) 22%, transparent);
+  animation: home-status-pulse 2s var(--ease) 1.2s 2;
 }
 
-.home-outlook-tile {
+@keyframes home-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes home-status-pulse {
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--crit) 0%, transparent);
+  }
+}
+
+/* First use: a fan of empty cards */
+.home-welcome {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 4px;
-  padding: var(--s-3);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-6) var(--s-2) 0;
   text-align: center;
 }
 
-.home-outlook-label {
-  font-size: 12.5px;
-  font-weight: 600;
+.home-welcome-fan {
+  position: relative;
+  width: 220px;
+  height: 160px;
+  margin-bottom: var(--s-4);
+}
+
+.home-welcome-card {
+  position: absolute;
+  left: 30px;
+  top: 20px;
+  width: 160px;
+  aspect-ratio: 1.586;
+  border-radius: var(--r-md);
+  background: var(--c);
+  box-shadow: 0 14px 30px -14px var(--c);
+  transform-origin: 50% 120%;
+  animation: home-fan-in 0.9s var(--ease-out-expo) both;
+}
+
+.home-welcome-card:nth-child(1) {
+  --r: -14deg;
+  animation-delay: 0.1s;
+}
+
+.home-welcome-card:nth-child(2) {
+  --r: 0deg;
+  animation-delay: 0.2s;
+}
+
+.home-welcome-card:nth-child(3) {
+  --r: 14deg;
+  animation-delay: 0.3s;
+}
+
+.home-welcome-card {
+  rotate: var(--r);
+}
+
+.home-welcome-title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.home-welcome-text {
+  max-width: 34ch;
+  font-size: var(--text-md);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.home-welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  width: 100%;
+  margin-top: var(--s-3);
+}
+
+@keyframes home-fan-in {
+  from {
+    opacity: 0;
+    rotate: 0deg;
+    translate: 0 24px;
+  }
+}
+
+/* Spending power, on the ground */
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: 0 var(--s-1);
+}
+
+.home-hero-label {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--muted);
 }
 
-.home-outlook-sub {
-  font-size: var(--text-xs);
+.home-hero-figure {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  margin-top: calc(var(--s-3) * -1);
+  animation: home-figure-in 0.8s var(--ease-out-expo) both;
+}
+
+.home-hero-value {
+  display: inline-block;
+}
+
+.home-hero-value.is-changed {
+  animation: home-figure-settle 0.5s var(--ease-out-expo);
+}
+
+.home-hero-delta {
+  align-self: flex-start;
+  margin-top: var(--s-2);
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  animation: home-delta 1.8s var(--ease-out-expo) both;
+}
+
+.home-hero-delta.is-down {
+  background: var(--crit-soft);
+  color: var(--crit);
+}
+
+.home-hero-delta.is-up {
+  background: var(--accent-soft);
+  color: var(--ok);
+}
+
+@keyframes home-figure-settle {
+  from {
+    transform: translateY(-8px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes home-delta {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  15%,
+  70% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.home-hero .amount-hero {
+  font-size: clamp(3.25rem, 17vw, 4.75rem);
+  letter-spacing: -0.04em;
+  font-variant-numeric: proportional-nums;
+}
+
+/* One segment per account, in its wallet colour */
+.home-spread {
+  display: flex;
+  gap: 3px;
+  height: 14px;
+}
+
+.home-spread-seg {
+  min-width: 8px;
+  transition: flex-grow 0.6s var(--ease-out-expo);
+  border-radius: var(--r-pill);
+  background: var(--c);
+  transform-origin: left center;
+  animation: home-seg-in 0.8s var(--ease-out-expo) both;
+  animation-delay: calc(var(--i) * 60ms + 150ms);
+}
+
+@keyframes home-figure-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(6px);
+  }
+}
+
+@keyframes home-seg-in {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+
+/* Runway panel */
+.home-runway {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-5) var(--s-5) var(--s-4);
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-hero);
+}
+
+.home-runway-label {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--hero-ink);
+}
+
+/* Cash after payments: one sentence */
+.home-cash {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: calc(var(--s-3) * -1);
+  padding: var(--s-3) var(--s-4);
+  background: var(--accent-soft);
+  border-radius: var(--r-lg);
+}
+
+.home-cash.is-short {
+  background: var(--crit-soft);
+}
+
+.home-cash-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.home-cash.is-short .home-cash-title .num {
+  color: var(--crit);
+}
+
+.home-cash-sub {
+  font-size: var(--text-sm);
   color: var(--muted);
-  line-height: 1.4;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Sections */
@@ -163,16 +331,18 @@
   justify-content: space-between;
   align-items: baseline;
   gap: var(--s-2);
+  padding: 0 var(--s-1);
 }
 
 .home-section-header h2 {
-  font-size: var(--text-lg);
+  font-size: var(--text-xl);
   font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
 .home-section-meta {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   color: var(--muted);
   white-space: nowrap;
 }
@@ -183,219 +353,50 @@
   gap: var(--s-2);
 }
 
-.home-section-note {
-  font-size: var(--text-xs);
-  color: var(--muted);
-  padding: var(--s-2) var(--s-3);
-  background: var(--surface-2);
-  border-radius: var(--r-md);
-  line-height: 1.4;
-}
-
-/* Add button (ghost style) */
-.home-add-button {
-  padding: var(--s-3) var(--s-4);
-  text-align: left;
-  font-weight: 600;
-  color: var(--accent);
-  font-size: var(--text-md);
-  cursor: pointer;
-  transition: background 0.15s;
-  border-radius: var(--r-md);
-  min-height: 44px;
-}
-
-.home-add-button:hover {
-  background: var(--accent-soft);
-}
-
-.home-add-button:active {
-  transform: scale(0.98);
-}
-
-/* Liquid account rows */
-.home-account-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--s-3) var(--s-4);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  text-align: left;
-}
-
-.home-account-row:active {
-  transform: scale(0.98);
-}
-
-.home-account-row-left {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.home-account-row-name {
-  font-weight: 600;
-  font-size: var(--text-md);
-  color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.home-account-row-note {
-  font-size: var(--text-xs);
-  color: var(--muted);
-}
-
-.home-account-row-balance {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-xl);
-  flex: 0 0 auto;
-  margin-left: var(--s-3);
-}
-
-/* Expense section */
-.home-expenses-header {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-align: center;
-  padding: var(--s-2) 0;
-}
-
-.home-expenses-month {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-2xl);
-}
-
-.home-expenses-month-label {
-  font-size: var(--text-xs);
-  color: var(--muted);
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.home-expenses-categories {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
-}
-
-.home-expenses-category {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-}
-
-.home-expenses-category-bar {
-  flex: 1;
-  height: 20px;
-  background: var(--surface-2);
-  border-radius: var(--r-sm);
-  overflow: hidden;
-}
-
-.home-expenses-category-fill {
-  height: 100%;
-  border-radius: var(--r-sm);
-}
-
-.home-expenses-category-label {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink);
-  min-width: 60px;
-  text-align: right;
-}
-
-.home-expenses-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
-}
-
-.home-expense-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--s-3);
-  padding: var(--s-3) var(--s-4);
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.15s;
-  border-radius: var(--r-md);
-  min-height: 44px;
-}
-
-.home-expense-row:hover {
-  background: var(--surface-2);
-}
-
-.home-expense-row:active {
-  transform: scale(0.98);
-}
-
-.home-expense-row-left {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.home-expense-row-label {
-  display: block;
-  font-weight: 600;
-  font-size: var(--text-md);
-  color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.home-expense-row-detail {
-  display: block;
-  font-size: var(--text-xs);
-  color: var(--muted);
-}
-
-.home-expense-row-amount {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-md);
-  color: var(--ink);
-  flex: 0 0 auto;
-  text-align: right;
-}
-
-/* Statement section */
+/* Payments: a date tile in the card's colour */
 .home-statement-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: var(--s-3);
-  padding: var(--s-3) var(--s-4);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  padding: var(--s-3);
+  background: color-mix(in srgb, var(--c) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--c) 22%, var(--surface));
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
   text-align: left;
+  transition: transform 0.12s var(--ease);
 }
 
 .home-statement-row:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
+}
+
+.home-statement-date {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--r-md);
+  background: var(--c);
+  color: var(--c-ink);
+  line-height: 1;
+}
+
+
+
+.home-statement-day {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 800;
+}
+
+.home-statement-month {
+  margin-top: 2px;
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 
 .home-statement-row-left {
@@ -407,7 +408,6 @@
 }
 
 .home-statement-row-name {
-  display: block;
   font-weight: 600;
   font-size: var(--text-md);
   color: var(--ink);
@@ -417,7 +417,6 @@
 }
 
 .home-statement-row-sub {
-  display: block;
   font-size: var(--text-xs);
   color: var(--muted);
 }
@@ -431,7 +430,6 @@
 }
 
 .home-statement-row-amount {
-  display: block;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-md);
@@ -444,4 +442,159 @@
 
 .home-statement-row-status {
   display: flex;
+}
+
+/* Expenses */
+.home-expenses-categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin: 0;
+  padding: var(--s-4);
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.home-expenses-category {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px var(--s-3);
+  align-items: baseline;
+}
+
+.home-expenses-category-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.home-expenses-category-label::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--cat);
+}
+
+.home-expenses-category-amount {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.home-expenses-category-bar {
+  grid-column: 1 / -1;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.home-expenses-category-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--cat);
+}
+
+.home-expenses-list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s-1) 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.home-expense-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  min-height: 44px;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.home-expense-row + .home-expense-row {
+  border-top: 1px solid var(--line);
+}
+
+.home-expense-row:hover,
+.home-expense-row:active {
+  background: var(--surface-2);
+}
+
+.home-expense-row-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home-expense-row-label {
+  font-weight: 600;
+  font-size: var(--text-md);
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-expense-row-detail {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.home-expense-row-amount {
+  flex: 0 0 auto;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+  color: var(--ink);
+  text-align: right;
+}
+
+.home-page .amount-sep,
+.runway .amount-sep {
+  font-variant-numeric: proportional-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-figure,
+  .home-hero-value.is-changed,
+  .home-spread-seg,
+  .home-status,
+  .home-status-dot,
+  .home-welcome-card {
+    animation: none;
+  }
+
+  .home-statement-row,
+  .home-spread-seg {
+    transition: none;
+  }
+
+  .home-hero-delta {
+    animation-name: home-delta-fade;
+  }
+
+  @keyframes home-delta-fade {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    15%,
+    70% {
+      opacity: 1;
+    }
+  }
 }

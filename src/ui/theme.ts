@@ -10,9 +10,9 @@ function loadPref(): ThemePref {
     const v = localStorage.getItem(STORAGE_KEY)
     if (v === 'light' || v === 'dark' || v === 'system') return v
   } catch {
-    // Storage blocked (private mode): fall back to the system theme.
+    // Storage blocked (private mode): fall back to the default theme.
   }
-  return 'system'
+  return 'dark'
 }
 
 export const themePref = signal<ThemePref>(loadPref())

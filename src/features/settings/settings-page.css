@@ -97,12 +97,8 @@
   border-radius: 50%;
 }
 
-.settings-dot-builtin {
-  background: var(--accent);
-}
-
-.settings-dot-custom {
-  background: var(--kmh);
+.settings-dot {
+  background: var(--cat);
 }
 
 .settings-archived {

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390,initial-scale=1">
+<title>Kart Limitlerim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--board:#17191b;--board2:#23272a;--rule:#33383c;--amber:#ffb000;--ground:#e4e6e2;--white:#fff;--ink:#17191b;--mute:#5d6266;--green:#1d7a46;--red:#c8202f;--blue:#1f4fa3;--neg:#c8202f}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:var(--ground);color:var(--ink);font-family:Onest,system-ui,sans-serif;font-size:14px}
+.c{font-family:"Barlow Condensed",sans-serif;letter-spacing:.04em;text-transform:uppercase}
+.num{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-variant-numeric:tabular-nums}
+header{display:flex;justify-content:space-between;align-items:baseline;padding:54px 16px 12px}
+header h1{font-family:"Barlow Condensed";font-weight:700;font-size:24px;letter-spacing:.01em}
+header span{font-size:13px;color:var(--mute)}
+.board{margin:0 12px;background:var(--board);border-radius:6px;color:#e9ebe8;padding:0 0 6px}
+.strip{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--rule);font-size:13px;font-weight:600;color:#9aa0a4}
+.strip b{color:var(--amber);font-weight:600}
+.plate{margin:12px 12px 0;background:var(--white);border-radius:4px;padding:10px 10px 10px;color:var(--ink)}
+.plate .lbl{font-size:12px;font-weight:700;color:var(--mute)}
+.flaps{display:flex;gap:3px;margin-top:6px;align-items:stretch}
+.f{position:relative;width:38px;height:54px;background:var(--board);color:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:44px;line-height:1}
+.f::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:#000;box-shadow:0 1px 0 #2e3337}
+.f.p{width:14px;background:none;color:var(--ink)}.f.p::after{display:none}
+.f.cur{width:30px;margin-left:4px;font-size:30px;color:var(--amber)}
+.split{display:flex;gap:14px;margin-top:9px;font-size:13px;color:var(--mute)}
+.split b{color:var(--ink);font-weight:600}
+.dep{padding:10px 12px 0}
+.dep .hd,.row{display:grid;grid-template-columns:52px 1fr 86px 50px;align-items:center}
+.dep .hd{font-size:12px;font-weight:600;color:#8a9094;padding-bottom:5px;border-bottom:1px solid var(--rule)}
+.row{height:30px;border-bottom:1px solid var(--rule);font-size:14px}
+.row:last-child{border-bottom:0}
+.row .t{color:#b9bec1}
+.row .n{display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:hidden}
+.row .n small{color:#8a9094;font-size:14px}
+.chip{width:6px;height:16px;border-radius:1px;flex:none}
+.r{text-align:right}
+.row .k{color:var(--amber);font-weight:600}
+.row.kesim{background:var(--board2);margin:0 -12px;padding:0 12px;border-radius:0 0 4px 4px}
+.row.kesim .n,.row.kesim .t{color:#fff;font-weight:700}
+.row.kesim .k{background:var(--amber);color:var(--board);border-radius:2px;padding:1px 4px;justify-self:end}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 12px 0}
+.tile{background:var(--white);border-radius:6px;padding:9px 11px}
+.tile .c{font-size:12px;font-weight:600;color:var(--mute)}
+.tile .v{font-size:28px;line-height:1.1;margin-top:2px}
+.tile p{font-size:12px;color:var(--mute);margin-top:1px;line-height:1.3}
+.tile.neg{box-shadow:inset 3px 0 0 var(--neg)}
+.tile.neg .v,.tile.neg p b{color:var(--neg)}
+.hint{margin:10px 12px 0;display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#3b4044;line-height:1.35;padding:0 2px}
+.hint i{flex:none;width:16px;height:16px;border:1.5px solid var(--ink);border-radius:50%;font:700 11px/13px "Barlow Condensed";text-align:center;font-style:normal;margin-top:1px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:16px 14px 6px}
+.sec h2{font-size:15px;font-weight:700}
+.sec a{font-size:13px;color:var(--blue);text-decoration:none}
+.cards{margin:0 12px;background:var(--white);border-radius:6px;overflow:hidden}
+.card{display:grid;grid-template-columns:4px 1fr auto;gap:0 11px;align-items:center;padding:9px 12px 9px 0;border-bottom:1px solid #eceeeb}
+.card .bar{height:30px;align-self:center}
+.card .nm{font-weight:600;font-size:14px}
+.card .sub{font-size:12px;color:var(--mute)}
+.card .amt{font-size:18px;text-align:right}.card .amt small{font-size:13px;color:var(--mute);font-weight:500}
+nav{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--white);border-top:1px solid #d3d6d1;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 6px 26px;align-items:start}
+nav a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--mute);text-decoration:none;font-weight:500}
+nav a.on{color:var(--ink);font-weight:600}
+nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav .plus{width:52px;height:52px;border-radius:50%;background:var(--board);color:var(--amber);margin:-14px auto 0;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px var(--white)}
+nav .plus svg{width:26px;height:26px;stroke-width:2.4}
+nav a.on::before{content:"";width:18px;height:2px;background:var(--amber);margin:-8px 0 4px}
+</style>
+</head>
+<body>
+<header><h1>Kart Limitlerim</h1><span>10 Ekim Cumartesi</span></header>
+
+<section class="board">
+  <div class="strip c"><span>Bugün 10 Eki <b>→</b> Kesim 18 Eki</span><b>8 gün</b></div>
+  <div class="plate">
+    <div class="lbl c">Şu an harcayabileceğin</div>
+    <div class="flaps num">
+      <span class="f">8</span><span class="f">0</span><span class="f p">.</span><span class="f">2</span><span class="f">2</span><span class="f">0</span><span class="f cur">₺</span>
+    </div>
+    <div class="split"><span>Kartlar <b class="num">57.100 ₺</b></span><span>KMH <b class="num">13.500 ₺</b></span><span>Nakit <b class="num">9.620 ₺</b></span></div>
+  </div>
+  <div class="dep">
+    <div class="hd c"><span>Tarih</span><span>Kalkışlar</span><span class="r">Tutar</span><span class="r">Kalan</span></div>
+    <div class="row"><span class="t num">12 EKİ</span><span class="n"><i class="chip" style="background:var(--green)"></i>Spotify <small>Bonus</small></span><span class="r num">99,99 ₺</span><span class="r k c">2 gün</span></div>
+    <div class="row"><span class="t num">13 EKİ</span><span class="n"><i class="chip" style="background:var(--green)"></i>Bonus son öd. <small>asg.</small></span><span class="r num">1.960 ₺</span><span class="r k c">3 gün</span></div>
+    <div class="row"><span class="t num">15 EKİ</span><span class="n"><i class="chip" style="background:#8a9094"></i>Kira <small>Ziraat vds.</small></span><span class="r num">18.000 ₺</span><span class="r k c">5 gün</span></div>
+    <div class="row"><span class="t num">15 EKİ</span><span class="n"><i class="chip" style="background:var(--blue)"></i>Maximum son öd. <small>asg.</small></span><span class="r num">3.740 ₺</span><span class="r k c">5 gün</span></div>
+    <div class="row kesim"><span class="t num">18 EKİ</span><span class="n c"><i class="chip" style="background:var(--red)"></i>Axess kesim</span><span class="r num">—</span><span class="r k c">8 gün</span></div>
+  </div>
+</section>
+
+<div class="tiles">
+  <div class="tile"><div class="c">Kesime kadar</div><div class="v num">62.120 ₺</div><p>18 Eki · 8 gün · düzenli ödemeler düşüldü</p></div>
+  <div class="tile neg"><div class="c">Ödemelerden sonra nakit</div><div class="v num">−4.520 ₺</div><p>Asgariler için <b>4.520 ₺</b> eksik</p></div>
+</div>
+<p class="hint"><i>%</i><span>Yalnız asgariyi ödersen gelecek ekstrede <b>≈1.284 ₺</b> faiz <span style="color:var(--mute)">(tahmin)</span></span></p>
+
+<div class="sec"><h2>Kartlar</h2><a href="#">Tümü</a></div>
+<div class="cards">
+  <div class="card"><i class="bar" style="background:var(--green)"></i><div><div class="nm">Garanti Bonus</div><div class="sub">Son ödeme 13 Eki</div></div><div class="amt num">31.200 <small>/ 45.000 ₺</small></div></div>
+  <div class="card"><i class="bar" style="background:var(--red)"></i><div><div class="nm">Akbank Axess</div><div class="sub">Kesim 18 Eki</div></div><div class="amt num">21.800 <small>/ 60.000 ₺</small></div></div>
+  <div class="card"><i class="bar" style="background:var(--blue)"></i><div><div class="nm">İş Maximum</div><div class="sub">Son ödeme 15 Eki</div></div><div class="amt num">4.100 <small>/ 25.000 ₺</small></div></div>
+</div>
+
+<nav>
+  <a class="on" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 15h4"/></svg>Özet</a>
+  <a href="#"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Harcamalar</a>
+  <a href="#" aria-label="Ekle"><span class="plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></a>
+  <a href="#"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Takvim</a>
+  <a href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Ayarlar</a>
+</nav>
+</body>
+</html>

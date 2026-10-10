@@ -4,7 +4,8 @@ import type { Account, CardAccount, KmhAccount, BalanceAccount } from '../../dom
 import { formatTL, formatTLExact } from '../../domain/money'
 import { formatMonth } from '../../domain/dates'
 import { CURRENT_RATES } from '../../domain/rates'
-import { accountById, today } from '../../data/store'
+import { accountById, accounts, today } from '../../data/store'
+import { accountColors } from '../../ui/accountColor'
 import { openSheet, closeSheet, type SheetRequest } from '../../ui/nav'
 import { Button, Pill } from '../../ui/components/controls'
 import { Sheet } from '../../ui/components/Sheet'
@@ -42,6 +43,7 @@ function renderCardContent(account: CardAccount): JSX.Element {
         available={available}
         limit={account.limit}
         tone="card"
+        slot={accountColors(accounts.value).get(account.id)}
       />
 
       <div class="account-detail-stats">
@@ -208,6 +210,7 @@ function renderKmhContent(account: KmhAccount): JSX.Element {
         available={available}
         limit={account.limit}
         tone="kmh"
+        slot={accountColors(accounts.value).get(account.id)}
       />
 
       <div class="account-detail-stats">

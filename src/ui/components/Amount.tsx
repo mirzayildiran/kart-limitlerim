@@ -12,6 +12,14 @@ interface Props {
   sign?: 'minus' | 'plus' | null
 }
 
+/**
+ * Digits stay tabular, but the display face's tabular "." and "," are as wide
+ * as a digit; set separators proportionally so "62.120" does not read as two numbers.
+ */
+export function figure(text: string) {
+  return text.split(/([.,])/).map((part, i) => (i % 2 ? <span key={i} class="amount-sep">{part}</span> : part))
+}
+
 const SIGN_GLYPH = { minus: '−', plus: '+' } as const
 
 /**
@@ -23,7 +31,7 @@ export function Amount({ value, exact = false, size = 'lg', tone = 'default', si
   const number = sign ? `${SIGN_GLYPH[sign]}${format(Math.abs(value))}` : format(value)
   return (
     <span class={`amount amount-${size} amount-${tone} num`}>
-      <span class="amount-num">{number}</span>{' '}
+      <span class="amount-num">{figure(number)}</span>{' '}
       <span class="amount-cur">₺</span>
     </span>
   )
