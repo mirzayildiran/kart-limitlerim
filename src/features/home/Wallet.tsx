@@ -8,6 +8,7 @@ import { Icon } from '../../ui/components/Icon'
 import { openSheet } from '../../ui/nav'
 export { accountColors } from '../../ui/accountColor'
 import './wallet.css'
+import { tick } from '../../platform/haptics'
 
 const KIND_LABEL = { card: 'Kredi kartı', kmh: 'KMH', bank: 'Banka hesabı', cash: 'Nakit' } as const
 const CAPTION = { card: 'Kullanılabilir', kmh: 'KMH kullanılabilir', bank: 'Banka bakiyesi', cash: 'Nakit' } as const
@@ -91,8 +92,8 @@ export function Wallet({ accounts, colors, statements }: Props) {
     if (!el || !first) return
     const step = first.offsetWidth + 12
     const next = Math.min(count - 1, Math.round(el.scrollLeft / step))
-    // A light tick as the active card changes (Android; ignored elsewhere).
-    if (next !== active) navigator.vibrate?.(8)
+    // A light tick as the active card changes.
+    if (next !== active) tick()
     setActive(next)
   }
 
