@@ -309,6 +309,12 @@ The wallet breaks the gutter: its rail runs edge to edge, cards at min(80%, 340p
 
 Every tappable row is at least 44px tall; primary buttons are 52px; inputs 48px with 16px text so iOS never zooms.
 
+### Accessibility preferences (erişilebilirlik tercihleri)
+
+- **Large text (Dynamic Type).** Type is in `rem`; the iOS shell scales the root size with the phone's text size (capped). Layouts must hold at 100%, 130% and 160% at 375px: rows wrap their trailing column under the label instead of squeezing it (payment rows, rate rows, the wallet card's date chip), names get two lines before truncating, and wallet cards use their 1.586 ratio as a minimum height so text grows the card instead of being clipped. The hero figure follows the screen width (`clamp(2.5rem, 17vw, 4.75rem)`), not the text size, so seven digits always fit.
+- **Reduce Motion.** Tab changes skip the View Transition, sheets appear and leave at once, the figure and delta, the lock fade and the boot veil end immediately; `base.css` carries a global safety net for anything left running. Opacity changes that carry state may stay as short fades.
+- **Increase Contrast.** `prefers-contrast: more` moves `--muted`, `--faint` and the hairlines toward the ink in both themes, removes the decorative circles from wallet cards, makes small card type heavier and turns the date chip solid.
+
 ## Elevation & Depth
 
 Dark is flat by tone, not by shadow: neutral surfaces carry no shadow at all (`--shadow-1` and `--shadow-hero` resolve to none in dark), and depth comes from the step between Night Ground and the slate surfaces plus hairline Night Line borders. Light comes from colour itself: wallet cards cast a soft glow in their own hue. Shadows exist only for things that genuinely float.
