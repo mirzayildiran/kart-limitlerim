@@ -54,13 +54,15 @@ interface MoneyFieldProps {
   error?: string | null
   placeholder?: string
   autofocus?: boolean
+  /** "hero": the sheet's primary amount, display face at 2.5rem/800 (ExpenseSheet). Default: 22px. */
+  size?: 'default' | 'hero'
 }
 
 /**
  * Amount input that accepts Turkish formatting ("1.234,56") and keeps the
  * user's own text while they type; the parsed value is reported upward.
  */
-export function MoneyField({ label, value, onChange, hint, error, placeholder = '0', autofocus }: MoneyFieldProps) {
+export function MoneyField({ label, value, onChange, hint, error, placeholder = '0', autofocus, size = 'default' }: MoneyFieldProps) {
   const [text, setText] = useState(value == null ? '' : formatInput(value))
   useEffect(() => {
     // Sync when the value is changed from outside (e.g. form reset).
@@ -70,7 +72,7 @@ export function MoneyField({ label, value, onChange, hint, error, placeholder = 
   return (
     <Field label={label} hint={hint} error={error}>
       {(id, desc) => (
-        <div class="money-input">
+        <div class={size === 'hero' ? 'money-input money-input-hero' : 'money-input'}>
           <input
             id={id}
             class="input input-money num"
@@ -167,7 +169,7 @@ interface ChoiceProps<T extends string> {
   options: ChoiceOption<T>[]
   value: T | null
   onChange: (v: T) => void
-  /** "chips" wraps; "segment" is an equal-width row. */
+  /** "chips" wraps; "segment" is an equal-width row of ≥44 px options whose labels never wrap (keep them short). */
   look?: 'chips' | 'segment'
   hideLegend?: boolean
 }

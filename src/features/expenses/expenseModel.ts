@@ -151,27 +151,30 @@ export function validateCategoryName(
 }
 
 /**
- * Calculate the interest nudge for a card or KMH expense.
- * Returns formatted interest text or null if not applicable.
+ * Estimated monthly interest (kuruş) if a card or KMH expense is carried over unpaid.
+ * amount × monthly contractual rate × 1.30 (KKDF + BSMV). Null when there is nothing to show.
  */
-export function interestNudge(account: CardAccount | KmhAccount, amount: Kurus): string | null {
+export function interestNudgeAmount(account: CardAccount | KmhAccount, amount: Kurus): Kurus | null {
   if (amount <= 0) return null
 
-  // Use the interest rate for this amount
-  let rate: number
-  if (account.kind === 'card') {
-    rate = account.rateOverride?.contractual ?? cardTierFor(amount, CURRENT_RATES).contractual
-  } else {
-    // KMH uses cash rate
-    rate = account.rateOverride?.contractual ?? CURRENT_RATES.cash.contractual
-  }
+  // Use the interest rate for this amount; KMH uses the cash rate.
+  const rate =
+    account.kind === 'card'
+      ? account.rateOverride?.contractual ?? cardTierFor(amount, CURRENT_RATES).contractual
+      : account.rateOverride?.contractual ?? CURRENT_RATES.cash.contractual
 
-  // Estimate monthly interest: amount × rate/100 × 1.30 (taxes)
-  const monthlyInterest = Math.round((amount * rate) / 100 * 1.3)
+  const monthlyInterest = Math.round(((amount * rate) / 100) * 1.3)
+  return monthlyInterest > 0 ? monthlyInterest : null
+}
 
-  if (monthlyInterest <= 0) return null
-
-  return `Bu harcamayı ödemeyip taşırsan ayda ~${formatTLExact(monthlyInterest)} faiz işler.`
+/**
+ * The interest nudge as one sentence. The sheet renders the figure on its own
+ * (see interestNudgeAmount) so only the figure takes the rose colour.
+ */
+export function interestNudge(account: CardAccount | KmhAccount, amount: Kurus): string | null {
+  const monthly = interestNudgeAmount(account, amount)
+  if (monthly === null) return null
+  return `Bu harcamayı ödemeyip taşırsan ayda ~${formatTLExact(monthly)} faiz işler.`
 }
 
 /**

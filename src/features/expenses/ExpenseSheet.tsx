@@ -1,42 +1,39 @@
-import { useEffect, useState } from 'preact/hooks'
-import { toIso } from '../../domain/dates'
+import { useState } from 'preact/hooks'
+import { addDays, toIso } from '../../domain/dates'
 import { formatTL, formatTLExact } from '../../domain/money'
-import type { Account, Expense, IsoDate, Kurus } from '../../domain/types'
-import { createCategory, newId, removeExpense, saveExpense } from '../../data/store'
+import type { Expense, IsoDate, Kurus } from '../../domain/types'
 import {
-  activeCategories,
   accountById,
+  accounts,
+  activeCategories,
   cards,
   categoryById,
+  createCategory,
   kmhAccounts,
   liquidAccounts,
+  newId,
+  removeExpense,
+  saveExpense,
   today,
 } from '../../data/store'
+import { accountColors } from '../../ui/accountColor'
 import { closeSheet, openSheet } from '../../ui/nav'
-import {
-  Button,
-  Choice,
-  ConfirmButton,
-  Field,
-  MoneyField,
-  Pill,
-  Switch,
-  TextField,
-} from '../../ui/components/controls'
+import type { SheetRequest } from '../../ui/nav'
+import { Button, Choice, ConfirmButton, Field, MoneyField, Pill, Switch, TextField } from '../../ui/components/controls'
+import { AccountPicker, accountFree } from '../../ui/components/AccountPicker'
+import { CategoryPicker } from '../../ui/components/CategoryPicker'
 import { Sheet } from '../../ui/components/Sheet'
 import { Icon } from '../../ui/components/Icon'
+import { figure } from '../../ui/components/Amount'
 import { toast } from '../../ui/components/toast'
-import type { SheetRequest } from '../../ui/nav'
-import {
-  interestNudge,
-  previewAvailable,
-  validateCategoryName,
-} from './expenseModel'
+import { interestNudgeAmount, previewAvailable, validateCategoryName } from './expenseModel'
 import './expense-sheet.css'
 
 export interface ExpenseSheetProps {
   request: Extract<SheetRequest, { type: 'expense' }>
 }
+
+const INSTALLMENT_COUNTS = [2, 3, 6, 9, 12]
 
 function getLastUsedAccountId(): string | null {
   try {
@@ -54,21 +51,16 @@ function setLastUsedAccountId(id: string): void {
   }
 }
 
-function canFocusAccount(account: Account): boolean {
-  if (account.kind === 'card' || account.kind === 'kmh') {
-    return account.available > 0
+/** Account the sheet opens on: the edited expense's, the requested one, the last used, else the first listed. */
+function initialAccountId(request: ExpenseSheetProps['request']): string | null {
+  const known = accountById.value
+  const candidates = [request.expense?.accountId, request.accountId, getLastUsedAccountId()]
+  for (const id of candidates) {
+    if (id && known.has(id)) return id
   }
-  if (account.kind === 'bank' || account.kind === 'cash') {
-    return account.balance > 0
-  }
-  return false
-}
-
-function getAccountBalance(account: Account): Kurus {
-  if (account.kind === 'card' || account.kind === 'kmh') {
-    return account.available
-  }
-  return account.balance
+  // Pre-sorted store signals: cards, then KMH, then liquid; most available first.
+  const first = cards.value[0] ?? kmhAccounts.value[0] ?? liquidAccounts.value[0]
+  return first?.id ?? null
 }
 
 export function ExpenseSheet({ request }: ExpenseSheetProps) {
@@ -76,7 +68,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
   const oldExpense = request.expense ?? null
 
   const [amount, setAmount] = useState<Kurus | null>(oldExpense?.amount ?? null)
-  const [accountId, setAccountId] = useState<string | null>(null)
+  const [accountId, setAccountId] = useState<string | null>(() => initialAccountId(request))
   const [categoryId, setCategoryId] = useState<string | null>(oldExpense?.categoryId ?? null)
   const [date, setDate] = useState<string>(oldExpense?.date ?? toIso(today.value))
   const [note, setNote] = useState<string>(oldExpense?.note ?? '')
@@ -89,41 +81,12 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
   // Validation messages appear only after the first save attempt.
   const [submitted, setSubmitted] = useState<boolean>(false)
 
-  // Initialize accountId on mount
-  useEffect(() => {
-    if (accountId !== null) return
-
-    let id: string | null = null
-
-    // Use request.accountId if provided
-    if (request.accountId) {
-      id = request.accountId
-    }
-    // Use the last used account if available
-    else {
-      const lastUsed = getLastUsedAccountId()
-      if (lastUsed && accountById.value.has(lastUsed)) {
-        id = lastUsed
-      }
-    }
-
-    // Fall back to the first card, then KMH, then liquid (all pre-sorted by most available)
-    if (!id) {
-      const allAccounts = [...cards.value, ...kmhAccounts.value, ...liquidAccounts.value]
-      if (allAccounts.length > 0) {
-        id = allAccounts[0].id
-      }
-    }
-
-    if (id) {
-      setAccountId(id)
-    }
-  }, [])
-
   // Plain expressions: signals read during render subscribe this component.
   const selectedAccount = accountId ? accountById.value.get(accountId) ?? null : null
   const selectedCategory = categoryId ? categoryById.value.get(categoryId) ?? null : null
-  const availableBefore = selectedAccount ? getAccountBalance(selectedAccount) : null
+  const isCard = selectedAccount?.kind === 'card'
+  const isInstallment = isCard && installments !== '1'
+  const availableBefore = selectedAccount ? accountFree(selectedAccount) : null
   const availableAfter =
     selectedAccount && amount !== null
       ? previewAvailable(
@@ -133,7 +96,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
             amount,
             categoryId: categoryId ?? '',
             accountId: selectedAccount.id,
-            date,
+            date: date as IsoDate,
             note,
             affectsAccount,
             installments: parseInt(installments, 10),
@@ -141,40 +104,34 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
             createdAt: oldExpense?.createdAt ?? Date.now(),
           },
           selectedAccount,
-          getAccountBalance(selectedAccount),
+          accountFree(selectedAccount),
         )
       : null
 
-  const interestText =
+  const monthlyInterest =
     selectedAccount && amount !== null && (selectedAccount.kind === 'card' || selectedAccount.kind === 'kmh')
-      ? interestNudge(selectedAccount, amount)
+      ? interestNudgeAmount(selectedAccount, amount)
       : null
 
-  const categoryOptions = [
-    ...activeCategories.value.map((c) => ({ value: c.id, label: c.name })),
-    { value: '__new__', label: '+ Yeni' },
-  ]
-
   // Pre-sorted store signals: cards, then KMH, then liquid; most available first.
-  const accountOptions = [...cards.value, ...kmhAccounts.value, ...liquidAccounts.value].map((a) => ({
-    account: a,
-    canFocus: canFocusAccount(a),
-  }))
+  const accountList = [...cards.value, ...kmhAccounts.value, ...liquidAccounts.value]
+  const colors = accountColors(accounts.value)
+
+  const todayIso = toIso(today.value)
+  const yesterdayIso = toIso(addDays(today.value, -1))
 
   const amountRaw = amount === null ? 'Tutarı yaz, örneğin 250.' : amount <= 0 ? 'Tutar sıfırdan büyük olmalı.' : null
   const accountRaw = accountId === null ? 'Önce bir kart ya da hesap ekle.' : null
   const categoryRaw = categoryId === null ? 'Bir kategori seç.' : null
+  const dateRaw = date === '' ? 'Bir tarih seç.' : null
   const amountError = submitted ? amountRaw : null
   const accountError = submitted ? accountRaw : null
   const categoryError = submitted ? categoryRaw : null
+  const dateError = submitted ? dateRaw : null
 
-  const handleCategoryChange = async (value: string) => {
-    if (value === '__new__') {
-      setShowNewCat(true)
-    } else {
-      setCategoryId(value)
-      setShowNewCat(false)
-    }
+  const handleCategoryChange = (value: string) => {
+    setCategoryId(value)
+    setShowNewCat(false)
   }
 
   const handleAddCategory = async () => {
@@ -198,7 +155,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
 
   const handleSave = async () => {
     setSubmitted(true)
-    if (!selectedAccount || amount === null || !categoryId) return
+    if (!selectedAccount || amount === null || amount <= 0 || !categoryId || date === '') return
 
     setIsSaving(true)
     try {
@@ -258,11 +215,8 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
     }
   }
 
-  const handleOpenAccountSheet = () => {
-    openSheet({ type: 'account', kind: 'card' })
-  }
-
   const afterIsNegative = (availableAfter ?? 0) < 0
+  const hasLimit = selectedAccount?.kind === 'card' || selectedAccount?.kind === 'kmh'
 
   return (
     <Sheet
@@ -271,22 +225,10 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
       onClose={closeSheet}
       footer={
         <div class="expense-sheet-footer">
-          <Button
-            variant="primary"
-            block
-            type="button"
-            disabled={isSaving}
-            onClick={handleSave}
-          >
+          <Button variant="primary" block type="button" disabled={isSaving} onClick={handleSave}>
             Kaydet
           </Button>
-          {isEdit && (
-            <ConfirmButton
-              label="Harcamayı sil"
-              confirmLabel="Silmek için tekrar dokun"
-              onConfirm={handleDelete}
-            />
-          )}
+          {isEdit && <ConfirmButton label="Harcamayı sil" confirmLabel="Silmek için tekrar dokun" onConfirm={handleDelete} />}
         </div>
       }
     >
@@ -297,137 +239,140 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
             Ekran görüntüsünden ekle
           </Button>
         )}
-        <MoneyField
-          label="Tutar"
-          value={amount}
-          onChange={setAmount}
-          error={amountError}
-          autofocus
-        />
 
-        <Field label="Nereden ödedin?" error={accountError}>
-          {() => (
-            <div class="expense-account-chips">
-              {accountOptions.length === 0 ? (
-                <div class="expense-account-empty">
-                  <p>Henüz kart ya da hesap eklemediniz.</p>
-                  <Button type="button" variant="primary" onClick={handleOpenAccountSheet}>
-                    Kart Ekle
-                  </Button>
-                </div>
-              ) : (
-                <div class="expense-account-scroll">
-                  {accountOptions.map(({ account: acct, canFocus }) => (
-                    <label
-                      key={acct.id}
-                      class={`expense-chip${accountId === acct.id ? ' is-selected' : ''}${!canFocus ? ' is-disabled' : ''}`}
-                    >
-                      <input
-                        type="radio"
-                        name="account"
-                        value={acct.id}
-                        checked={accountId === acct.id}
-                        onChange={() => setAccountId(acct.id)}
-                      />
-                      <span class="expense-chip-name">{acct.name}</span>
-                      <span class="expense-chip-balance num">
-                        {formatTL(getAccountBalance(acct))}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </Field>
+        <MoneyField label="Tutar" value={amount} onChange={setAmount} error={amountError} size="hero" autofocus />
 
-        <Field label="Kategori" error={categoryError}>
-          {() => (
-            <div>
-              <Choice<string>
-                legend="Kategori"
-                hideLegend
-                options={categoryOptions}
-                value={categoryId}
-                onChange={handleCategoryChange}
-                look="chips"
+        {accountList.length === 0 ? (
+          <div class="expense-account-empty">
+            <span class="field-label">Nereden ödedin?</span>
+            <p>Henüz kart ya da hesap eklemedin.</p>
+            <Button type="button" variant="secondary" onClick={() => openSheet({ type: 'account', kind: 'card' })}>
+              <Icon name="plus" size={20} />
+              Kart ya da hesap ekle
+            </Button>
+            {accountError && (
+              <p class="field-error" role="alert">
+                {accountError}
+              </p>
+            )}
+          </div>
+        ) : (
+          <AccountPicker
+            label="Nereden ödedin?"
+            accounts={accountList}
+            colors={colors}
+            value={accountId}
+            onChange={setAccountId}
+            error={accountError}
+          />
+        )}
+
+        <div class="expense-category">
+          <CategoryPicker
+            label="Kategori"
+            categories={activeCategories.value}
+            value={categoryId}
+            onChange={handleCategoryChange}
+            onNew={() => setShowNewCat(!showNewCat)}
+            newOpen={showNewCat}
+            error={categoryError}
+          />
+          {showNewCat && (
+            <div class="expense-new-category">
+              <TextField
+                label="Yeni kategori adı"
+                value={newCatName}
+                onChange={setNewCatName}
+                placeholder="Örn. Spor"
+                error={newCatError}
               />
-              {showNewCat && (
-                <div class="expense-new-category">
-                  <TextField
-                    label="Kategori adı"
-                    value={newCatName}
-                    onChange={setNewCatName}
-                    placeholder="Örn. Spor"
-                    error={newCatError}
-                  />
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    block
-                    onClick={handleAddCategory}
-                    disabled={newCatName.trim().length === 0}
-                  >
-                    Ekle
-                  </Button>
-                </div>
-              )}
+              <Button
+                type="button"
+                variant="secondary"
+                block
+                onClick={handleAddCategory}
+                disabled={newCatName.trim().length === 0}
+              >
+                Kategoriyi ekle
+              </Button>
             </div>
           )}
-        </Field>
-
-        <div class="expense-date-note">
-          <TextField
-            label="Tarih"
-            type="date"
-            value={date}
-            onChange={setDate}
-          />
-          <TextField
-            label="Not"
-            value={note}
-            onChange={setNote}
-            placeholder="Örn. Yemek siparişi"
-          />
         </div>
 
-        {selectedAccount?.kind === 'card' && (
-          <Choice<string>
-            legend="Taksit"
-            value={installments}
-            onChange={setInstallments}
-            options={[1, 2, 3, 6, 9, 12].map((n) => ({
-              value: String(n),
-              label: n === 1 ? 'Tek çekim' : `${n}`,
-              name: n === 1 ? 'Tek çekim' : `${n} taksit`,
-            }))}
-            look="segment"
-          />
-        )}
+        <Field label="Tarih" error={dateError}>
+          {(id, desc) => (
+            <div class="expense-date">
+              <div class="expense-date-quick" role="group" aria-label="Hızlı tarih">
+                {[
+                  { iso: todayIso, text: 'Bugün' },
+                  { iso: yesterdayIso, text: 'Dün' },
+                ].map((d) => (
+                  <button
+                    key={d.text}
+                    type="button"
+                    class={`expense-date-chip${date === d.iso ? ' is-selected' : ''}`}
+                    aria-pressed={date === d.iso}
+                    onClick={() => setDate(d.iso)}
+                  >
+                    {date === d.iso && <Icon name="check" size={16} class="expense-date-check" />}
+                    {d.text}
+                  </button>
+                ))}
+              </div>
+              <input
+                id={id}
+                class="input expense-date-input"
+                type="date"
+                value={date}
+                aria-describedby={desc}
+                aria-invalid={dateError ? true : undefined}
+                onInput={(e) => setDate(e.currentTarget.value)}
+              />
+            </div>
+          )}
+        </Field>
 
-        <Switch
-          label="Limitten / bakiyeden düş"
-          checked={affectsAccount}
-          onChange={setAffectsAccount}
-        />
+        <TextField label="Not" value={note} onChange={setNote} placeholder="Örn. Yemek siparişi" />
 
-        {selectedAccount && availableBefore !== null && availableAfter !== null && (
-          <div class={`expense-preview ${afterIsNegative ? 'is-negative' : ''}`}>
-            <span>
-              {selectedAccount.name} kullanılabilir{' '}
-              {selectedAccount.kind === 'card' || selectedAccount.kind === 'kmh' ? 'limit' : 'bakiye'}
-            </span>
-            <span class="num">
-              {formatTL(availableBefore)} → {formatTL(availableAfter)}
-            </span>
-            {afterIsNegative && <Pill tone="crit">(yetersiz)</Pill>}
+        {isCard && (
+          <div class="expense-installments">
+            <Switch label="Taksitli" checked={isInstallment} onChange={(on) => setInstallments(on ? '2' : '1')} />
+            {isInstallment && (
+              <Choice<string>
+                legend="Kaç taksit?"
+                value={installments}
+                onChange={setInstallments}
+                options={INSTALLMENT_COUNTS.map((n) => ({ value: String(n), label: String(n), name: `${n} taksit` }))}
+                look="chips"
+              />
+            )}
           </div>
         )}
 
-        {interestText && (
-          <div class="expense-interest-nudge">
-            <Pill tone="crit">{interestText}</Pill>
-          </div>
+        <div class="expense-effect">
+          <Switch label="Limitten / bakiyeden düş" checked={affectsAccount} onChange={setAffectsAccount} />
+
+          {selectedAccount && availableBefore !== null && availableAfter !== null && (
+            <div class={`expense-preview${afterIsNegative ? ' is-negative' : ''}`}>
+              <span class="expense-preview-label">
+                {selectedAccount.name} kullanılabilir {hasLimit ? 'limit' : 'bakiye'}
+              </span>
+              <span class="expense-preview-figures num">
+                <span class="expense-preview-before">{figure(formatTL(availableBefore))}</span>
+                <span aria-hidden="true">→</span>
+                <span class="sr-only">sonra</span>
+                <span class="expense-preview-after">{figure(formatTL(availableAfter))}</span>
+                {afterIsNegative && <Pill tone="crit">Yetersiz</Pill>}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {monthlyInterest !== null && (
+          <p class="expense-interest">
+            Bu harcamayı ödemeyip taşırsan ayda{' '}
+            <strong class="expense-interest-figure num">~{figure(formatTLExact(monthlyInterest))}</strong> faiz işler.
+          </p>
         )}
       </div>
     </Sheet>
