@@ -227,6 +227,57 @@ describe('budgetSummary', () => {
     expect(Object.keys(s.insights[0])).toEqual(['severity', 'title', 'body'])
   })
 
+  it('summarises the month pace with formatted figures', () => {
+    const expenses = [
+      expense({ date: '2026-10-03', amount: 120000, categoryId: 'yemek' }),
+      expense({ date: '2026-09-10', amount: 70000, categoryId: 'yemek' }),
+      expense({ date: '2026-09-25', amount: 30000, categoryId: 'yemek' }),
+    ]
+    const s = budgetSummary(input({ expenses }), [])
+    expect(s.month).toEqual({
+      spent: '1.200 ₺',
+      lastMonthSamePeriod: '700 ₺',
+      lastMonthTotal: '1.000 ₺',
+      projected: '3.720 ₺',
+      daysPassed: 10,
+      daysInMonth: 31,
+    })
+  })
+
+  it('lists budget progress with formatted figures', () => {
+    const expenses = [expense({ date: '2026-10-03', amount: 120000, categoryId: 'yemek' })]
+    const s = budgetSummary(input({ expenses, budgets: [{ categoryId: 'yemek', monthly: 100000 }] }), [])
+    expect(s.budgets).toEqual([
+      {
+        category: 'Yemek',
+        monthly: '1.000 ₺',
+        spent: '1.200 ₺',
+        remaining: '-200 ₺',
+        usedPercent: 120,
+        projected: '3.720 ₺',
+        status: 'over',
+      },
+    ])
+  })
+
+  it('has no budget rows when there is no plan', () => {
+    expect(budgetSummary(input(), []).budgets).toEqual([])
+    expect(budgetSummary(input({ budgets: [] }), []).budgets).toEqual([])
+  })
+
+  it('caps budget rows at twelve', () => {
+    const many: Category[] = Array.from({ length: 13 }, (_, i) => ({
+      id: `b${i}`,
+      name: `Bütçe ${i}`,
+      hue: i,
+      builtin: false,
+      order: i,
+    }))
+    const budgets = many.map((c) => ({ categoryId: c.id, monthly: 100000 }))
+    const s = budgetSummary(input({ categories: many, budgets }), [])
+    expect(s.budgets).toHaveLength(12)
+  })
+
   it('never includes expense notes, expense ids, account ids or recurring names', () => {
     const expenses = [
       expense({ id: 'exp-gizli-001', date: '2026-10-02', amount: 5000, categoryId: 'yemek', note: 'GIZLI-NOT-XYZ' }),

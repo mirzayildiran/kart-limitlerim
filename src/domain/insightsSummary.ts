@@ -1,7 +1,16 @@
+import { budgetProgress, monthPace } from './budget'
 import { toIso } from './dates'
 import { formatTL } from './money'
 import { isCard, isKmh, outlook, spendingPower, statementItems, type StatementItem } from './power'
-import type { BudgetSummary, Insight, InsightInput, SummaryAccount, SummaryCategory } from './insightsTypes'
+import type {
+  BudgetSummary,
+  Insight,
+  InsightInput,
+  SummaryAccount,
+  SummaryBudget,
+  SummaryCategory,
+  SummaryMonth,
+} from './insightsTypes'
 import type { Account, Kurus } from './types'
 
 /**
@@ -11,6 +20,7 @@ import type { Account, Kurus } from './types'
  */
 
 const MAX_CATEGORIES = 8
+const MAX_BUDGETS = 12
 const MAX_INSIGHTS = 10
 
 export function budgetSummary(input: InsightInput, insights: Insight[]): BudgetSummary {
@@ -38,6 +48,20 @@ export function budgetSummary(input: InsightInput, insights: Insight[]): BudgetS
       shortfall: o.cashAfter < 0,
     },
     accounts: orderAccounts(accounts).map((a) => summarizeAccount(a, statements)),
+    month: summarizeMonth(input),
+    budgets: budgetProgress(input.expenses, input.budgets ?? [], input.categories, today)
+      .slice(0, MAX_BUDGETS)
+      .map(
+        (r): SummaryBudget => ({
+          category: r.name,
+          monthly: formatTL(r.monthly),
+          spent: formatTL(r.spent),
+          remaining: formatTL(r.remaining),
+          usedPercent: r.usedPercent,
+          projected: formatTL(r.projected),
+          status: r.status,
+        }),
+      ),
     categories: categoryComparison(input)
       .slice(0, MAX_CATEGORIES)
       .map(
@@ -52,6 +76,18 @@ export function budgetSummary(input: InsightInput, insights: Insight[]): BudgetS
         }),
       ),
     insights: insights.slice(0, MAX_INSIGHTS).map((i) => ({ severity: i.severity, title: i.title, body: i.body })),
+  }
+}
+
+function summarizeMonth(input: InsightInput): SummaryMonth {
+  const p = monthPace(input.expenses, input.today)
+  return {
+    spent: formatTL(p.spent),
+    lastMonthSamePeriod: formatTL(p.lastMonthSamePeriod),
+    lastMonthTotal: formatTL(p.lastMonthTotal),
+    projected: formatTL(p.projected),
+    daysPassed: p.daysPassed,
+    daysInMonth: p.daysInMonth,
   }
 }
 
