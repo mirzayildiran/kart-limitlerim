@@ -47,6 +47,22 @@ Tema tercihi tek başına `localStorage` içinde (`kl:theme`) tutulur. Bu, veri 
 - Şema sürümü 1 dışındaki yedekler reddedilir. Daha yeni bir sürümden alınmış yedek için uygulamanın güncellenmesi istenir.
 - Yedek hiçbir yere gönderilmez; kullanıcı dosyayı kendisi saklar.
 
+## Veri dayanıklılığı
+
+Bulgular (2026-10-10):
+
+- Capacitor'ın [depolama rehberi](https://capacitorjs.com/docs/guides/storage), localStorage'ın geçici sayılması gerektiğini ve bunun "en azından iOS'ta" IndexedDB için de geçerli olduğunu söylüyor: iOS depolama baskısında bu veriyi geri alabilir. Kalıcı veri için native depolama öneriyor.
+- WebKit'in [depolama politikası](https://webkit.org/blog/14403/updates-to-storage-policy/) (iOS 17+): kaynaklar varsayılan olarak "best-effort" modundadır. Kota aşımında, depolama baskısında ya da uzun süre kullanılmayınca en eski kullanılandan başlayarak silinebilirler. Tarayıcı olmayan uygulamalarda kota daha düşüktür: kaynak başına diskin %15'i, toplam %20. `navigator.storage.persist()` var, ama WebKit isteği sezgisel olarak kabul ediyor (örnek: ana ekrana eklenmiş web uygulaması). WKWebView'lı uygulamalarda kabul edileceğine dair belgelenmiş bir garanti yok.
+- Sonuç: iOS uygulamasında IndexedDB tek kopya olarak yeterli değil.
+
+Uygulama:
+
+- Web/PWA: açılışta `navigator.storage.persist()` istenir (`store.ts`). Kullanıcı ayrıca elle yedek alır.
+- iOS uygulaması: `src/data/autoBackup.ts` (saf mantık) ve `src/data/autoBackupRuntime.ts` (bağlantı). Her anlamlı değişiklikten 5 sn sonra, uygulama arka plana geçerken de hemen, verinin tamamı normal yedek biçiminde `Library/autobackup/autobackup.json`'a yazılır. Önceki iki kopya `.1` ve `.2` olarak döner. `Library`, WebKit'in web sitesi verisinden ayrıdır ve Dosyalar'da görünmez (`libraryFiles()`, `src/platform/files.ts`).
+- Kullanıcı verisi olmayan anlık görüntü hiç yazılmaz. Böylece silinmiş ya da boş açılan bir veritabanı iyi kopyaları döngüden atamaz. Diskteki kopyayla aynı veri de yazılmaz.
+- Açılışta veritabanında kullanıcı verisi yoksa ve otomatik yedekte varsa, ana ekran "Önceki verilerin bulundu" der. Geri yükleme normal yolu kullanır (`importBackupText`). "Şimdi değil" o kopyayı bir daha sormaz.
+- "Tüm verileri sil" otomatik kopyaları da siler.
+
 ## Bütçe asistanı
 
 İki katman var:
