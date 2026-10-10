@@ -11,6 +11,8 @@ const config: CapacitorConfig = {
   ios: {
     // Güvenli alanları CSS (env(safe-area-inset-*)) yönetir.
     contentInset: 'never',
+    // Açılış ekranıyla aynı zemin; web içeriği yüklenirken beyaz flaş olmaz.
+    backgroundColor: '#0a0a11',
     limitsNavigationsToAppBoundDomains: false,
   },
   server: devServer ? { url: devServer, cleartext: true } : undefined,
