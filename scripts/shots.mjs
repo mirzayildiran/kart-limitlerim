@@ -215,6 +215,24 @@ async function bootApp(page, appUrl, theme, demo) {
   await waitApp(page)
 }
 
+/**
+ * Full-page capture with the fixed tab bar pinned to the bottom of the page. The style is
+ * added only for this capture and removed right after; sheets and toasts are left alone.
+ */
+async function shootFullPage(page, file) {
+  const handle = await page.addStyleTag({
+    content: `
+      .app-main { position: relative !important; }
+      .tabbar { position: absolute !important; bottom: 0 !important; }
+    `,
+  })
+  try {
+    await shoot(page, file, { fullPage: true })
+  } finally {
+    await handle.evaluate((el) => el.remove())
+  }
+}
+
 async function shoot(page, file, opts = {}) {
   await page.screenshot({ path: join(OUT, file), type: 'jpeg', quality: 80, ...opts })
   console.log(`  ${file}`)
@@ -256,7 +274,8 @@ async function main() {
                   await page.waitForTimeout(200)
                 } else {
                   await goRoute(page, ROUTES[screen])
-                  await shoot(page, `${screen}-${width}-${theme}.jpg`, { fullPage: true })
+                  await shoot(page, `${screen}-${width}-${theme}-fold.jpg`)
+                  await shootFullPage(page, `${screen}-${width}-${theme}.jpg`)
                 }
               }
             } finally {
