@@ -26,3 +26,7 @@ FIRST VIEWPORT: Greeting and date; "Harcama gücün" and the figure at ~76px; a 
 FORM: User-pinned own world (seed 57a8a444 rerolled once, then both rejected; round-1 build rejected). Signature interactions: wallet swipe with snap, active card full size and the rest scaled 0.94; runway scrub (pointer and keys, role=slider). Motion grammar: one load moment (figure rise-in, spread segments and cards staggering in, limit bars filling), exponential ease-out, off under reduced motion.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+## Finish record (2026-10-10)
+
+Dual-agent critique 22/36 → three fix rounds → finish reviewer `disposition: ship` (covers the scored fixes). Accepted adaptations: the available label sits in the card's meta line under the track; runway magenta stays user-pinned and is separated from the wallet magenta slot and category colour by shape (DESIGN.md Owned Colour and Runway Pair rules). Carried to the sheets surface: figure and name duplication in the account detail sheet. Deferred to the onboarding pass: empty-state (welcome) improvements.
