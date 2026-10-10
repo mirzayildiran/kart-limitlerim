@@ -1,13 +1,8 @@
+/* The 16px gutter comes from .sheet-body; an extra padding here would indent the account rail and clip it. */
 .import-sheet {
   display: flex;
   flex-direction: column;
   gap: var(--s-4);
-  padding: var(--s-4);
-}
-
-.import-account {
-  display: flex;
-  flex-direction: column;
 }
 
 /* Native file input stays in the tab order but is visually hidden; the label is the target. */

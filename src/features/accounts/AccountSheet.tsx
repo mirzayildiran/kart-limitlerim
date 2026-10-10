@@ -3,6 +3,8 @@ import { computed } from '@preact/signals'
 import type { SheetRequest } from '../../ui/nav'
 import { closeSheet } from '../../ui/nav'
 import { Sheet } from '../../ui/components/Sheet'
+import { Icon } from '../../ui/components/Icon'
+import { Disclosure } from '../../ui/components/Disclosure'
 import { Button, MoneyField, TextField, Choice, ConfirmButton } from '../../ui/components/controls'
 import { toast } from '../../ui/components/toast'
 import { saveAccount, removeAccount, newId, accountById } from '../../data/store'
@@ -99,8 +101,9 @@ export function AccountSheet({ request }: AccountSheetProps) {
     }
   }
 
+  // Segment labels: one short word each so the row never wraps at 360 px.
   const kindDisplayNames = {
-    card: 'Kredi kartı',
+    card: 'Kart',
     kmh: 'KMH',
     bank: 'Hesap',
     cash: 'Nakit',
@@ -247,7 +250,7 @@ function CardFields({ state, errors, setFormState }: { state: CardFormState; err
                 }}
                 aria-label="Kartı kaldır"
               >
-                ×
+                <Icon name="close" size={16} />
               </button>
             )}
           </div>
@@ -260,16 +263,16 @@ function CardFields({ state, errors, setFormState }: { state: CardFormState; err
             setFormState({ ...state, lines: newLines })
           }}
         >
-          + Aynı limite bağlı kart ekle
+          <Icon name="plus" size={18} />
+          Aynı limite bağlı kart ekle
         </button>
         {state.lines.length >= 1 && (
           <p class="field-hint">İki kartın aynı müşteri limitini paylaşıyorsa ikisini de buraya ekle.</p>
         )}
       </div>
 
-      <details class="rate-override">
-        <summary>Faiz oranı</summary>
-        <div class="rate-override-content">
+      <div class="rate-override">
+        <Disclosure label="Faiz oranı">
           <TextField
             label="Aylık sözleşmeli oran"
             type="number"
@@ -289,8 +292,8 @@ function CardFields({ state, errors, setFormState }: { state: CardFormState; err
             error={errors.lateRate}
             inputMode="numeric"
           />
-        </div>
-      </details>
+        </Disclosure>
+      </div>
     </>
   )
 }
@@ -316,9 +319,8 @@ function KmhFields({ state, errors, setFormState }: { state: KmhFormState; error
         <p class="card-sheet-warning">Kullanılabilir limit toplam limitten büyük görünüyor</p>
       )}
 
-      <details class="rate-override">
-        <summary>Faiz oranı</summary>
-        <div class="rate-override-content">
+      <div class="rate-override">
+        <Disclosure label="Faiz oranı">
           <TextField
             label="Aylık sözleşmeli oran"
             type="number"
@@ -338,8 +340,8 @@ function KmhFields({ state, errors, setFormState }: { state: KmhFormState; error
             error={errors.lateRate}
             inputMode="numeric"
           />
-        </div>
-      </details>
+        </Disclosure>
+      </div>
     </>
   )
 }

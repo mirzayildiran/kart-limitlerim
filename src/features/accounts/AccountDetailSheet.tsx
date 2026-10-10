@@ -24,6 +24,8 @@ import {
 import './account-detail.css'
 
 const CAPTION = { card: 'Kullanılabilir', kmh: 'KMH kullanılabilir', bank: 'Banka bakiyesi', cash: 'Nakit' } as const
+/** Window title: the account's type. The name is already on the card below it. */
+const KIND_TITLE = { card: 'Kredi kartı', kmh: 'KMH', bank: 'Banka hesabı', cash: 'Nakit' } as const
 const effectiveFmt = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
 const RATES_SINCE = effectiveFmt.format(fromIso(CURRENT_RATES.effective))
 
@@ -262,7 +264,7 @@ function AccountDetailSheetImpl({ request }: AccountDetailSheetProps): JSX.Eleme
   return (
     <Sheet
       open={open}
-      title={account.name}
+      title={KIND_TITLE[account.kind]}
       onClose={handleClose}
       footer={
         <>
