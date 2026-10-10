@@ -47,31 +47,31 @@ colors:
   light-crit: "#b3372a"
 typography:
   display:
-    fontFamily: "Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "KL Lira, Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(3.25rem, 17vw, 4.75rem)"
     fontWeight: 800
     lineHeight: 1
     letterSpacing: "-0.04em"
   headline:
-    fontFamily: "Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "KL Lira, Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.75rem"
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: "-0.025em"
   title:
-    fontFamily: "Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "KL Lira, Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.375rem"
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: "-0.02em"
   title-sm:
-    fontFamily: "Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "KL Lira, Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.125rem"
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: "-0.015em"
   figure:
-    fontFamily: "Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "KL Lira, Schibsted Grotesk Variable, Onest Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.75rem"
     fontWeight: 700
     lineHeight: 1
@@ -224,7 +224,7 @@ Rollout status: the world is built on the Özet tab (`src/features/home/`) and i
 - Seven neon wallet colours, each owned by one account and repeated wherever that account appears.
 - Neon lime is the single action colour.
 - Cyan line and magenta selected day are the runway panel's own pair; the wallet's cyan and magenta slots are account colours, never runway markers.
-- Money in Schibsted Grotesk; words in Onest; the ₺ sign always drawn by Onest.
+- Money in Schibsted Grotesk; words in Onest; the ₺ sign always drawn by Onest through `KL Lira`, a self-hosted face that maps only U+20BA to Onest and leads every display stack.
 - Pressable surfaces shrink on press; cards glow in their own colour.
 - One load moment with exponential ease-out, off under reduced motion.
 
@@ -285,7 +285,7 @@ Light swaps the neutrals and semantics (light-ground, light-surface, light-surfa
 **Character:** A tight, confident grotesk for every figure and heading against a friendly humanist sans for everything you read. The pairing keeps numbers crisp and assertive while sentences stay warm.
 
 ### Hierarchy
-- **Display** (800, clamp(3.25rem, 17vw, 4.75rem), line-height 1, -0.04em): the spending-power figure on Özet only, with proportional numerals. The shared hero size elsewhere is the smaller `--text-hero` (clamp(3rem, 15vw, 4.25rem)).
+- **Display** (800, clamp(3.25rem, 17vw, 4.75rem), line-height 1, -0.04em): the spending-power figure on Özet only, with proportional numerals. The clamp floor holds it near 61px at 360 px and reaches the brief's ~76px only from about 447 px; this narrow-width step is deliberate, so the figure and the ₺ never wrap. The shared hero size elsewhere is the smaller `--text-hero` (clamp(3rem, 15vw, 4.25rem)).
 - **Headline** (700, 28px, 1.15, -0.025em): the greeting at the top of Özet.
 - **Title** (700, 22px, -0.02em): section headings ("Ödemeler", "Harcamalar").
 - **Title small** (700, 18px, -0.015em): panel headings ("Kesime kadar") and the account name on a wallet card.
