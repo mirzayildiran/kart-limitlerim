@@ -164,11 +164,11 @@
 }
 
 .settings-error {
+  /* Part of the backup card like the confirmation: a hairline, not a box inside the box. */
   font-size: var(--text-sm);
   color: var(--crit);
-  padding: var(--s-3);
-  border-radius: var(--r-md);
-  background: var(--crit-soft);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--line);
 }
 
 /* Lead line above the interest table: the same ink and size as running text, aligned with the titles. */
