@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { budgetSummary, categoryComparison } from './insightsSummary'
+import { budgetSummary, categoryComparison, scrub } from './insightsSummary'
 import type { Insight, InsightInput } from './insightsTypes'
 import type { BalanceAccount, CardAccount, CardLine, Category, Expense, KmhAccount } from './types'
 
@@ -341,5 +341,21 @@ describe('categoryComparison', () => {
   it('falls back to "Diğer" for an unknown category id', () => {
     const expenses = [expense({ date: '2026-10-01', amount: 1000, categoryId: 'silinmis' })]
     expect(categoryComparison(input({ expenses }))[0].name).toBe('Diğer')
+  })
+})
+
+describe('scrub', () => {
+  it.each([
+    ['Bonus 4543', 'Bonus ••••'],
+    ['Bonus 4543 1234 5678 9012', 'Bonus ••••'],
+    ['TR12 0006 4000 0011 2345 6789 01', '••••'],
+    ['Kira 0532-123-45-67', 'Kira ••••'],
+    ['ahmet.yilmaz@ornek.com', '[e-posta]'],
+    ['Akbank', 'Akbank'],
+    ['Kart 2', 'Kart 2'],
+    ['Son ödeme 13 Eki. Ödenmemiş asgari tutar 1.280 ₺.', 'Son ödeme 13 Eki. Ödenmemiş asgari tutar 1.280 ₺.'],
+    ['Bu hızla tahmini 129.482 ₺ harcarsın.', 'Bu hızla tahmini 129.482 ₺ harcarsın.'],
+  ])('%s → %s', (text, expected) => {
+    expect(scrub(text)).toBe(expected)
   })
 })
