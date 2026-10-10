@@ -161,7 +161,7 @@ function BackupSection() {
           <div class="settings-confirm" role="group" aria-label="Geri yükleme onayı">
             <p class="settings-text">Bu cihazdaki bütün veriler yedektekilerle değiştirilecek.</p>
             <ConfirmButton label="Geri yükle" confirmLabel="Emin misin? Tekrar dokun" onConfirm={restore} />
-            <Button variant="ghost" block onClick={() => setPending(null)}>
+            <Button variant="secondary" block onClick={() => setPending(null)}>
               Vazgeç
             </Button>
           </div>
