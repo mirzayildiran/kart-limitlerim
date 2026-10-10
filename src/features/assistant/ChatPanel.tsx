@@ -5,6 +5,7 @@ import { LIMITS, type AssistantErrorCode, type ChatMessage } from '../../ai/prot
 import type { BudgetSummary } from '../../domain/insightsTypes'
 import { Button } from '../../ui/components/controls'
 import { canSend, DISCLAIMER, QUICK_PROMPTS } from './assistantModel'
+import { assistantConsent } from './consent'
 import './chat-panel.css'
 
 /**
@@ -19,9 +20,13 @@ const error = signal<AssistantErrorCode | null>(null)
 
 /** Bumped on reset so a reply that arrives after closing the chat is dropped. */
 let generation = 0
+/** The request in flight; aborted when the chat is closed or consent is withdrawn. */
+let inflight: AbortController | null = null
 
 export function resetChat(): void {
   generation++
+  inflight?.abort()
+  inflight = null
   messages.value = []
   busy.value = false
   error.value = null
@@ -38,7 +43,11 @@ async function request(summary: BudgetSummary): Promise<void> {
   error.value = null
   try {
     const history = messages.value.map(({ role, text }) => ({ role, text }))
-    const reply = await askAssistant(summary, history)
+    inflight = new AbortController()
+    const reply = await askAssistant(summary, history, {
+      consented: assistantConsent.value !== null,
+      signal: inflight.signal,
+    })
     if (gen !== generation) return
     messages.value = [...messages.value, { role: 'assistant', text: reply.text, provider: reply.provider }]
   } catch (err) {

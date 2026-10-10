@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import preact from '@preact/preset-vite'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { csp } from './vite.csp.ts'
 
 // GitHub Pages serves the app under /kart-limitlerim/.
 // CAP_NATIVE=1: iOS app build (Capacitor). Served from the app root, no service worker.
@@ -19,6 +20,7 @@ export default defineConfig({
   },
   plugins: [
     preact(),
+    csp({ connect: [process.env.VITE_ASSISTANT_PROXY_URL] }),
     VitePWA({
       disable: native,
       registerType: 'prompt',
