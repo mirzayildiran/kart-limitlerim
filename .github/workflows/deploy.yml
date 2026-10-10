@@ -27,6 +27,9 @@ jobs:
       - run: npm test
       - run: npm run lint
       - run: npm run build
+        env:
+          # Bütçe asistanı aracı sunucusu (worker/assistant-proxy). Boşsa asistan sohbeti kapalı derlenir.
+          VITE_ASSISTANT_PROXY_URL: ${{ vars.ASSISTANT_PROXY_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
