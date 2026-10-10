@@ -6,6 +6,7 @@ import { BackupError, parseBackup } from '../../data/backup'
 import { go, openSheet, route } from '../../ui/nav'
 import { Button, Choice, ConfirmButton } from '../../ui/components/controls'
 import { Icon } from '../../ui/components/Icon'
+import { figure } from '../../ui/components/Amount'
 import { toast } from '../../ui/components/toast'
 import { setTheme, themePref, type ThemePref } from '../../ui/theme'
 import { backupFileName, rateGroups, sourceLines, type RateRow } from './settingsModel'
@@ -180,7 +181,7 @@ function RateList({ rows, class: cls }: { rows: RateRow[]; class?: string }) {
           <dd class="settings-rate-value num">
             {row.lines.map((line) => (
               <span key={line} class="settings-rate-line">
-                {line}
+                {figure(line)}
               </span>
             ))}
           </dd>
