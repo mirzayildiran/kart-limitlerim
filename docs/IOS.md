@@ -52,6 +52,14 @@ PWA'da Ayarlar → Yedek → indir; uygulamada Ayarlar → Yedekten geri yükle.
 | Kendi iPhone'unda test | Ücretsiz Apple ID (kurulum 7 gün geçerli, sonra yeniden Run) |
 | TestFlight ve App Store | Apple Developer Program, yıllık 99 USD |
 
+Şu an ücretsiz hesapla ilerliyoruz. Bu hesabın sınırları:
+
+- Telefondaki kurulum 7 günde süresi dolar; Xcode'da yeniden Run yeterli, veriler kalır.
+- Aynı anda en çok 3 uygulama, haftada en çok 10 yeni Bundle ID.
+- Çalışır: Face ID, yerel bildirimler (son ödeme hatırlatma), dokunsal geri bildirim, Anahtar Zinciri, paylaşım menüsü.
+- Çalışmaz: uzaktan push bildirimi, App Groups (ana ekran widget'ı buna bağlı), iCloud, TestFlight.
+  Bu yüzden widget ücretli üyeliğe kadar bekler; ücretli hesaba geçince Bundle ID ve kod aynı kalır.
+
 Mağazaya göndermeden önce: gizlilik politikası adresi (`docs/PRIVACY.md` yayında olmalı),
 App Store gizlilik etiketleri, 6.9" iPhone ekran görüntüleri, `PrivacyInfo.xcprivacy`,
 ve uygulamanın "web sitesini saran uygulama" sayılmaması için yerel özellikler
