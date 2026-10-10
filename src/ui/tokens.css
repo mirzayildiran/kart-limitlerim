@@ -52,7 +52,8 @@
   --ok: #0d7c55;
   --ok-soft: #dff5ea;
   --warn: #9a5a0c;
-  --warn-soft: #f6efd6;
+  --warn-soft: #f3f1e8;
+  --warn-line: #e3d29c;
   --warn-bar: #d38b2a;
   --crit: #b3372a;
   --crit-soft: #f7e0da;
@@ -142,6 +143,7 @@
     --ok-soft: #0c2a1d;
     --warn: #ffc24d;
     --warn-soft: #2e2309;
+    --warn-line: #4a3a12;
     --warn-bar: #ffb020;
     --crit: #ff5c7a;
     --crit-soft: #36101c;
@@ -180,6 +182,7 @@
   --ok-soft: #0c2a1d;
   --warn: #ffc24d;
   --warn-soft: #2e2309;
+  --warn-line: #4a3a12;
   --warn-bar: #ffb020;
   --crit: #ff5c7a;
   --crit-soft: #36101c;
