@@ -33,6 +33,26 @@ export function groupExpensesByDay(expenses: Expense[]): Array<{ date: IsoDate; 
 }
 
 /**
+ * Narrow expenses to one category and/or one account (both conditions must hold).
+ * Without a filter the list is returned unchanged in order.
+ */
+export function filterExpenses(
+  expenses: Expense[],
+  filter: { categoryId?: string; accountId?: string } = {},
+): Expense[] {
+  return expenses.filter(
+    (e) =>
+      (filter.categoryId === undefined || e.categoryId === filter.categoryId) &&
+      (filter.accountId === undefined || e.accountId === filter.accountId),
+  )
+}
+
+/** Sum of one day's expenses in kuruş. */
+export function dayTotal(expenses: Expense[]): Kurus {
+  return expenses.reduce((sum, e) => sum + e.amount, 0)
+}
+
+/**
  * Sum expenses by category. Returns { categoryId, amount }.
  */
 export function categoryTotals(expenses: Expense[]): Map<string, Kurus> {

@@ -8,6 +8,8 @@ import {
   validateCategoryName,
   interestNudge,
   monthNavigation,
+  filterExpenses,
+  dayTotal,
 } from './expenseModel'
 import type { Expense, CardAccount, KmhAccount, Kurus, IsoDate } from '../../domain/types'
 
@@ -241,6 +243,55 @@ describe('expenseModel', () => {
       const currentKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`
       const nav = monthNavigation(currentKey)
       expect(nav.next).toBeNull()
+    })
+  })
+  describe('filterExpenses', () => {
+    const list = [
+      mockExpense({ id: 'a', categoryId: 'cat_food', accountId: 'acc_1' }),
+      mockExpense({ id: 'b', categoryId: 'cat_food', accountId: 'acc_2' }),
+      mockExpense({ id: 'c', categoryId: 'cat_fun', accountId: 'acc_1' }),
+    ]
+
+    it('returns every expense when no filter is given', () => {
+      expect(filterExpenses(list).map((e) => e.id)).toEqual(['a', 'b', 'c'])
+      expect(filterExpenses(list, {}).map((e) => e.id)).toEqual(['a', 'b', 'c'])
+    })
+
+    it('filters by category', () => {
+      expect(filterExpenses(list, { categoryId: 'cat_food' }).map((e) => e.id)).toEqual(['a', 'b'])
+    })
+
+    it('filters by account', () => {
+      expect(filterExpenses(list, { accountId: 'acc_1' }).map((e) => e.id)).toEqual(['a', 'c'])
+    })
+
+    it('combines category and account with AND', () => {
+      expect(filterExpenses(list, { categoryId: 'cat_food', accountId: 'acc_1' }).map((e) => e.id)).toEqual(['a'])
+    })
+
+    it('returns an empty list when nothing matches', () => {
+      expect(filterExpenses(list, { categoryId: 'cat_missing' })).toEqual([])
+    })
+
+    it('does not mutate the input', () => {
+      const copy = [...list]
+      filterExpenses(list, { accountId: 'acc_2' })
+      expect(list).toEqual(copy)
+    })
+  })
+
+  describe('dayTotal', () => {
+    it('sums amounts in kuruş', () => {
+      const day = [
+        mockExpense({ amount: 12345 as Kurus }),
+        mockExpense({ amount: 1 as Kurus }),
+        mockExpense({ amount: 99900 as Kurus }),
+      ]
+      expect(dayTotal(day)).toBe(112246)
+    })
+
+    it('is zero for an empty day', () => {
+      expect(dayTotal([])).toBe(0)
     })
   })
 })
