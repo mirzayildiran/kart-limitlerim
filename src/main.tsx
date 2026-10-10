@@ -12,6 +12,7 @@ import { startReminders } from './platform/reminders'
 import { startLock } from './platform/lock'
 import { startDeepLinks } from './platform/deeplinks'
 import { startTextSize } from './platform/textSize'
+import { startKeyboard } from './platform/keyboard'
 import { LockScreen } from './features/lock/LockScreen'
 
 // Initialize data store (don't await before first render)
@@ -22,6 +23,7 @@ startReminders()
 startLock()
 startDeepLinks()
 startTextSize()
+startKeyboard()
 
 render(<App />, document.getElementById('app')!)
 
