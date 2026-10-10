@@ -5,6 +5,7 @@ import { formatTL } from '../../domain/money'
 import { figure } from '../../ui/components/Amount'
 import type { RunwayDay } from '../../domain/runway'
 import './runway.css'
+import { tick } from '../../platform/haptics'
 
 interface Props {
   days: RunwayDay[]
@@ -60,8 +61,8 @@ export function Runway({ days }: Props) {
     const r = el.getBoundingClientRect()
     const t = Math.min(1, Math.max(0, (clientX - r.left) / r.width))
     const next = Math.round(t * last)
-    // A light tick under the finger as the day changes (Android; ignored elsewhere).
-    if (next !== index && days[next].events.length > 0) navigator.vibrate?.(8)
+    // A light tick under the finger as the day changes.
+    if (next !== index && days[next].events.length > 0) tick()
     setSelected(next)
   }
 

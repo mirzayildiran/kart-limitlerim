@@ -10,7 +10,12 @@ workers_dev = true
 #   npx wrangler secret put OPENROUTER_API_KEY
 
 [vars]
-ALLOWED_ORIGINS = "https://mirzayildiran.github.io,http://localhost:5173"
+# capacitor://localhost is the iOS app (Capacitor).
+ALLOWED_ORIGINS = "https://mirzayildiran.github.io,http://localhost:5173,capacitor://localhost"
+# Live iOS testing loads the Mac's Vite server over the LAN (scripts/ios-dev.mjs), so also allow
+# http origins on a private IPv4 address (10/8, 172.16/12, 192.168/16) at this port only.
+# Remove the line to turn this off.
+LAN_DEV_PORT = "5173"
 RATE_LIMIT_PER_HOUR = "30"
 
 # 10 requests per minute per IP. Workers Rate Limiting binding; works on the free plan.
