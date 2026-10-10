@@ -51,7 +51,7 @@ Karar (2026-10-10): Öncelik App Store. Google Play çok sonraki bir plan. Ayrı
 - [x] iOS dokunsal geri bildirim (`src/platform/haptics.ts`)
 - [ ] Gerçek iPhone'da ilk deneme (Xcode kurulumu bekleniyor)
 - [ ] `PrivacyInfo.xcprivacy` ve App Store gizlilik etiketleri
-- [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası adresi
+- [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası (App Store paketi ve kalan eksikler: `docs/APP_STORE.md`; sayfalar: `public/privacy.html`, `public/support.html`)
 - [ ] Apple Developer Program üyeliği (TestFlight ve yayın için; şimdilik ücretsiz hesap)
 - [ ] Android paketi (sonra)
 
