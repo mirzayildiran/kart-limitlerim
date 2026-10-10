@@ -99,7 +99,7 @@ function RowBody({ row, onEdit }: { row: BudgetRow; onEdit: () => void }) {
         </p>
       )}
       <div class="budget-plan-actions">
-        <Button variant="ghost" onClick={onEdit}>
+        <Button variant="ghost" class="budget-plan-edit" onClick={onEdit}>
           Düzenle
         </Button>
       </div>
