@@ -6,7 +6,7 @@ import type { CardAccount, CardLine, Kurus } from './types'
 /**
  * Interest breakdown for a statement cycle.
  */
-export interface InterestBreakdown {
+interface InterestBreakdown {
   /** Contractual interest (period 1 + period 2) before taxes. */
   contractual: Kurus
   /** Late payment interest before taxes. */

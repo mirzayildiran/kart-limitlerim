@@ -2,7 +2,7 @@ import type { Expense, IsoDate, Kurus, MerchantRule } from '../../domain/types'
 import type { ParsedTxn } from '../../ocr/types'
 
 /** Rows below this parser confidence are not preselected and get a "Kontrol et" pill. */
-export const CONFIDENCE_MIN = 0.5
+const CONFIDENCE_MIN = 0.5
 
 /** One editable row on the review screen. Only debits become rows. */
 export interface DraftRow {
@@ -19,9 +19,9 @@ export interface DraftRow {
   selected: boolean
 }
 
-export type ImportableRow = DraftRow & { date: IsoDate; amount: Kurus }
+type ImportableRow = DraftRow & { date: IsoDate; amount: Kurus }
 
-export function normalizeText(s: string): string {
+function normalizeText(s: string): string {
   return s.replace(/\s+/g, ' ').trim().toLocaleLowerCase('tr-TR')
 }
 

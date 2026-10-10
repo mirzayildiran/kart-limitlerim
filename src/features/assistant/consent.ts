@@ -6,9 +6,9 @@ import { signal } from '@preact/signals'
  */
 
 export const CONSENT_VERSION = 1
-export const STORAGE_KEY = 'kl:assistant-consent'
+const STORAGE_KEY = 'kl:assistant-consent'
 
-export interface Consent {
+interface Consent {
   v: number
   /** When consent was given, epoch milliseconds. */
   at: number

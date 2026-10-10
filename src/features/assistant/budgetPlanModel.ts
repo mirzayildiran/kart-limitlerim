@@ -5,7 +5,7 @@ import type { Category, CategoryBudget, Kurus } from '../../domain/types'
 /** Pure helpers for the budget plan section of the assistant screen. */
 
 /** Days into the month before the month-end estimate is shown. */
-export const FORECAST_MIN_DAYS = PACE_MIN_DAYS
+const FORECAST_MIN_DAYS = PACE_MIN_DAYS
 
 export function statusLabel(s: BudgetStatus): string {
   if (s === 'ok') return 'Yolunda'

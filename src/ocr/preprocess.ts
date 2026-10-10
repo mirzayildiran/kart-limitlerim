@@ -4,11 +4,11 @@
  */
 
 /** Screenshots narrower than this are upscaled: Tesseract reads small text poorly. */
-export const UPSCALE_BELOW_WIDTH = 1400
-export const UPSCALE_FACTOR = 2
+const UPSCALE_BELOW_WIDTH = 1400
+const UPSCALE_FACTOR = 2
 
 /** Pixel buffer in RGBA order (a canvas `ImageData.data` or a plain array in tests). */
-export type RgbaBuffer = Uint8ClampedArray | number[]
+type RgbaBuffer = Uint8ClampedArray | number[]
 
 /** Scale applied before OCR for an image of this width. */
 export function ocrScaleFor(width: number): number {
@@ -65,7 +65,7 @@ export function toGrayscaleInPlace(rgba: RgbaBuffer, invert: boolean): void {
   }
 }
 
-export interface PreparedImage {
+interface PreparedImage {
   /** Canvas handed to Tesseract. Coordinates it reports are `scale` times the original image. */
   canvas: HTMLCanvasElement
   /** Upscale factor applied (1 or UPSCALE_FACTOR). */

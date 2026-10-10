@@ -27,6 +27,7 @@ export interface AssistantReply {
   provider: string
 }
 
+/** Error body the proxy sends: `{ "error": AssistantErrorCode }`. */
 export type AssistantErrorCode =
   | 'not_configured'
   | 'offline'
@@ -36,10 +37,6 @@ export type AssistantErrorCode =
   | 'unavailable'
   /** Client only: the user has not consented, so nothing was sent. The proxy never returns it. */
   | 'no_consent'
-
-export interface AssistantErrorBody {
-  error: AssistantErrorCode
-}
 
 export const LIMITS = {
   /** Most messages sent per request (older ones are dropped by the client). */

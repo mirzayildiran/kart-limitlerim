@@ -9,7 +9,7 @@ import { canDeleteCategory, checkCategoryName, isCategoryInUse } from '../settin
 import './category-sheet.css'
 
 /** Rendered by SheetHost while `sheet.value.type === 'category'`. No id = new category. */
-export interface CategorySheetProps {
+interface CategorySheetProps {
   request: Extract<SheetRequest, { type: 'category' }>
 }
 

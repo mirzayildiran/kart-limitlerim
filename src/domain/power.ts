@@ -9,7 +9,7 @@ import type { Account, BalanceAccount, CardAccount, KmhAccount, Kurus, Recurring
  * left once known obligations are paid. This is the app's core number.
  */
 
-export interface PowerBreakdown {
+interface PowerBreakdown {
   cards: Kurus
   kmh: Kurus
   liquid: Kurus
@@ -51,7 +51,7 @@ export function freeRatio(a: CardAccount | KmhAccount): number {
   return Math.min(1, Math.max(0, a.available / a.limit))
 }
 
-export type LimitHealth = 'empty' | 'low' | 'ok'
+type LimitHealth = 'empty' | 'low' | 'ok'
 
 export function limitHealth(a: CardAccount | KmhAccount): LimitHealth {
   if (a.available <= 0) return 'empty'
@@ -94,7 +94,7 @@ export function statementItems(accounts: Account[], today: Date): StatementItem[
   return items.sort((a, b) => rank[a.view.status] - rank[b.view.status] || +a.view.due - +b.view.due)
 }
 
-export interface Outlook {
+interface Outlook {
   until: Date
   days: number
   /** Unpaid minimums due on or before `until` (known or estimated). */

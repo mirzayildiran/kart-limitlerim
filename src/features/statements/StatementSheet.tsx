@@ -23,7 +23,7 @@ import {
 } from './statementForm'
 import './statementsheet.css'
 
-export interface StatementSheetProps {
+interface StatementSheetProps {
   request: Extract<SheetRequest, { type: 'statement' }>
 }
 

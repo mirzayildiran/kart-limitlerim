@@ -4,7 +4,7 @@ import type { CardAccount, KmhAccount, Kurus } from '../../domain/types'
 import { formatShort } from '../../domain/dates'
 import { CURRENT_RATES, withTaxes } from '../../domain/rates'
 
-export interface InterestPanelData {
+interface InterestPanelData {
   totalInterest: Kurus
   historyCycles: number
   currentProjected: Kurus | null
@@ -18,7 +18,7 @@ export interface InterestPanelData {
   }[]
 }
 
-export interface HistoryItem {
+interface HistoryItem {
   cycle: string
   amount: Kurus
   source: 'estimate' | 'statement'
@@ -102,7 +102,7 @@ export function kmhDailyCost(account: Pick<KmhAccount, 'limit' | 'available' | '
   return daily
 }
 
-export type StatementRowData = {
+type StatementRowData = {
   lineIndex: number
   label: string
   cutShort: string

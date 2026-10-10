@@ -11,7 +11,7 @@ export function accountFree(a: Account): Kurus {
   return a.kind === 'card' || a.kind === 'kmh' ? a.available : a.balance
 }
 
-export interface AccountPickerProps {
+interface AccountPickerProps {
   /** Visible label above the row, e.g. "Nereden ödedin?". */
   label: string
   /** Accounts in display order (callers usually pass cards, then KMH, then liquid). */
