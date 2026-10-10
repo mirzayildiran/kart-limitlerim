@@ -1,4 +1,4 @@
-import type { Account, Category, Expense, Kurus, RecurringPayment } from './types'
+import type { Account, Category, CategoryBudget, Expense, Kurus, RecurringPayment } from './types'
 
 /**
  * Shared contracts for the budget assistant. Every figure the assistant shows
@@ -11,6 +11,8 @@ export interface InsightInput {
   expenses: Expense[]
   categories: Category[]
   recurring: RecurringPayment[]
+  /** The user's monthly category targets; empty or missing when there is no plan. */
+  budgets?: CategoryBudget[]
   /** Local start of today. */
   today: Date
 }
@@ -25,6 +27,9 @@ export type InsightKind =
   | 'minimumInterest'
   | 'categoryIncrease'
   | 'bestCard'
+  | 'budgetOver'
+  | 'budgetPace'
+  | 'monthPace'
 
 /** One rule-based suggestion. Texts are Turkish, addressed with "sen". */
 export interface Insight {
@@ -71,6 +76,10 @@ export interface BudgetSummary {
   accounts: SummaryAccount[]
   /** Spending per category, month to date vs. the same days last month. */
   categories: SummaryCategory[]
+  /** Whole-month spending pace; figures are estimates. */
+  month: SummaryMonth
+  /** The user's budget plan with progress; empty when there is no plan. */
+  budgets: SummaryBudget[]
   /** Rule-based insights, already worded. */
   insights: { severity: InsightSeverity; title: string; body: string }[]
 }
@@ -98,3 +107,32 @@ export interface SummaryCategory {
   /** Whole-percent change, null when last month was zero. */
   changePercent: number | null
 }
+
+export interface SummaryMonth {
+  /** Spent this month up to today. */
+  spent: string
+  /** Same days of last month. */
+  lastMonthSamePeriod: string
+  /** Whole of last month. */
+  lastMonthTotal: string
+  /** Estimated month-end total if the daily pace holds (tahmini). */
+  projected: string
+  daysPassed: number
+  daysInMonth: number
+}
+
+export interface SummaryBudget {
+  category: string
+  monthly: string
+  spent: string
+  /** Negative when over the target. */
+  remaining: string
+  /** Whole percent of the target used so far. */
+  usedPercent: number
+  /** Estimated month-end spend at the current pace (tahmini). */
+  projected: string
+  status: BudgetStatus
+}
+
+/** ok: on track; near: ≥ 80% used; pace: projected to exceed; over: already exceeded. */
+export type BudgetStatus = 'ok' | 'near' | 'pace' | 'over'

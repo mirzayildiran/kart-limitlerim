@@ -1,3 +1,4 @@
+import { budgetProgress, monthPace as paceOfMonth, type BudgetRow } from './budget'
 import { cycleKeyOf, daysBetween, fromIso, formatShort, shiftMonth } from './dates'
 import { projectedInterest } from './interest'
 import { CURRENT_RATES } from './rates'
@@ -20,6 +21,12 @@ const CATEGORY_MIN_THIS_MONTH: Kurus = 50_000
 const CATEGORY_RATIO_NUM = 13
 const CATEGORY_RATIO_DEN = 10
 const CATEGORY_MAX = 3
+
+/** Month pace is worth a note only when it runs this far above last month (+10%). */
+const MONTH_PACE_NUM = 11
+const MONTH_PACE_DEN = 10
+/** Same minimum day count as the budget pace check: earlier estimates are too noisy. */
+const MONTH_PACE_MIN_DAYS = 7
 
 /** Taxes on interest (KKDF + BSMV = 15% + 15%), applied on top of the rate. */
 const TAX_FACTOR = 1.3
@@ -146,7 +153,11 @@ function minimumInterest(input: InsightInput): Insight[] {
   return out
 }
 
-function categoryIncrease(input: InsightInput): Insight[] {
+/**
+ * `budgeted` lists categories with a budget row. Those are covered by the
+ * budget rules, so they get no category-increase insight.
+ */
+function categoryIncrease(input: InsightInput, budgeted: Set<string>): Insight[] {
   const { today } = input
   const thisKey = cycleKeyOf(today)
   const lastKey = shiftMonth(thisKey, -1)
@@ -169,6 +180,7 @@ function categoryIncrease(input: InsightInput): Insight[] {
 
   const candidates: { categoryId: string; name: string; thisMonth: Kurus; lastMonth: Kurus; diff: Kurus }[] = []
   for (const [categoryId, t] of totals) {
+    if (budgeted.has(categoryId)) continue
     if (t.thisMonth < CATEGORY_MIN_THIS_MONTH || t.lastMonth <= 0) continue
     // Integer comparison: thisMonth ≥ 1.3 × lastMonth.
     if (t.thisMonth * CATEGORY_RATIO_DEN < t.lastMonth * CATEGORY_RATIO_NUM) continue
@@ -188,6 +200,49 @@ function categoryIncrease(input: InsightInput): Insight[] {
       amount: c.diff,
     }
   })
+}
+
+function budgetOver(rows: BudgetRow[]): Insight[] {
+  return rows
+    .filter((r) => r.status === 'over')
+    .map((r) => ({
+      id: `budgetOver:${r.categoryId}`,
+      kind: 'budgetOver',
+      severity: 'warn',
+      title: `${r.name} bütçesi aşıldı`,
+      body: `Bu ay ${formatTL(r.spent)} harcadın, hedefin ${formatTL(r.monthly)}. ${formatTL(r.spent - r.monthly)} fazlası var.`,
+      amount: r.spent - r.monthly,
+    }))
+}
+
+function budgetPace(rows: BudgetRow[]): Insight[] {
+  return rows
+    .filter((r) => r.status === 'pace')
+    .map((r) => ({
+      id: `budgetPace:${r.categoryId}`,
+      kind: 'budgetPace',
+      severity: 'warn',
+      title: `${r.name} bütçesi bu hızla aşılabilir`,
+      body: `Bu ay şimdiye kadar ${formatTL(r.spent)} harcadın, hedefin ${formatTL(r.monthly)}. Bu hızla ay sonunda tahmini ${formatTL(r.projected)} harcarsın.`,
+      amount: r.projected,
+    }))
+}
+
+function monthPace(input: InsightInput): Insight[] {
+  const pace = paceOfMonth(input.expenses, input.today)
+  if (pace.daysPassed < MONTH_PACE_MIN_DAYS || pace.lastMonthTotal <= 0) return []
+  // Integer comparison: projected > 1.1 × last month's total.
+  if (pace.projected * MONTH_PACE_DEN <= pace.lastMonthTotal * MONTH_PACE_NUM) return []
+  return [
+    {
+      id: 'monthPace',
+      kind: 'monthPace',
+      severity: 'info',
+      title: 'Bu ay geçen aydan fazla harcıyorsun',
+      body: `Bu hızla ay sonunda tahmini ${formatTL(pace.projected)} harcarsın. Geçen ay toplam ${formatTL(pace.lastMonthTotal)} idi.`,
+      amount: pace.projected,
+    },
+  ]
 }
 
 function bestCard(input: InsightInput): Insight[] {
@@ -225,13 +280,18 @@ function bestCard(input: InsightInput): Insight[] {
  * Within one severity the order follows the rule order below.
  */
 export function computeInsights(input: InsightInput): Insight[] {
+  const rows = budgetProgress(input.expenses, input.budgets ?? [], input.categories, input.today)
+  const budgeted = new Set(rows.map((r) => r.categoryId))
   const all = [
     ...cashShortfall(input),
     ...statementDue(input),
     ...cardNearLimit(input),
     ...kmhInterest(input),
     ...minimumInterest(input),
-    ...categoryIncrease(input),
+    ...categoryIncrease(input, budgeted),
+    ...budgetOver(rows),
+    ...budgetPace(rows),
+    ...monthPace(input),
     ...bestCard(input),
   ]
   return all.sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity])

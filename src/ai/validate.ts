@@ -60,6 +60,8 @@ function isSummaryShape(value: unknown): value is BudgetSummary {
     isRecord(value.outlook) &&
     Array.isArray(value.accounts) &&
     Array.isArray(value.categories) &&
+    isRecord(value.month) &&
+    Array.isArray(value.budgets) &&
     Array.isArray(value.insights)
   )
 }

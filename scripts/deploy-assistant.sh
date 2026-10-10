@@ -61,7 +61,7 @@ echo "Aracı adresi: $URL"
 sleep 5
 STATUS=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$URL/" \
   -H "Origin: $ORIGIN" -H 'content-type: application/json' \
-  --data '{"v":1,"summary":{"date":"2026-01-01","power":{},"outlook":{},"accounts":[],"categories":[],"insights":[]},"messages":[{"role":"user","text":"Merhaba"}]}' \
+  --data '{"v":1,"summary":{"date":"2026-01-01","power":{},"outlook":{},"accounts":[],"categories":[],"month":{},"budgets":[],"insights":[]},"messages":[{"role":"user","text":"Merhaba"}]}' \
   || echo "000")
 echo "Duman testi durum kodu: $STATUS"
 [ "$STATUS" = "200" ] || echo "::warning::Aracı duman testinde $STATUS döndü."
