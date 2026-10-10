@@ -12,6 +12,48 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <title>Kart Limitlerim</title>
+    <!--
+      Theme before first paint. The native splash and the default theme are dark (#0a0a11);
+      a saved light theme is applied at once and a dark veil over it fades out, so the
+      hand-over from the splash is a short fade, never a hard flash. Mirrors src/ui/theme.ts.
+    -->
+    <script>
+      ;(function () {
+        try {
+          var t = localStorage.getItem('kl:theme') || 'dark'
+          var root = document.documentElement
+          if (t === 'light' || t === 'dark') root.setAttribute('data-theme', t)
+          var light = t === 'light' || (t === 'system' && matchMedia('(prefers-color-scheme: light)').matches)
+          if (light) root.setAttribute('data-boot', 'fade')
+        } catch (e) {}
+      })()
+    </script>
+    <style>
+      html {
+        background: #0a0a11;
+      }
+      html[data-boot='fade'] body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 2147483646;
+        background: #0a0a11;
+        pointer-events: none;
+        animation: kl-boot-fade 320ms ease-out 120ms forwards;
+      }
+      @keyframes kl-boot-fade {
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html[data-boot='fade'] body::after {
+          animation-duration: 1ms;
+          animation-delay: 0ms;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
