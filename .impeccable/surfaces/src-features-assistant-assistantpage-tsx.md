@@ -32,3 +32,12 @@ FORM:
 - **Motion:** press language only.
 
 FINISH: critique on captures, fix round, finish reviewer verdict, DESIGN.md Rollout status updated.
+
+## As built (lead, 2026-10-10) — supersedes FORM where they differ
+
+- Intro may wrap to two balanced lines at 360 px (`text-wrap: balance`); the sentence carries the product's promise and is not cut to fit one line.
+- "Kategori için hedef ekle" is a secondary button: lime stays for the single forward action on a screen, and this page has none above the fold; OWN-WORLD's mention of it as lime is superseded.
+- Suggestion rows with a target are full-width buttons with a chevron (statement, account detail, Harcamalar, Takvim); each due suggestion carries a pill.
+- Özet entry reads "· asistanda N öneri" (the word "asistan" makes the destination findable; the suffix never wraps apart); when the status is "all fine" but warn/crit suggestions exist, the most urgent suggestion's title replaces the status.
+- Budget plan category goals render as hairline rows in one container, like the suggestions.
+- With no proxy URL the chat shows one quiet line, "Sohbet şu an kullanılamıyor. Yukarıdaki öneriler yine de çalışır.", without a section title.
