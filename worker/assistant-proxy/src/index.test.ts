@@ -28,6 +28,8 @@ const SUMMARY = {
   },
   accounts: [],
   categories: [],
+  month: { spent: '0 ₺', lastMonthSamePeriod: '0 ₺', lastMonthTotal: '0 ₺', projected: '0 ₺', daysPassed: 10, daysInMonth: 31 },
+  budgets: [],
   insights: [],
 }
 

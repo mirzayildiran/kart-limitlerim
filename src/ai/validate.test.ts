@@ -17,6 +17,15 @@ const summary = {
   },
   accounts: [{ name: 'Örnek Kart', kind: 'kart', available: '20.000 ₺', limit: '30.000 ₺' }],
   categories: [{ name: 'Market', thisMonth: '1.000 ₺', lastMonthSamePeriod: '800 ₺', changePercent: 25 }],
+  month: {
+    spent: '3.000 ₺',
+    lastMonthSamePeriod: '2.500 ₺',
+    lastMonthTotal: '8.000 ₺',
+    projected: '9.300 ₺',
+    daysPassed: 10,
+    daysInMonth: 31,
+  },
+  budgets: [],
   insights: [{ severity: 'info', title: 'Başlık', body: 'Metin.' }],
 }
 
@@ -169,10 +178,18 @@ describe('parseAssistantRequest', () => {
     expect(parseAssistantRequest(noOutlook)).toBeNull()
   })
 
-  it('rejects a summary whose accounts, categories or insights is not an array', () => {
-    for (const key of ['accounts', 'categories', 'insights'] as const) {
+  it('rejects a summary whose accounts, categories, budgets or insights is not an array', () => {
+    for (const key of ['accounts', 'categories', 'budgets', 'insights'] as const) {
       const body = validBody()
       body.summary = { ...summary, [key]: {} }
+      expect(parseAssistantRequest(body)).toBeNull()
+    }
+  })
+
+  it('rejects a summary whose month is missing or not an object', () => {
+    for (const month of [undefined, 'x', []]) {
+      const body = validBody()
+      body.summary = { ...summary, month }
       expect(parseAssistantRequest(body)).toBeNull()
     }
   })

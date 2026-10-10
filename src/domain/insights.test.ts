@@ -341,6 +341,107 @@ describe('computeInsights', () => {
     })
   })
 
+  describe('budgetOver', () => {
+    it('warns when spending in a category passes its monthly target', () => {
+      const result = computeInsights(
+        input({
+          budgets: [{ categoryId: 'yemek', monthly: 100_000 }],
+          expenses: [exp('yemek', 120_000, '2026-10-03')],
+        }),
+      )
+      const [s] = byKind(result, 'budgetOver')
+      expect(s).toMatchObject({ id: 'budgetOver:yemek', severity: 'warn', title: 'Yemek bütçesi aşıldı', amount: 20_000 })
+      expect(s.body).toBe(
+        `Bu ay ${formatTL(120_000)} harcadın, hedefin ${formatTL(100_000)}. ${formatTL(20_000)} fazlası var.`,
+      )
+    })
+
+    it('does not fire while spending is within the target', () => {
+      const result = computeInsights(
+        input({
+          budgets: [{ categoryId: 'yemek', monthly: 500_000 }],
+          expenses: [exp('yemek', 120_000, '2026-10-03')],
+        }),
+      )
+      expect(byKind(result, 'budgetOver')).toHaveLength(0)
+    })
+  })
+
+  describe('budgetPace', () => {
+    it('warns when the month-end estimate passes the target', () => {
+      // 1.000 ₺ in 10 days projects to 3.100 ₺ against a 3.000 ₺ target.
+      const result = computeInsights(
+        input({
+          budgets: [{ categoryId: 'market', monthly: 300_000 }],
+          expenses: [exp('market', 100_000, '2026-10-03')],
+        }),
+      )
+      const [s] = byKind(result, 'budgetPace')
+      expect(s).toMatchObject({ id: 'budgetPace:market', severity: 'warn', title: 'Market bütçesi bu hızla aşılabilir', amount: 310_000 })
+      expect(s.body).toBe(
+        `Bu ay şimdiye kadar ${formatTL(100_000)} harcadın, hedefin ${formatTL(300_000)}. Bu hızla ay sonunda tahmini ${formatTL(310_000)} harcarsın.`,
+      )
+      expect(byKind(result, 'budgetOver')).toHaveLength(0)
+    })
+
+    it('waits until the seventh day of the month', () => {
+      const result = computeInsights(
+        input({
+          today: new Date(2026, 9, 5),
+          budgets: [{ categoryId: 'market', monthly: 100_000 }],
+          expenses: [exp('market', 30_000, '2026-10-02')],
+        }),
+      )
+      expect(byKind(result, 'budgetPace')).toHaveLength(0)
+    })
+  })
+
+  describe('monthPace', () => {
+    // 10 Oct: 40.000 ₺ so far projects to 124.000 ₺; last month was 100.000 ₺.
+    const fast = [exp('yemek', 4_000_000, '2026-10-03'), exp('yemek', 10_000_000, '2026-09-15')]
+
+    it('notes a month running more than 10% above last month', () => {
+      const [s] = byKind(computeInsights(input({ expenses: fast })), 'monthPace')
+      expect(s).toMatchObject({ id: 'monthPace', severity: 'info', title: 'Bu ay geçen aydan fazla harcıyorsun', amount: 12_400_000 })
+      expect(s.body).toBe(
+        `Bu hızla ay sonunda tahmini ${formatTL(12_400_000)} harcarsın. Geçen ay toplam ${formatTL(10_000_000)} idi.`,
+      )
+    })
+
+    it('does not fire at exactly 10% above last month', () => {
+      // Projects to 3.410.000 kuruş against 1.1 × 3.100.000 = 3.410.000.
+      const exact = [exp('yemek', 1_100_000, '2026-10-03'), exp('yemek', 3_100_000, '2026-09-20')]
+      expect(byKind(computeInsights(input({ expenses: exact })), 'monthPace')).toHaveLength(0)
+    })
+
+    it('waits until the seventh day of the month', () => {
+      const result = computeInsights(input({ today: new Date(2026, 9, 6), expenses: fast }))
+      expect(byKind(result, 'monthPace')).toHaveLength(0)
+    })
+
+    it('needs some spending last month to compare with', () => {
+      const result = computeInsights(input({ expenses: [exp('yemek', 4_000_000, '2026-10-03')] }))
+      expect(byKind(result, 'monthPace')).toHaveLength(0)
+    })
+  })
+
+  describe('budgeted categories', () => {
+    it('leaves out the category increase for a budgeted category only', () => {
+      const result = computeInsights(
+        input({
+          budgets: [{ categoryId: 'yemek', monthly: 500_000 }],
+          expenses: [
+            exp('yemek', 60_000, '2026-10-03'),
+            exp('yemek', 40_000, '2026-09-02'),
+            exp('market', 60_000, '2026-10-03'),
+            exp('market', 40_000, '2026-09-02'),
+          ],
+        }),
+      )
+      expect(byKind(result, 'categoryIncrease').map((i) => i.id)).toEqual(['categoryIncrease:market'])
+    })
+  })
+
   describe('ordering', () => {
     it('sorts crit, then warn, then info, keeping rule order within a severity', () => {
       const result = computeInsights(
