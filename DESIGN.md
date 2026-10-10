@@ -217,7 +217,7 @@ Density is mobile-first and generous: one column, at most 560px wide, 24px betwe
 
 The user has explicitly rejected, across this redesign: grey stone ground with an evergreen accent, a warm peach ground, and violet panels or accents; and, as a durable brand commitment, any themed costume world (road signs, boarding passes, transit boards, calendars, banknotes). Treat those as closed doors.
 
-Rollout status (2026-10-10): the world is built on Özet (`src/features/home/`), Harcamalar (`src/features/expenses/ExpensesPage.tsx`), Takvim (`src/features/calendar/`) and Ayarlar (`src/features/settings/`), plus the shared components (Amount, LimitStrip, controls, Sheet, TabBar) and the motion system (`.impeccable/surfaces/motion-system.md`). The bottom sheets are being migrated (`.impeccable/surfaces/sheets.md`); until then they inherit the tokens only.
+Rollout status (2026-10-10): the world is built on Özet (`src/features/home/`), Harcamalar (`src/features/expenses/ExpensesPage.tsx`), Takvim (`src/features/calendar/`) and Ayarlar (`src/features/settings/`), Bütçe asistanı (`src/features/assistant/`), plus the shared components (Amount, LimitStrip, controls, Sheet, TabBar) and the motion system (`.impeccable/surfaces/motion-system.md`). The bottom sheets are being migrated (`.impeccable/surfaces/sheets.md`); until then they inherit the tokens only.
 
 **Key Characteristics:**
 - Near-black ground, slate surfaces, colour reserved for meaning.
@@ -368,6 +368,9 @@ A 28px-radius slate panel ("Kesime kadar") holding a scrubbable plot (role=slide
 
 ### Payment row
 A 16px row tinted 10% toward its account's wallet colour with a 22% border, led by a 52px date tile in the full wallet colour (day in display 800, month caption). Figure right, status pill below. Shrinks to 0.985 on press.
+
+### Suggestion row (assistant)
+One slate container of hairline rows, never a stack of cards. Each row leads with a 36px rounded medallion: the account's wallet colour with its ink when the suggestion concerns one account, otherwise slate with a muted icon. Urgency sits on the medallion as a 2px ring 2px off its edge (rose for crit, amber for warn; info has none), and as text: a pill for due dates and a screen-reader prefix. Rows that lead somewhere are full-width buttons with a chevron. The same medallion language marks Takvim's agenda rows.
 
 ### Status notes
 Full-width 16px-radius notes on a semantic wash: Lime Moss for "cash left after payments", rose wash when short (the shortfall figure in rose), amber wash for recurring payments due today with a round slate icon medallion and a chevron.
