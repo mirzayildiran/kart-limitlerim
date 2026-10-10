@@ -17,6 +17,12 @@ THESIS: Forms that speak the wallet's language. Choosing an account means choosi
 
 OWN-WORLD: Özet's world unchanged. Lime = the primary action and "you are here" (selected category, focused field ring). Account colour fills account choices. Category colour only as a dot. Rose only for destructive actions and the interest figure. Amber for estimates needing attention.
 
+STORY: open from a page action → the one field the sheet is for → the choices in the app's colours → the preview of what saving does → one primary action.
+
+FIRST VIEWPORT (360×780): title (and subtitle when it names the account); the primary field; the first choice row.
+
+FORM: inherits the Özet roll (seed 57a8a444, recorded in `.impeccable/surfaces/src-features-home-homepage-tsx.md`); the per-control and per-sheet rules below are the form.
+
 ## Shared controls (src/ui/components)
 
 - **AccountPicker** (new, shared): horizontal snap-scrolling row of compact account chips (min 120×56, `--r-lg`): name (body-strong) + available/balance (caption, tabular). Unselected: slate `--surface-2`, 1px line, a 14×10 rounded-rect swatch in the account's wallet colour before the name (the tile shape in miniature; never a dot). Selected: filled with the wallet colour, wallet ink, `check` icon top-right, `aria-pressed`/radio semantics (`role="radiogroup"` + `role="radio"` + `aria-checked`). Used by ExpenseSheet, RecurringSheet, ImportSheet.
