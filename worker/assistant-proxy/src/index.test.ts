@@ -274,7 +274,7 @@ describe('providers', () => {
     const messageText = 'MESAJ-GIZLI-4417'
     const summary = {
       ...SUMMARY,
-      insights: [{ severity: 'warning', title: 'OZET-GIZLI-9921', body: 'ozet metni' }],
+      insights: [{ severity: 'warn', title: 'OZET-GIZLI-9921', body: 'ozet metni' }],
     }
     stubFetch(() => new Response('x', { status: 500 }))
     const body = { v: 1, summary, messages: [{ role: 'user', text: messageText }] }

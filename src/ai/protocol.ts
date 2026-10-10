@@ -48,4 +48,16 @@ export const LIMITS = {
   maxMessageChars: 1000,
   /** Largest JSON body the proxy accepts, in bytes. */
   maxBodyBytes: 16_000,
+  /** Summary list sizes; the proxy drops anything past these. */
+  maxAccounts: 30,
+  maxCategories: 8,
+  maxBudgets: 12,
+  maxInsights: 10,
+  /** Account and category names, cut to this many characters. */
+  maxNameChars: 60,
+  /** A formatted figure such as "1.234.567,89 ₺". */
+  maxFigureChars: 24,
+  /** Insight title and body. */
+  maxTitleChars: 120,
+  maxBodyChars: 400,
 } as const

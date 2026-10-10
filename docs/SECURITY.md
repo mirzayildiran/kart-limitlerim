@@ -9,10 +9,11 @@ Yayın öncesi denetim, 2026-10-10. Dal: `claude/security-pass`. Bulgular önem 
 - Derin bağlantıda prototip anahtarı ve uzunluk sınırı (bulgu 5).
 - Yedek dosyasında 20 milyon karakter sınırı (bulgu 6).
 - Derlemede sır taraması: temiz (bulgu 7).
+- Worker özeti alan alan yeniden kuruyor; bilinmeyen alanlar atılıyor (bulgu 2, bulut oturumu).
 
 ## Açık kalanlar
 
-1. **Worker özetinin alan alan doğrulanması (orta, bulgu 2):** Bilinen anahtarlar, metin ve dizi sınırları; bilinmeyen alanlar atılsın. Gerekirse Turnstile ya da App Attest.
+1. **İstemci doğrulaması (bulgu 2'nin kalanı):** Gerekirse Turnstile ya da App Attest. Alan doğrulaması yapıldı.
 2. **Yedek kayıt şeması (düşük, bulgu 4):** En azından `accounts` için tür, kuruş ve tarih denetimi.
 3. **iOS'ta CSP doğrulaması:** WKWebView'da `capacitor://localhost` için `'self'` ve Capacitor köprüsü (bulgu 3). Chromium'da doğrulandı, cihazda denenmedi.
 
@@ -21,7 +22,7 @@ Yayın öncesi denetim, 2026-10-10. Dal: `claude/security-pass`. Bulgular önem 
 | # | Önem | Bulgu | Durum |
 |---|---|---|---|
 | 1 | Yüksek | Asistan onayı yalnızca arayüzde uygulanıyordu | Düzeltildi |
-| 2 | Orta | Worker, Origin taklidiyle genel bir LLM aracısı gibi kullanılabilir | Açık, öneri aşağıda |
+| 2 | Orta | Worker, Origin taklidiyle genel bir LLM aracısı gibi kullanılabilir | Alan doğrulaması yapıldı; istemci doğrulaması açık |
 | 3 | Orta | Content-Security-Policy yoktu | Düzeltildi |
 | 4 | Düşük | Yedek geri yüklemede kayıt içi alanlar doğrulanmıyor | Açık, öneri aşağıda |
 | 5 | Düşük | Derin bağlantıda prototip anahtarları ve sınırsız uzunluk | Düzeltildi |
@@ -44,7 +45,11 @@ Gönderilmeyenler: tek tek harcamalar, notlar, düzenli ödeme adları, yedek, k
 
 Hesap ve kategori adları kullanıcının serbest metnidir; kişisel bilgi içerebilir. Onay ekranı gönderilecek özetin tam hâlini gösterir.
 
-## 2. Worker genel bir LLM aracısı gibi kullanılabilir (orta, açık)
+## 2. Worker genel bir LLM aracısı gibi kullanılabilir (orta, kısmen düzeltildi)
+
+**Düzeltme:** `parseSummary` (`src/ai/validate.ts`) özeti alan alan yeniden kurar. Bilinmeyen anahtarlar atılır; tutarlar yalnızca rakam, ayraç, işaret ve ₺ içerebilir (en çok 24 karakter); tarihler `YYYY-AA-GG`; sayılar tam sayı; tür ve durum alanları izin listesinden. Adlar 60, öneri başlığı 120, metni 400 karakterde kesilir; listeler en çok 30 hesap, 8 kategori, 12 bütçe, 10 öneri. Böylece özete serbest metin koymanın tek yolu kısa ad ve öneri alanları kalır. Testler `src/ai/validate.test.ts`.
+
+Önceki durum:
 
 `Origin` başlığı tarayıcı dışında taklit edilebilir; README'de de böyle yazıyor. `parseAssistantRequest` özetin yalnızca biçimini denetler, içindeki alanlara bakmaz. Bu yüzden biri `summary` içine 16 KB'a kadar keyfi metin koyup Worker'ı ücretsiz bir LLM aracısı gibi kullanabilir. Sonuç sağlayıcı kotalarının tükenmesi ve asistanın gerçek kullanıcılar için `unavailable` dönmesidir.
 
@@ -55,7 +60,7 @@ Hesap ve kategori adları kullanıcının serbest metnidir; kişisel bilgi içer
 - Sağlayıcı anahtarları istemciye hiç gelmez.
 
 **Öneri (sıradaki iş):**
-1. `parseAssistantRequest` özeti alan alan doğrulasın: bilinen anahtarlar, metin uzunluğu sınırları, dizi boyları (ör. en çok 30 hesap ve 30 kategori). Bilinmeyen alanlar atılsın.
+1. ~~`parseAssistantRequest` özeti alan alan doğrulasın~~ (yapıldı).
 2. Gerekirse Cloudflare Turnstile ya da iOS App Attest ile istemci doğrulaması.
 
 ## 3. Content-Security-Policy (orta, düzeltildi)
@@ -113,7 +118,7 @@ Web ve `CAP_NATIVE` derlemesinde `dist/` (OCR dosyaları dahil) şu desenlerle t
 
 ## Worker (girdi, boyut, günlük)
 
-- **Girdi:** `parseAssistantRequest` sürümü, mesaj sayısını (1–12), rolleri, metin uzunluğunu (1.000) ve son mesajın kullanıcıdan gelmesini denetler. Özetin yalnızca biçimine bakılır (bkz. 2).
+- **Girdi:** `parseAssistantRequest` sürümü, mesaj sayısını (1–12), rolleri, metin uzunluğunu (1.000) ve son mesajın kullanıcıdan gelmesini denetler. Özet alan alan yeniden kurulur (bkz. 2).
 - **Boyut:** `content-length` ve gerçek gövde 16 KB ile sınırlı; aşınca 413.
 - **Günlük:** Yalnızca sağlayıcı adı ve hata türü yazılır; istek gövdesi, özet ve yanıt metni yazılmaz. Sağlayıcı hata gövdesi istemciye iletilmez. Testle doğrulanıyor (`worker/assistant-proxy/src/index.test.ts`).
 - **IP adresi:** Yalnızca bellekte, saatlik sayaçta tutulur; sağlayıcılara iletilmez.
