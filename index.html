@@ -13,9 +13,11 @@
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <title>Kart Limitlerim</title>
     <!--
-      Theme before first paint. The native splash and the default theme are dark (#0a0a11);
-      a saved light theme is applied at once and a dark veil over it fades out, so the
-      hand-over from the splash is a short fade, never a hard flash. Mirrors src/ui/theme.ts.
+      Boot screen and theme before first paint. The native splash and the default theme are
+      dark (#0a0a11). #boot covers the page on that ground until the first render; then
+      dismissBoot() in src/ui/theme.ts takes it down: a short fade over a light theme
+      (data-boot="fade", set below), at once over the dark theme or with reduced motion.
+      The theme logic mirrors src/ui/theme.ts.
     -->
     <script>
       ;(function () {
@@ -32,30 +34,32 @@
       html {
         background: #0a0a11;
       }
-      html[data-boot='fade'] body::after {
-        content: '';
+      #boot {
         position: fixed;
         inset: 0;
         z-index: 2147483646;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: #0a0a11;
+        color: #f5f5fa;
+        font: 600 20px/1.2 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        letter-spacing: -0.01em;
         pointer-events: none;
-        animation: kl-boot-fade 320ms ease-out 120ms forwards;
+        transition: opacity 320ms ease-out;
       }
-      @keyframes kl-boot-fade {
-        to {
-          opacity: 0;
-          visibility: hidden;
-        }
+      #boot.is-leaving {
+        opacity: 0;
       }
       @media (prefers-reduced-motion: reduce) {
-        html[data-boot='fade'] body::after {
-          animation-duration: 1ms;
-          animation-delay: 0ms;
+        #boot {
+          transition: none;
         }
       }
     </style>
   </head>
   <body>
+    <div id="boot">Kart Limitlerim</div>
     <div id="app"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
