@@ -15,7 +15,7 @@ Audience and job: occasional visits to change the theme, manage categories, back
 
 THESIS: A calm settings page that still belongs to the wallet world: slate groups on the night ground, sentence-case section titles that stand on their own, the privacy promise stated as the page's quiet anchor. Rejects the incumbent's small muted labels floating above each group (they read as kickers), the always-on install guide at the top, and the dense rate paragraph.
 
-OWN-WORLD: Özet's world unchanged. Lime only for actions (segmented active state, "Kategori ekle", primary buttons); rose only for the destructive action; category colour as dots.
+OWN-WORLD: Özet's world unchanged. Lime only for actions ("Kategori ekle", primary buttons; the segmented control's selected option sits on slate per DESIGN.md Choice); rose only for the destructive action; category colour as dots.
 
 STORY: Görünüm → Kategoriler → Yedek → Faiz nasıl tahmin ediliyor → Gizlilik → Uygulama gibi kullan (only when not installed) → Tehlikeli bölge → version line.
 
@@ -34,3 +34,9 @@ FORM:
 - **Motion:** press language only.
 
 FINISH: critique on captures, fix round, finish reviewer verdict, DESIGN.md Rollout status updated.
+
+## Adaptations recorded after build (lead, 2026-10-10)
+
+- Backup buttons stay stacked at every width: at 430 px side by side, "Yedekten geri yükle" wrapped to two lines (measured in the 430 capture); stacking keeps both labels on one line and the restore action no wider than the download.
+- Rate values break into two lines ("akdi %3,25" / "gecikme %3,55"): at 360 px the single-line form squeezed the label column to about 100 px and wrapped the labels to three lines.
+- The restore confirmation is part of the backup group, separated by a hairline, not a nested box (craft floor: nested cards).
