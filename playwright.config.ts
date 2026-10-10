@@ -22,6 +22,9 @@ export default defineConfig({
     locale: 'tr-TR',
     timezoneId: 'Europe/Istanbul',
     reducedMotion: 'reduce',
+    // The PWA's "works offline" toast would replace the toast a test checks once the service
+    // worker installs; the tests are about the app, not the offline cache.
+    serviceWorkers: 'block',
     trace: 'retain-on-failure',
     launchOptions: process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {},
   },
