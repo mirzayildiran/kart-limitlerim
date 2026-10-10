@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact'
 import { useEffect, useId, useRef } from 'preact/hooks'
-import { formatTL } from '../../domain/money'
+import { formatTL, spokenTL } from '../../domain/money'
 import type { Account, Kurus } from '../../domain/types'
 import { Icon } from './Icon'
 import { rovingRadioKey } from './roving'
@@ -71,7 +71,7 @@ export function AccountPicker({ label, accounts, colors, value, onChange, error,
               type="button"
               role="radio"
               aria-checked={on}
-              aria-label={`${a.name}, ${formatTL(free)} ${hasLimit ? 'kullanılabilir' : 'bakiye'}`}
+              aria-label={`${a.name}, ${spokenTL(free)} ${hasLimit ? 'kullanılabilir' : 'bakiye'}`}
               tabIndex={on || (!hasSelection && i === 0) ? 0 : -1}
               class={`account-picker-chip${on ? ' is-selected' : ''}`}
               data-slot={colors.get(a.id) ?? 1}

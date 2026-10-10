@@ -39,6 +39,32 @@ export function formatTLExact(k: Kurus): string {
   return `${formatNumberTLExact(k)} ₺`
 }
 
+/**
+ * How VoiceOver should say an amount: "eksi 1.234 lira", "1.234,56 lira". The ₺ sign is read
+ * as a symbol name and a leading "−" may be skipped, so both are spelled out as words.
+ * `sign` prefixes the sign for the absolute value, as Amount does.
+ */
+export function spokenTL(k: Kurus, opts: { exact?: boolean; sign?: 'minus' | 'plus' | null } = {}): string {
+  const { exact = false, sign = null } = opts
+  const format = exact ? exactText : formatNumberTL
+  const shown = exact ? k : Math.round(k / 100) * 100
+  const negative = sign ? sign === 'minus' : shown < 0
+  const prefix = sign === 'plus' ? 'artı ' : negative && shown !== 0 ? 'eksi ' : ''
+  return `${prefix}${format(Math.abs(k))} lira`
+}
+
+/**
+ * Spoken form of a formatted figure such as "~−1.234,56 ₺": "yaklaşık eksi 1.234,56 lira".
+ * Text without a leading "~" or minus, or without ₺, is left as it is.
+ */
+export function spokenFigure(text: string): string {
+  return text
+    .replace(/^~\s*/, 'yaklaşık ')
+    .replace(/(^|\s)[−-](?=\d)/, '$1eksi ')
+    .replace(/\s*₺/g, ' lira')
+    .trim()
+}
+
 /** Number only, for prefilling inputs: 123456 → "1.234,56". Same shape as formatNumberTLExact. */
 export function formatInput(k: Kurus): string {
   return exactText(k)
