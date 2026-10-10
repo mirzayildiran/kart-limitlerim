@@ -32,7 +32,7 @@ const DEFAULT_RATE_LIMIT = 30
 const RATE_WINDOW_MS = 60 * 60 * 1000
 const RATE_MAP_PRUNE_AT = 5_000
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent'
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
@@ -138,8 +138,9 @@ async function callGemini(key: string, system: string, turns: ChatMessage[]): Pr
     generationConfig: {
       temperature: TEMPERATURE,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
-      // gemini-2.5-flash thinks by default and the thinking tokens count against maxOutputTokens.
-      thinkingConfig: { thinkingBudget: 0 },
+      // Gemini 3 models think by default and the thinking tokens count against maxOutputTokens;
+      // thinkingBudget is ignored there, so ask for the lowest thinking level instead.
+      thinkingConfig: { thinkingLevel: 'low' },
     },
   }
   const data = await postJson(GEMINI_URL, { 'x-goog-api-key': key }, body)
