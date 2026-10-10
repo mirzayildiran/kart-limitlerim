@@ -26,6 +26,7 @@ import {
   monthNavigation,
 } from './expenseModel'
 import './expenses-page.css'
+import { tick } from '../../platform/haptics'
 
 const CATEGORY_PREVIEW = 4
 
@@ -50,13 +51,13 @@ function setSelectedMonth(key: string) {
 }
 
 function toggleCategory(id: string) {
-  navigator.vibrate?.(8)
+  tick()
   categoryFilter.value = categoryFilter.value === id ? null : id
   listSwap.value++
 }
 
 function toggleAccount(id: string) {
-  navigator.vibrate?.(8)
+  tick()
   accountFilter.value = accountFilter.value === id ? null : id
   listSwap.value++
 }
