@@ -314,9 +314,6 @@
   font-size: var(--text-sm);
   color: var(--muted);
   line-height: 1.35;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* Sections */
