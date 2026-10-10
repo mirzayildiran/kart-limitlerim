@@ -47,15 +47,18 @@ Gerçek ekran görüntüleriyle yapılan değerlendirmede beş bankada 29 satır
 - [ ] Son ödeme hatırlatma bildirimleri
 - [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası
 
-## Aşama 4.5 — Bütçe asistanı (tasarım tamamlandıktan sonra ilk iş)
+## Aşama 4.5 — Bütçe asistanı 🚧
 
-Karar (2026-10-10): Telefonda çalışan model yerine ücretsiz bulut API'leri kullanılacak. Uygulamanın boyutu büyümeyecek.
+Karar (2026-10-10): Telefonda çalışan model yerine ücretsiz bulut API'leri kullanılacak. Uygulamanın boyutu büyümeyecek. Anahtarlar kullanıcıdan istenmez; projenin Cloudflare Workers üzerindeki aracı sunucusunda durur (`worker/assistant-proxy/`).
 
-- [ ] Kurala dayalı öneriler (yapay zekasız): kategori artışları, kesime kadar risk, "hangi kartla öde" önerisi. Rakamlar yalnızca `src/domain/` hesaplarından gelir.
-- [ ] Sohbet ekranı: model uygulamanın hesapladığı özeti okur, açıklar ve bütçe planını tartışır. Model hesap yapmaz.
-- [ ] Sağlayıcı katmanı: ücretsiz katmanı olan API'ler (Gemini, Groq, OpenRouter) için tek arayüz.
-- [ ] Gizlilik: varsayılan kapalı. Açmadan önce hangi verinin hangi servise gideceğini gösteren açık onay ekranı. Ham harcama listesi yerine özet gönderilir. PRODUCT.md'deki "veriler cihazdan çıkmaz" sözü bu özellik için güncellenir.
-- [ ] Her yanıtta "tahmindir, finansal tavsiye değildir" ibaresi.
+- [x] Kurala dayalı öneriler (yapay zekasız): kesime kadar nakit açığı, yaklaşan ve geciken asgari ödemeler, limiti azalan kart, KMH günlük faizi, asgari ödeme faizi, kategori artışları, "bugün hangi kartla öde". Rakamlar yalnızca `src/domain/` hesaplarından gelir (`src/domain/insights.ts`).
+- [x] Sohbet ekranı (`#/asistan`): model uygulamanın hesapladığı özeti (`src/domain/insightsSummary.ts`) okur, açıklar ve tartışır. Model hesap yapmaz. Sohbet geçmişi yalnızca bellekte tutulur.
+- [x] Sağlayıcı katmanı: aracı sunucu sırayla Gemini, Groq ve OpenRouter'ı dener (`src/ai/`, `worker/assistant-proxy/`). CORS ve IP başına hız sınırı var.
+- [x] Gizlilik: varsayılan kapalı. Onay ekranı gönderilecek alanları, gönderilmeyenleri, servisleri ve özetin tam hâlini gösterir. PRODUCT.md ilkesi ve `docs/PRIVACY.md` güncellendi.
+- [x] Her yanıtta "Tahmindir, finansal tavsiye değildir." ibaresi (uygulama ekler, modele bırakılmaz).
+- [ ] Aracı sunucuyu yayına alma: Worker'ı kur, anahtarları `wrangler secret` ile ekle, depo değişkeni `ASSISTANT_PROXY_URL`'i tanımla. Değişken yoksa uygulama sohbetsiz derlenir.
+- [ ] Ana ekrandan asistana giriş (şu an Ayarlar → Bütçe asistanı). Tasarım çalışmasıyla birlikte yerleştirilecek.
+- [ ] Cloudflare WAF hız sınırı kuralı (Worker içindeki sayaç yalnızca isolate başına).
 
 ## Aşama 5 — İleri özellikler
 

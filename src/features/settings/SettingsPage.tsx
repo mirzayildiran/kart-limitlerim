@@ -205,6 +205,20 @@ function PrivacySection() {
       <div class="settings-card settings-pad settings-stack">
         <p class="settings-text">Hesap yok, sunucu yok. Verilerin bu cihazda kalır.</p>
         <p class="settings-text">Ekran görüntüsü içe aktarma cihazda okunur ve hiçbir yerde saklanmaz.</p>
+        <p class="settings-text">Tek istisna bütçe asistanı sohbetidir: açarsan, onay ekranında gösterilen özet ve mesajların bir yapay zekâ servisine gönderilir.</p>
+      </div>
+    </Section>
+  )
+}
+
+function AssistantSection() {
+  return (
+    <Section title="Bütçe asistanı" id="settings-assistant">
+      <div class="settings-card settings-pad settings-stack">
+        <p class="settings-text">Bütçene göre öneriler ve isteğe bağlı sohbet. Sohbet açılmadan hiçbir veri gönderilmez.</p>
+        <Button variant="secondary" block onClick={() => go('assistant')}>
+          Asistanı aç
+        </Button>
       </div>
     </Section>
   )
@@ -242,6 +256,7 @@ export function SettingsPage() {
       <CategoriesSection />
       <BackupSection />
       <RatesSection />
+      <AssistantSection />
       <PrivacySection />
       <DangerSection />
       <footer class="settings-foot">Kart Limitlerim · sürüm {APP_VERSION}</footer>
