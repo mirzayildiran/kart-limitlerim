@@ -1,6 +1,8 @@
 // Design-review screenshots of the built app, seeded with the demo backup.
 // Usage:
 //   node scripts/shots.mjs [screen...]   screens: home expenses calendar settings welcome sheet-expense sheet-account
+//                                        sheet-account-edit sheet-account-new sheet-statement sheet-recurring
+//                                        sheet-category sheet-import sheet-expense-filled
 //   node scripts/shots.mjs --motion      frames of the home -> expenses tab transition (reduced motion off)
 // Output: .impeccable/review/shots/<screen>-<width>-<theme>.jpg (motion: motion-<ms>.jpg)
 // Builds the app first, then uses a running preview on :4173 or starts one and stops it at the end.
@@ -26,7 +28,29 @@ const ROUTES = { home: '#/', expenses: '#/harcamalar', calendar: '#/takvim', set
 const SIZES = [360, 430]
 const WELCOME_WIDTH = 390
 const THEMES = ['dark', 'light']
-const SCREENS = ['home', 'expenses', 'calendar', 'settings', 'welcome', 'sheet-expense', 'sheet-account']
+const PAGE_SCREENS = ['home', 'expenses', 'calendar', 'settings']
+// Sheets are opened with the taps a user makes (role, visible text, a few classes), never by setting the hash.
+const NEW_SHEETS = [
+  'sheet-account-edit',
+  'sheet-account-new',
+  'sheet-statement',
+  'sheet-recurring',
+  'sheet-category',
+  'sheet-import',
+  'sheet-expense-filled',
+]
+const SHEET_SCREENS = ['sheet-expense', 'sheet-account', ...NEW_SHEETS]
+const SCREENS = [...PAGE_SCREENS, 'welcome', ...SHEET_SCREENS]
+// Heading each sheet shows once open. Sheets whose title depends on data (account name) are left out.
+const SHEET_TITLE = {
+  'sheet-expense': 'Harcama ekle',
+  'sheet-expense-filled': 'Harcama ekle',
+  'sheet-account-new': 'Hesap ekle',
+  'sheet-recurring': 'Düzenli ödemeyi düzenle',
+  'sheet-category': 'Kategoriyi düzenle',
+  'sheet-import': 'Ekran görüntüsünden ekle',
+}
+const CLICK_TIMEOUT = 8_000
 const MOTION_MS = [0, 60, 120, 200, 320]
 
 const args = process.argv.slice(2)
@@ -41,6 +65,8 @@ for (const s of selected) {
 const wanted = selected.length ? selected : SCREENS
 
 const errors = []
+// Sheets that could not be opened: { screen, variant, reason }.
+const skipped = []
 
 // ---- build and preview server -------------------------------------------------
 
@@ -174,15 +200,104 @@ async function goRoute(page, hash) {
   await page.waitForTimeout(350)
 }
 
-async function openSheet(page, screen) {
-  await goRoute(page, ROUTES.home)
-  if (screen === 'sheet-expense') {
-    await page.getByRole('button', { name: 'Harcama ekle' }).click()
-  } else {
-    await page.locator('.wallet-card').first().click()
+/** Opens one sheet through the UI. Throws when a control is missing or the wrong sheet comes up. */
+async function openScreen(page, screen) {
+  const dialog = page.getByRole('dialog')
+  const tap = (locator) => locator.click({ timeout: CLICK_TIMEOUT })
+  const openExpense = async () => {
+    await goRoute(page, ROUTES.home)
+    await tap(page.getByRole('button', { name: 'Harcama ekle' }))
   }
-  await page.getByRole('dialog').waitFor()
+
+  switch (screen) {
+    case 'sheet-expense':
+      await openExpense()
+      break
+    case 'sheet-expense-filled':
+      await openExpense()
+      await dialog.getByLabel('Tutar', { exact: true }).fill('1250')
+      await tap(dialog.locator('.choice-item').first())
+      break
+    case 'sheet-import':
+      await openExpense()
+      await tap(dialog.getByRole('button', { name: 'Ekran görüntüsünden ekle' }))
+      break
+    case 'sheet-account':
+      await goRoute(page, ROUTES.home)
+      await tap(page.locator('.wallet-card').first())
+      break
+    case 'sheet-account-edit':
+      await goRoute(page, ROUTES.home)
+      await tap(page.locator('.wallet-card').first())
+      await dialog.getByRole('button', { name: 'Düzenle', exact: true }).waitFor({ timeout: CLICK_TIMEOUT })
+      await tap(dialog.getByRole('button', { name: 'Düzenle', exact: true }))
+      // The detail sheet's "Düzenle" button is gone once the edit sheet has replaced it.
+      await dialog.getByRole('button', { name: 'Düzenle', exact: true }).waitFor({ state: 'detached', timeout: CLICK_TIMEOUT })
+      break
+    case 'sheet-account-new':
+      await goRoute(page, ROUTES.home)
+      await tap(page.getByRole('button', { name: 'Kart veya hesap ekle' }))
+      break
+    case 'sheet-statement':
+      await goRoute(page, ROUTES.home)
+      await tap(page.locator('.home-statement-row').first())
+      break
+    case 'sheet-recurring':
+      await goRoute(page, ROUTES.calendar)
+      await tap(page.getByRole('region', { name: 'Düzenli ödemeler' }).getByRole('button', { name: /^Kira\b/ }))
+      break
+    case 'sheet-category':
+      await goRoute(page, ROUTES.settings)
+      await tap(page.getByRole('region', { name: 'Kategoriler' }).getByRole('button', { name: /^Yemek\b/ }))
+      break
+    default:
+      throw new Error(`bilinmeyen pencere: ${screen}`)
+  }
+
+  await dialog.waitFor({ timeout: CLICK_TIMEOUT })
+  if (SHEET_TITLE[screen]) {
+    await dialog.getByRole('heading', { name: SHEET_TITLE[screen], exact: true }).waitFor({ timeout: CLICK_TIMEOUT })
+  }
   await page.waitForTimeout(350)
+}
+
+/** Scrolls the open sheet's body to its end and shoots it, only when the body can scroll. */
+async function shootSheetEnd(page, file) {
+  const body = page.getByRole('dialog').locator('.sheet-body')
+  const scrollable = await body.evaluate((el) => el.scrollHeight > el.clientHeight + 1)
+  if (!scrollable) return
+  await body.evaluate((el) => {
+    el.scrollTop = el.scrollHeight
+  })
+  await page.waitForTimeout(150)
+  await shoot(page, file)
+}
+
+/** Opens, shoots and closes one sheet. A sheet that cannot be opened is recorded and skipped. */
+async function shootSheet(page, screen, width, theme) {
+  const variant = `${width}-${theme}`
+  try {
+    await openScreen(page, screen)
+    await shoot(page, `${screen}-${variant}.jpg`)
+    if (NEW_SHEETS.includes(screen) && width === 360) await shootSheetEnd(page, `${screen}-${variant}-end.jpg`)
+  } catch (err) {
+    const reason = String(err?.message ?? err).split('\n')[0]
+    skipped.push({ screen, variant, reason })
+    console.log(`  açılamadı: ${screen} (${variant})`)
+  }
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(200)
+}
+
+/** One line per sheet that could not be opened, with the variants it failed in. */
+function skippedLines() {
+  const bySheet = new Map()
+  for (const { screen, variant, reason } of skipped) {
+    const entry = bySheet.get(screen) ?? { reason, variants: [] }
+    entry.variants.push(variant)
+    bySheet.set(screen, entry)
+  }
+  return [...bySheet].map(([screen, { reason, variants }]) => `açılamadı: ${screen} (${reason}; ${variants.join(', ')})`)
 }
 
 function track(page, label) {
@@ -258,20 +373,17 @@ async function main() {
     if (motion) {
       await shootMotion(browser, appUrl, demo)
     } else {
-      const pageScreens = wanted.filter((s) => ['home', 'expenses', 'calendar', 'settings', 'sheet-expense', 'sheet-account'].includes(s))
-      if (pageScreens.length) {
+      const browserScreens = wanted.filter((s) => PAGE_SCREENS.includes(s) || SHEET_SCREENS.includes(s))
+      if (browserScreens.length) {
         for (const theme of THEMES) {
           for (const width of SIZES) {
             console.log(`${width} ${theme}`)
             const { context, page } = await newPage(browser, { width, height: 780, theme, reducedMotion: 'reduce' }, `${width}-${theme}`)
             try {
               await bootApp(page, appUrl, theme, demo)
-              for (const screen of pageScreens) {
-                if (screen.startsWith('sheet-')) {
-                  await openSheet(page, screen)
-                  await shoot(page, `${screen}-${width}-${theme}.jpg`)
-                  await page.keyboard.press('Escape')
-                  await page.waitForTimeout(200)
+              for (const screen of browserScreens) {
+                if (SHEET_SCREENS.includes(screen)) {
+                  await shootSheet(page, screen, width, theme)
                 } else {
                   await goRoute(page, ROUTES[screen])
                   await shoot(page, `${screen}-${width}-${theme}-fold.jpg`)
@@ -306,6 +418,11 @@ async function main() {
   console.log('\nKonsol hataları:')
   if (errors.length === 0) console.log('  yok')
   else for (const e of errors) console.log(`  ${e}`)
+
+  console.log('\nAçılamayan pencereler:')
+  const lines = skippedLines()
+  if (lines.length === 0) console.log('  yok')
+  else for (const line of lines) console.log(`  ${line}`)
 }
 
 /**
