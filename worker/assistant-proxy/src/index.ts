@@ -19,6 +19,11 @@ interface Env {
   OPENROUTER_API_KEY?: string
   /** Comma-separated list of origins allowed to call the proxy. */
   ALLOWED_ORIGINS: string
+  /**
+   * When set (e.g. "5173"), also allow http origins on a private IPv4 address at exactly this
+   * port: the phone loading the Mac's Vite server over the LAN during live iOS testing.
+   */
+  LAN_DEV_PORT?: string
   RATE_LIMIT_PER_HOUR?: string
   /** Per-IP, per-minute limit shared across isolates in a location. Absent in local tests. */
   LIMITER?: RateLimiter
@@ -72,7 +77,7 @@ const hits = new Map<string, { count: number; windowStart: number }>()
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const origin = request.headers.get('Origin')
-    const allowed = origin !== null && parseOrigins(env.ALLOWED_ORIGINS).includes(origin)
+    const allowed = origin !== null && isAllowedOrigin(origin, env)
     if (!allowed) return reply(403, { error: 'bad_request' }, null)
 
     const cors = corsHeaders(origin)
@@ -248,6 +253,21 @@ function parseOrigins(list: string): string[] {
     .split(',')
     .map((o) => o.trim())
     .filter((o) => o.length > 0)
+}
+
+function isAllowedOrigin(origin: string, env: Env): boolean {
+  if (parseOrigins(env.ALLOWED_ORIGINS).includes(origin)) return true
+  const port = env.LAN_DEV_PORT?.trim()
+  return port ? isPrivateLanOrigin(origin, port) : false
+}
+
+/** `http://<10/8 | 172.16/12 | 192.168/16 address>:<port>` and nothing else. */
+function isPrivateLanOrigin(origin: string, port: string): boolean {
+  const m = /^http:\/\/(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):(\d{1,5})$/.exec(origin)
+  if (!m || m[5] !== port) return false
+  const [a, b, c, d] = m.slice(1, 5).map(Number)
+  if ([a, b, c, d].some((n) => n > 255)) return false
+  return a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168)
 }
 
 function corsHeaders(origin: string | null): Record<string, string> {
