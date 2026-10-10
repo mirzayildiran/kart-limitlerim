@@ -10,6 +10,7 @@ export { accountColors } from '../../ui/accountColor'
 import './wallet.css'
 
 const KIND_LABEL = { card: 'Kredi kartı', kmh: 'KMH', bank: 'Banka hesabı', cash: 'Nakit' } as const
+const CAPTION = { card: 'Kullanılabilir', kmh: 'KMH · Kullanılabilir', bank: 'Banka · Bakiye', cash: 'Nakit' } as const
 const cutFmt = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' })
 
 function nextDate(items: StatementItem[]): { text: string; urgent: boolean } | null {
@@ -50,18 +51,14 @@ function WalletCard({ account, slot, items }: { account: Account; slot: number; 
       </svg>
 
       <span class="wallet-card-top">
-        <span class="wallet-card-kind">{KIND_LABEL[account.kind]}</span>
-        {date ? (
-          <span class={`wallet-card-date${date.urgent ? ' is-urgent' : ''}`}>{date.text}</span>
-        ) : (
-          account.kind !== 'cash' && account.kind !== 'bank' && <span class="wallet-card-chip" />
-        )}
+        <span class="wallet-card-name">{account.name}</span>
+        {date && <span class={`wallet-card-date${date.urgent ? ' is-urgent' : ''}`}>{date.text}</span>}
       </span>
 
-      <span class="wallet-card-name">{account.name}</span>
+      {hasLimit && <span class="wallet-card-chip" aria-hidden="true" />}
 
       <span class="wallet-card-bottom">
-        <span class="wallet-card-caption">{hasLimit ? 'Kullanılabilir' : 'Bakiye'}</span>
+        <span class="wallet-card-caption">{CAPTION[account.kind]}</span>
         <Amount value={free} size="xl" />
         {hasLimit && (
           <>
@@ -95,7 +92,10 @@ export function Wallet({ accounts, colors, statements }: Props) {
     const first = el?.firstElementChild as HTMLElement | null
     if (!el || !first) return
     const step = first.offsetWidth + 12
-    setActive(Math.min(count - 1, Math.round(el.scrollLeft / step)))
+    const next = Math.min(count - 1, Math.round(el.scrollLeft / step))
+    // A light tick as the active card changes (Android; ignored elsewhere).
+    if (next !== active) navigator.vibrate?.(8)
+    setActive(next)
   }
 
   return (
