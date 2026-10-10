@@ -182,6 +182,116 @@
   margin-top: var(--s-3);
 }
 
+/* Restore offer: the primary choice on an empty start, on the runway panel's slate. */
+.home-restore {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-2);
+  padding: var(--s-5);
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-hero);
+  animation: home-restore-in 0.5s var(--ease-out-expo) both;
+}
+
+.home-restore-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--s-1);
+  border-radius: var(--r-md);
+  background: var(--hero-track);
+  color: var(--night-action);
+}
+
+.home-restore-title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--hero-ink);
+}
+
+.home-restore-text {
+  font-size: var(--text-md);
+  line-height: 1.45;
+  color: var(--hero-muted);
+}
+
+.home-restore-text .num {
+  font-weight: 700;
+  color: var(--hero-ink);
+}
+
+.home-restore-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  width: 100%;
+  margin-top: var(--s-3);
+}
+
+.home-restore-primary,
+.home-restore-dismiss {
+  flex: 1 1 8rem;
+  min-height: 48px;
+  padding: 0 var(--s-4);
+  border-radius: var(--r-pill);
+  font-weight: 700;
+  text-align: center;
+  transition: transform var(--dur-tap, 120ms) var(--ease-out-expo);
+}
+
+.home-restore-primary {
+  background: var(--night-action);
+  color: var(--night-action-ink);
+}
+
+.home-restore-dismiss {
+  background: var(--hero-track);
+  color: var(--hero-ink);
+}
+
+.home-restore-primary:active,
+.home-restore-dismiss:active {
+  transform: scale(var(--press, 0.97));
+}
+
+.home-restore-primary:focus-visible,
+.home-restore-dismiss:focus-visible {
+  outline: 2px solid var(--night-action);
+  outline-offset: 3px;
+}
+
+/* Under a restore offer the welcome is the quieter second choice: no fan, a smaller heading. */
+.home-welcome.is-secondary {
+  padding-top: 0;
+}
+
+.home-welcome.is-secondary .home-welcome-title {
+  font-size: var(--text-lg);
+}
+
+@keyframes home-restore-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-restore {
+    animation: none;
+  }
+
+  .home-restore-primary,
+  .home-restore-dismiss {
+    transition: none;
+  }
+}
+
 .home-welcome-privacy {
   display: inline-flex;
   align-items: center;
