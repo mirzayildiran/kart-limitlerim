@@ -444,16 +444,24 @@
   gap: 2px;
 }
 
+/* Long names wrap to at most two lines, then end with an ellipsis. */
 .home-statement-row-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   font-weight: 600;
   font-size: var(--text-md);
   color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .home-statement-row-sub {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   font-size: var(--text-xs);
   color: var(--muted);
 }
@@ -467,6 +475,8 @@
 }
 
 .home-statement-row-amount {
+  flex: none;
+  white-space: nowrap;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-md);
@@ -578,21 +588,29 @@
 }
 
 .home-expense-row-label {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   font-weight: 600;
   font-size: var(--text-md);
   color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .home-expense-row-detail {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   font-size: var(--text-xs);
   color: var(--muted);
 }
 
 .home-expense-row-amount {
-  flex: 0 0 auto;
+  flex: none;
+  white-space: nowrap;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-md);
