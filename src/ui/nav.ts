@@ -80,7 +80,8 @@ let transition: ViewTransition | undefined
  */
 function setRoute(next: Route) {
   const prev = route.value
-  if (next === prev || typeof document.startViewTransition !== 'function') {
+  // Reduce Motion: the tab changes at once, no snapshot slide.
+  if (next === prev || typeof document.startViewTransition !== 'function' || reducedMotion()) {
     route.value = next
     window.scrollTo({ top: 0 })
     return
