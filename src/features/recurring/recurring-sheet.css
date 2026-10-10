@@ -34,8 +34,26 @@
   margin: 0;
   padding: var(--s-3) var(--s-4);
   border-radius: var(--r-md);
-  background: var(--accent-soft);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   color: var(--ink);
   font-size: var(--text-sm);
   font-weight: 600;
+}
+
+/* Category chips and the inline "new category" form under them (as in ExpenseSheet). */
+.recurring-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.recurring-new-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
 }

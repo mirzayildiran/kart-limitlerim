@@ -148,15 +148,30 @@
   color: var(--ink);
 }
 
+/* The estimate figure: "~" in the display face, the same size as the amount beside it. */
+.account-detail-interest-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+
+.account-detail-interest-figure.is-crit {
+  color: var(--crit);
+}
+
+.account-detail-interest-approx {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
 .account-detail-interest-sub {
   margin-top: var(--s-1);
   font-size: var(--text-sm);
   font-weight: 600;
-}
-
-.account-detail-interest-source {
-  font-size: var(--text-sm);
-  color: var(--muted);
 }
 
 .account-detail-interest-lines {

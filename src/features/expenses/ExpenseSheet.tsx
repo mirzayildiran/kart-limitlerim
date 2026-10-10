@@ -362,7 +362,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
               </span>
               <span class="expense-preview-figures num">
                 <span class="expense-preview-before">{figure(formatTL(availableBefore))}</span>
-                <span aria-hidden="true">→</span>
+                <Icon name="chevron" size={14} class="expense-preview-arrow" />
                 <span class="sr-only">sonra</span>
                 <span class="expense-preview-after">{figure(formatTL(availableAfter))}</span>
                 {afterIsNegative && <Pill tone="crit">Yetersiz</Pill>}

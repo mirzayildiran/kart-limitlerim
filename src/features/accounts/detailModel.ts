@@ -16,6 +16,8 @@ export interface InterestPanelData {
     projectedAsEntered: Kurus
     projectedMinimum: Kurus | null
     payment: string
+    /** True when this line's projection is the whole panel figure (no history, one open statement): already said by the figure. */
+    repeatsTotal: boolean
   }[]
 }
 
@@ -41,6 +43,9 @@ export function cardInterestPanelData(account: CardAccount, today: Date): Intere
     }
   }
 
+  // The panel's figure: history plus the running estimate of every open statement.
+  const totalFigure = lifetime.total + (lifetime.currentProjected ?? 0)
+
   // Collect projections per line with debt, excluding paid-in-full
   const lineProjections: InterestPanelData['lineProjections'] = []
   for (let i = 0; i < account.lines.length; i++) {
@@ -55,6 +60,7 @@ export function cardInterestPanelData(account: CardAccount, today: Date): Intere
         projectedAsEntered: projAsEntered.total,
         projectedMinimum: projMinimum?.total ?? null,
         payment: view.payment,
+        repeatsTotal: projAsEntered.total === totalFigure,
       })
     }
   }
