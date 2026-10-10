@@ -1,0 +1,1266 @@
+{
+  "_note": "Uydurma stres fikstürü: yalnızca tasarım incelemesi (harden) için. Gerçek kişi, hesap ya da bakiye içermez. 12 hesap (8 kart, 2 KMH, 1 banka, 1 nakit); uzun ve Türkçe karakterli adlar; limitler 1.000 ₺–2.500.000 ₺; bir kartın kullanılabilir limiti 0, bir kartınki limitin tamamı; kuruşlu tutarlar; 15 kategori; 60 harcama (biri 9.999.999,99 ₺); 8 düzenli ödeme; bir kartın son ödemesi 5 gün geçmiş, biri bugün.",
+  "app": "kart-limitlerim",
+  "schema": 1,
+  "exportedAt": "2026-10-10T09:00:00.000Z",
+  "data": {
+    "accounts": [
+      {
+        "id": "acc-c1",
+        "kind": "card",
+        "name": "Mavikent",
+        "limit": 250000000,
+        "available": 250000000,
+        "lines": [
+          {
+            "id": "line-c1",
+            "label": "Mavikent Ana Kart",
+            "cutDay": 1,
+            "dueOffsetDays": 10,
+            "subLimit": null,
+            "cycle": "2026-10",
+            "statementDebt": 4215000,
+            "minimumDue": 421500,
+            "dueDate": "2026-10-11",
+            "payment": "unpaid",
+            "paidAmount": null
+          }
+        ],
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-c2",
+        "kind": "card",
+        "name": "Kredi Kartı Lale",
+        "limit": 100000,
+        "available": 0,
+        "lines": [
+          {
+            "id": "line-c2",
+            "label": "Lale Kart",
+            "cutDay": 5,
+            "dueOffsetDays": 8,
+            "subLimit": null,
+            "cycle": "2026-10",
+            "statementDebt": 98000,
+            "minimumDue": 9800,
+            "dueDate": "2026-10-13",
+            "payment": "unpaid",
+            "paidAmount": null
+          }
+        ],
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-c3",
+        "kind": "card",
+        "name": "Zirve Kart Ödül",
+        "limit": 18750050,
+        "available": 9123456,
+        "lines": [
+          {
+            "id": "line-c3",
+            "label": "Zirve Dijital",
+            "cutDay": 12,
+            "dueOffsetDays": 10,
+            "subLimit": null,
+            "cycle": "2026-09",
+            "statementDebt": 1234567,
+            "minimumDue": 123456,
+            "dueDate": "2026-10-10",
+            "payment": "partial",
+            "paidAmount": 50000
+          }
+        ],
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-c4",
+        "kind": "card",
+        "name": "Şenlik Gıda İşletme Kartı Ödüllü Platin",
+        "limit": 73000000,
+        "available": 41987654,
+        "lines": [
+          {
+            "id": "line-c4",
+            "label": "Platin İşletme Kartı",
+            "cutDay": 18,
+            "dueOffsetDays": 12,
+            "subLimit": null,
+            "cycle": "2026-09",
+            "statementDebt": 3876543,
+            "minimumDue": 387654,
+            "dueDate": "2026-10-30",
+            "payment": "minimum",
+            "paidAmount": 387654
+          }
+        ],
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-c5",
+        "kind": "card",
+        "name": "Örnek Ticari Kart Genç Paketi Gümüş Ödüllü",
+        "limit": 12345600,
+        "available": 765432,
+        "lines": [
+          {
+            "id": "line-c5",
+            "label": "Gümüş Sanal Kart",
+            "cutDay": 22,
+            "dueOffsetDays": 10,
+            "subLimit": null,
+            "cycle": null,
+            "statementDebt": null,
+            "minimumDue": null,
+            "dueDate": null,
+            "payment": "unpaid",
+            "paidAmount": null
+          }
+        ],
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-c6",
+        "kind": "card",
+        "name": "Yaprak Kent Kristal Kart",
+        "limit": 5500000,
+        "available": 1999999,
+        "lines": [
+          {
+            "id": "line-c6",
+            "label": "Kristal Kart",
+            "cutDay": 25,
+            "dueOffsetDays": 10,
+            "subLimit": null,
+            "cycle": "2026-09",
+            "statementDebt": 2100000,
+            "minimumDue": 210000,
+            "dueDate": "2026-10-05",
+            "payment": "unpaid",
+            "paidAmount": null
+          }
+        ],
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-c7",
+        "kind": "card",
+        "name": "İnanç Mavikent Ticari Esnaf Kartı",
+        "limit": 9900000,
+        "available": 4321000,
+        "lines": [
+          {
+            "id": "line-c7",
+            "label": "Esnaf Kartı Ana Hesap",
+            "cutDay": 28,
+            "dueOffsetDays": 9,
+            "subLimit": null,
+            "cycle": "2026-09",
+            "statementDebt": 777777,
+            "minimumDue": 77777,
+            "dueDate": "2026-10-20",
+            "payment": "full",
+            "paidAmount": 777777
+          }
+        ],
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-c8",
+        "kind": "card",
+        "name": "Vadi Ödüllü Kredi Kartı Genç Hesabı",
+        "limit": 2000000,
+        "available": 2000000,
+        "lines": [
+          {
+            "id": "line-c8",
+            "label": "Genç Kart",
+            "cutDay": 31,
+            "dueOffsetDays": 14,
+            "subLimit": null,
+            "cycle": "2026-09",
+            "statementDebt": 0,
+            "minimumDue": 0,
+            "dueDate": "2026-10-25",
+            "payment": "full",
+            "paidAmount": 0
+          }
+        ],
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-kmh1",
+        "kind": "kmh",
+        "name": "Kartım",
+        "limit": 100000,
+        "available": 100000,
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-kmh2",
+        "kind": "kmh",
+        "name": "Zümrüt Esnek Hesap Kredisi Üst Limit",
+        "limit": 3000000,
+        "available": 1234500,
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-bank",
+        "kind": "bank",
+        "name": "Demo Vadesiz Hesap Bankası Hesabı",
+        "balance": 8765432,
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "acc-cash",
+        "kind": "cash",
+        "name": "Cüzdandaki nakit",
+        "balance": 125000,
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      }
+    ],
+    "expenses": [
+      {
+        "id": "exp-00",
+        "amount": 999999999,
+        "categoryId": "yemek",
+        "accountId": "acc-cash",
+        "date": "2026-08-31",
+        "note": "Dönem sonu toplu ödeme (üst sınır testi)",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "exp-01",
+        "amount": 1,
+        "categoryId": "market",
+        "accountId": "acc-kmh2",
+        "date": "2026-10-04",
+        "note": "Ayakkabı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117201000
+      },
+      {
+        "id": "exp-02",
+        "amount": 4240227,
+        "categoryId": "egitim",
+        "accountId": "acc-c1",
+        "date": "2026-09-26",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117202000
+      },
+      {
+        "id": "exp-03",
+        "amount": 1850189,
+        "categoryId": "saglik",
+        "accountId": "acc-kmh2",
+        "date": "2026-09-14",
+        "note": "Taksi",
+        "affectsAccount": false,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117203000
+      },
+      {
+        "id": "exp-04",
+        "amount": 3546146,
+        "categoryId": "eglence",
+        "accountId": "acc-c5",
+        "date": "2026-08-27",
+        "note": "Otopark",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117204000
+      },
+      {
+        "id": "exp-05",
+        "amount": 3188061,
+        "categoryId": "market",
+        "accountId": "acc-c6",
+        "date": "2026-10-05",
+        "note": "Elektrik",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117205000
+      },
+      {
+        "id": "exp-06",
+        "amount": 4499207,
+        "categoryId": "market",
+        "accountId": "acc-c7",
+        "date": "2026-09-11",
+        "note": "Kahve",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117206000
+      },
+      {
+        "id": "exp-07",
+        "amount": 3034614,
+        "categoryId": "egitim",
+        "accountId": "acc-c4",
+        "date": "2026-08-15",
+        "note": "Kahve",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117207000
+      },
+      {
+        "id": "exp-08",
+        "amount": 1953791,
+        "categoryId": "hediye",
+        "accountId": "acc-c2",
+        "date": "2026-10-05",
+        "note": "Ayakkabı",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117208000
+      },
+      {
+        "id": "exp-09",
+        "amount": 3106303,
+        "categoryId": "eglence",
+        "accountId": "acc-c4",
+        "date": "2026-09-30",
+        "note": "Taksi",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117209000
+      },
+      {
+        "id": "exp-10",
+        "amount": 1436615,
+        "categoryId": "abonelik",
+        "accountId": "acc-cash",
+        "date": "2026-10-06",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117210000
+      },
+      {
+        "id": "exp-11",
+        "amount": 4673033,
+        "categoryId": "fatura",
+        "accountId": "acc-bank",
+        "date": "2026-08-12",
+        "note": "Elektrik",
+        "affectsAccount": false,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117211000
+      },
+      {
+        "id": "exp-12",
+        "amount": 270276,
+        "categoryId": "cocuk",
+        "accountId": "acc-c6",
+        "date": "2026-08-19",
+        "note": "Ayakkabı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117212000
+      },
+      {
+        "id": "exp-13",
+        "amount": 2640709,
+        "categoryId": "fatura",
+        "accountId": "acc-bank",
+        "date": "2026-08-15",
+        "note": "Eczane",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117213000
+      },
+      {
+        "id": "exp-14",
+        "amount": 2222975,
+        "categoryId": "ulasim",
+        "accountId": "acc-c4",
+        "date": "2026-10-01",
+        "note": "Taksi",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117214000
+      },
+      {
+        "id": "exp-15",
+        "amount": 3037646,
+        "categoryId": "fatura",
+        "accountId": "acc-c3",
+        "date": "2026-09-15",
+        "note": "Eczane",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117215000
+      },
+      {
+        "id": "exp-16",
+        "amount": 1343026,
+        "categoryId": "cocuk",
+        "accountId": "acc-bank",
+        "date": "2026-10-01",
+        "note": "Ayakkabı",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117216000
+      },
+      {
+        "id": "exp-17",
+        "amount": 3927287,
+        "categoryId": "abonelik",
+        "accountId": "acc-c5",
+        "date": "2026-09-02",
+        "note": "Haftalık market alışverişi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117217000
+      },
+      {
+        "id": "exp-18",
+        "amount": 4505433,
+        "categoryId": "cocuk",
+        "accountId": "acc-c5",
+        "date": "2026-08-15",
+        "note": "Elektrik",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117218000
+      },
+      {
+        "id": "exp-19",
+        "amount": 28223,
+        "categoryId": "otomobil",
+        "accountId": "acc-cash",
+        "date": "2026-09-11",
+        "note": "Taksi",
+        "affectsAccount": false,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117219000
+      },
+      {
+        "id": "exp-20",
+        "amount": 893638,
+        "categoryId": "hediye",
+        "accountId": "acc-bank",
+        "date": "2026-08-13",
+        "note": "Taksi",
+        "affectsAccount": false,
+        "installments": 6,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117220000
+      },
+      {
+        "id": "exp-21",
+        "amount": 1283108,
+        "categoryId": "eglence",
+        "accountId": "acc-c3",
+        "date": "2026-09-28",
+        "note": "Haftalık market alışverişi",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117221000
+      },
+      {
+        "id": "exp-22",
+        "amount": 3045903,
+        "categoryId": "diger",
+        "accountId": "acc-c5",
+        "date": "2026-10-03",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 6,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117222000
+      },
+      {
+        "id": "exp-23",
+        "amount": 4077783,
+        "categoryId": "hediye",
+        "accountId": "acc-c2",
+        "date": "2026-10-05",
+        "note": "Otopark",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117223000
+      },
+      {
+        "id": "exp-24",
+        "amount": 2224456,
+        "categoryId": "abonelik",
+        "accountId": "acc-kmh2",
+        "date": "2026-09-30",
+        "note": "Ayakkabı",
+        "affectsAccount": false,
+        "installments": 6,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117224000
+      },
+      {
+        "id": "exp-25",
+        "amount": 1688377,
+        "categoryId": "otomobil",
+        "accountId": "acc-c5",
+        "date": "2026-08-27",
+        "note": "Ayakkabı",
+        "affectsAccount": false,
+        "installments": 12,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117225000
+      },
+      {
+        "id": "exp-26",
+        "amount": 4342740,
+        "categoryId": "saglik",
+        "accountId": "acc-c2",
+        "date": "2026-09-12",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117226000
+      },
+      {
+        "id": "exp-27",
+        "amount": 4647630,
+        "categoryId": "fatura",
+        "accountId": "acc-kmh2",
+        "date": "2026-09-03",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117227000
+      },
+      {
+        "id": "exp-28",
+        "amount": 1921502,
+        "categoryId": "market",
+        "accountId": "acc-c1",
+        "date": "2026-10-07",
+        "note": "Elektrik",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117228000
+      },
+      {
+        "id": "exp-29",
+        "amount": 4072951,
+        "categoryId": "fatura",
+        "accountId": "acc-kmh1",
+        "date": "2026-08-29",
+        "note": "Otopark",
+        "affectsAccount": true,
+        "installments": 6,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117229000
+      },
+      {
+        "id": "exp-30",
+        "amount": 2039408,
+        "categoryId": "cocuk",
+        "accountId": "acc-c8",
+        "date": "2026-09-10",
+        "note": "Ayakkabı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117230000
+      },
+      {
+        "id": "exp-31",
+        "amount": 2973063,
+        "categoryId": "giyim",
+        "accountId": "acc-c7",
+        "date": "2026-09-13",
+        "note": "Eczane",
+        "affectsAccount": false,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117231000
+      },
+      {
+        "id": "exp-32",
+        "amount": 826588,
+        "categoryId": "yemek",
+        "accountId": "acc-c7",
+        "date": "2026-08-30",
+        "note": "Elektrik",
+        "affectsAccount": false,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117232000
+      },
+      {
+        "id": "exp-33",
+        "amount": 1596587,
+        "categoryId": "abonelik",
+        "accountId": "acc-c8",
+        "date": "2026-09-28",
+        "note": "Otopark",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117233000
+      },
+      {
+        "id": "exp-34",
+        "amount": 633374,
+        "categoryId": "saglik",
+        "accountId": "acc-kmh1",
+        "date": "2026-09-25",
+        "note": "Kahve",
+        "affectsAccount": true,
+        "installments": 6,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117234000
+      },
+      {
+        "id": "exp-35",
+        "amount": 1983894,
+        "categoryId": "ulasim",
+        "accountId": "acc-c7",
+        "date": "2026-10-05",
+        "note": "Eczane",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117235000
+      },
+      {
+        "id": "exp-36",
+        "amount": 3180056,
+        "categoryId": "yemek",
+        "accountId": "acc-c7",
+        "date": "2026-09-30",
+        "note": "Taksi",
+        "affectsAccount": false,
+        "installments": 3,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117236000
+      },
+      {
+        "id": "exp-37",
+        "amount": 4663122,
+        "categoryId": "seyahat",
+        "accountId": "acc-cash",
+        "date": "2026-09-13",
+        "note": "Eczane",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117237000
+      },
+      {
+        "id": "exp-38",
+        "amount": 4859516,
+        "categoryId": "otomobil",
+        "accountId": "acc-kmh1",
+        "date": "2026-10-07",
+        "note": "Haftalık market alışverişi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117238000
+      },
+      {
+        "id": "exp-39",
+        "amount": 4000591,
+        "categoryId": "abonelik",
+        "accountId": "acc-kmh1",
+        "date": "2026-09-03",
+        "note": "Otopark",
+        "affectsAccount": true,
+        "installments": 6,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117239000
+      },
+      {
+        "id": "exp-40",
+        "amount": 1559812,
+        "categoryId": "market",
+        "accountId": "acc-kmh2",
+        "date": "2026-08-17",
+        "note": "Kahve",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117240000
+      },
+      {
+        "id": "exp-41",
+        "amount": 4779783,
+        "categoryId": "fatura",
+        "accountId": "acc-kmh2",
+        "date": "2026-10-03",
+        "note": "Haftalık market alışverişi",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117241000
+      },
+      {
+        "id": "exp-42",
+        "amount": 4742467,
+        "categoryId": "abonelik",
+        "accountId": "acc-c6",
+        "date": "2026-09-03",
+        "note": "Taksi",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117242000
+      },
+      {
+        "id": "exp-43",
+        "amount": 2229136,
+        "categoryId": "giyim",
+        "accountId": "acc-c3",
+        "date": "2026-09-25",
+        "note": "Taksi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117243000
+      },
+      {
+        "id": "exp-44",
+        "amount": 4723732,
+        "categoryId": "market",
+        "accountId": "acc-c2",
+        "date": "2026-09-11",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117244000
+      },
+      {
+        "id": "exp-45",
+        "amount": 578063,
+        "categoryId": "diger",
+        "accountId": "acc-c4",
+        "date": "2026-08-15",
+        "note": "Elektrik",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117245000
+      },
+      {
+        "id": "exp-46",
+        "amount": 2538697,
+        "categoryId": "egitim",
+        "accountId": "acc-bank",
+        "date": "2026-08-26",
+        "note": "Haftalık market alışverişi",
+        "affectsAccount": true,
+        "installments": 6,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117246000
+      },
+      {
+        "id": "exp-47",
+        "amount": 869946,
+        "categoryId": "diger",
+        "accountId": "acc-c3",
+        "date": "2026-08-12",
+        "note": "Taksi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117247000
+      },
+      {
+        "id": "exp-48",
+        "amount": 1304991,
+        "categoryId": "kira",
+        "accountId": "acc-c5",
+        "date": "2026-09-05",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117248000
+      },
+      {
+        "id": "exp-49",
+        "amount": 2215457,
+        "categoryId": "abonelik",
+        "accountId": "acc-c8",
+        "date": "2026-08-31",
+        "note": "Taksi",
+        "affectsAccount": false,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117249000
+      },
+      {
+        "id": "exp-50",
+        "amount": 3554211,
+        "categoryId": "hediye",
+        "accountId": "acc-c5",
+        "date": "2026-08-31",
+        "note": "Haftalık market alışverişi",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117250000
+      },
+      {
+        "id": "exp-51",
+        "amount": 1356447,
+        "categoryId": "otomobil",
+        "accountId": "acc-c8",
+        "date": "2026-09-24",
+        "note": "Ayakkabı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117251000
+      },
+      {
+        "id": "exp-52",
+        "amount": 1251357,
+        "categoryId": "abonelik",
+        "accountId": "acc-c1",
+        "date": "2026-08-11",
+        "note": "Elektrik",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117252000
+      },
+      {
+        "id": "exp-53",
+        "amount": 351885,
+        "categoryId": "kira",
+        "accountId": "acc-c6",
+        "date": "2026-10-02",
+        "note": "Haftalık market alışverişi",
+        "affectsAccount": false,
+        "installments": 1,
+        "source": "screenshot",
+        "recurringId": null,
+        "createdAt": 1789117253000
+      },
+      {
+        "id": "exp-54",
+        "amount": 863295,
+        "categoryId": "eglence",
+        "accountId": "acc-kmh1",
+        "date": "2026-09-25",
+        "note": "Ayakkabı",
+        "affectsAccount": false,
+        "installments": 12,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117254000
+      },
+      {
+        "id": "exp-55",
+        "amount": 1986896,
+        "categoryId": "hediye",
+        "accountId": "acc-c3",
+        "date": "2026-08-12",
+        "note": "Otopark",
+        "affectsAccount": false,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117255000
+      },
+      {
+        "id": "exp-56",
+        "amount": 2787573,
+        "categoryId": "cocuk",
+        "accountId": "acc-c7",
+        "date": "2026-08-24",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 12,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117256000
+      },
+      {
+        "id": "exp-57",
+        "amount": 325845,
+        "categoryId": "hediye",
+        "accountId": "acc-c8",
+        "date": "2026-09-16",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 3,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117257000
+      },
+      {
+        "id": "exp-58",
+        "amount": 1910209,
+        "categoryId": "fatura",
+        "accountId": "acc-c1",
+        "date": "2026-09-21",
+        "note": "Çocukların okul ve kırtasiye masrafları için alışveriş yapıldı",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117258000
+      },
+      {
+        "id": "exp-59",
+        "amount": 2342470,
+        "categoryId": "eglence",
+        "accountId": "acc-bank",
+        "date": "2026-08-22",
+        "note": "Ayakkabı",
+        "affectsAccount": true,
+        "installments": 6,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117259000
+      }
+    ],
+    "categories": [
+      {
+        "id": "yemek",
+        "name": "Yemek",
+        "hue": 24,
+        "builtin": true,
+        "order": 0
+      },
+      {
+        "id": "market",
+        "name": "Market",
+        "hue": 140,
+        "builtin": true,
+        "order": 1
+      },
+      {
+        "id": "ulasim",
+        "name": "Ulaşım",
+        "hue": 205,
+        "builtin": true,
+        "order": 2
+      },
+      {
+        "id": "fatura",
+        "name": "Fatura",
+        "hue": 48,
+        "builtin": true,
+        "order": 3
+      },
+      {
+        "id": "kira",
+        "name": "Kira",
+        "hue": 265,
+        "builtin": true,
+        "order": 4
+      },
+      {
+        "id": "eglence",
+        "name": "Eğlence",
+        "hue": 320,
+        "builtin": true,
+        "order": 5
+      },
+      {
+        "id": "giyim",
+        "name": "Giyim",
+        "hue": 290,
+        "builtin": true,
+        "order": 6
+      },
+      {
+        "id": "saglik",
+        "name": "Sağlık",
+        "hue": 0,
+        "builtin": true,
+        "order": 7
+      },
+      {
+        "id": "abonelik",
+        "name": "Abonelik",
+        "hue": 180,
+        "builtin": true,
+        "order": 8
+      },
+      {
+        "id": "egitim",
+        "name": "Eğitim",
+        "hue": 95,
+        "builtin": true,
+        "order": 9
+      },
+      {
+        "id": "seyahat",
+        "name": "Seyahat ve konaklama",
+        "hue": 230,
+        "builtin": true,
+        "order": 10
+      },
+      {
+        "id": "otomobil",
+        "name": "Otomobil bakımı ve yakıt",
+        "hue": 12,
+        "builtin": true,
+        "order": 11
+      },
+      {
+        "id": "cocuk",
+        "name": "Çocukların okul ve kırtasiye masrafları",
+        "hue": 160,
+        "builtin": true,
+        "order": 12
+      },
+      {
+        "id": "hediye",
+        "name": "Hediye",
+        "hue": 300,
+        "builtin": true,
+        "order": 13
+      },
+      {
+        "id": "diger",
+        "name": "Diğer",
+        "hue": 60,
+        "builtin": true,
+        "order": 14
+      }
+    ],
+    "recurring": [
+      {
+        "id": "rec-0",
+        "name": "Çocukların okul servisi ve yemek ücreti aylık ödemesi",
+        "amount": 215765,
+        "categoryId": "market",
+        "accountId": "acc-c5",
+        "dayOfMonth": 1,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "never"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "rec-1",
+        "name": "Kira",
+        "amount": 848967,
+        "categoryId": "egitim",
+        "accountId": "acc-c5",
+        "dayOfMonth": 4,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "until",
+          "date": "2027-06-30"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "rec-2",
+        "name": "Doğalgaz faturası ve aidat",
+        "amount": 260462,
+        "categoryId": "market",
+        "accountId": "acc-c7",
+        "dayOfMonth": 7,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "never"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "rec-3",
+        "name": "İnternet ve mobil hat paketi",
+        "amount": 1549916,
+        "categoryId": "otomobil",
+        "accountId": "acc-c6",
+        "dayOfMonth": 10,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "until",
+          "date": "2027-06-30"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "rec-4",
+        "name": "Spor salonu üyeliği (aile)",
+        "amount": 1930368,
+        "categoryId": "egitim",
+        "accountId": "acc-cash",
+        "dayOfMonth": 13,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "never"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "rec-5",
+        "name": "Dijital yayın abonelik paketi",
+        "amount": 585053,
+        "categoryId": "giyim",
+        "accountId": "acc-c4",
+        "dayOfMonth": 16,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "until",
+          "date": "2027-06-30"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "rec-6",
+        "name": "Sigorta primi taksidi",
+        "amount": 1168383,
+        "categoryId": "yemek",
+        "accountId": "acc-c7",
+        "dayOfMonth": 19,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "never"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "rec-7",
+        "name": "Öğrenci kredisi geri ödemesi çok uzun",
+        "amount": 107093,
+        "categoryId": "abonelik",
+        "accountId": "acc-cash",
+        "dayOfMonth": 22,
+        "startDate": "2026-01-01",
+        "end": {
+          "type": "until",
+          "date": "2027-06-30"
+        },
+        "active": true,
+        "handledThrough": "2026-10-01",
+        "createdAt": 1789117200000
+      }
+    ],
+    "rules": [
+      {
+        "id": "rule-1",
+        "pattern": "market",
+        "categoryId": "market",
+        "hits": 3
+      },
+      {
+        "id": "rule-2",
+        "pattern": "Çocukların okul",
+        "categoryId": "cocuk",
+        "hits": 1
+      }
+    ],
+    "budgets": []
+  }
+}

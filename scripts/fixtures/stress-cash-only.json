@@ -1,0 +1,63 @@
+{
+  "_note": "Uydurma fikstür: yalnızca 1 nakit hesabı, 3 harcama, kategori yok dışında varsayılanlar. Tasarım incelemesi (harden) için; gerçek veri içermez.",
+  "app": "kart-limitlerim",
+  "schema": 1,
+  "exportedAt": "2026-10-10T09:00:00.000Z",
+  "data": {
+    "accounts": [
+      {
+        "id": "acc-cash",
+        "kind": "cash",
+        "name": "Cüzdandaki nakit",
+        "balance": 125000,
+        "updatedAt": 1789117200000,
+        "createdAt": 1789117200000
+      }
+    ],
+    "expenses": [
+      {
+        "id": "exp-00",
+        "amount": 12500,
+        "categoryId": "market",
+        "accountId": "acc-cash",
+        "date": "2026-10-09",
+        "note": "Pazar",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117200000
+      },
+      {
+        "id": "exp-01",
+        "amount": 4500,
+        "categoryId": "yemek",
+        "accountId": "acc-cash",
+        "date": "2026-10-10",
+        "note": "Simit",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117201000
+      },
+      {
+        "id": "exp-02",
+        "amount": 89000,
+        "categoryId": "ulasim",
+        "accountId": "acc-cash",
+        "date": "2026-10-02",
+        "note": "Akbil yükleme",
+        "affectsAccount": true,
+        "installments": 1,
+        "source": "manual",
+        "recurringId": null,
+        "createdAt": 1789117202000
+      }
+    ],
+    "categories": [],
+    "recurring": [],
+    "rules": [],
+    "budgets": []
+  }
+}
