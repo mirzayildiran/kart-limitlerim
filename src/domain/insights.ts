@@ -86,6 +86,7 @@ function statementDueInsight(item: StatementItem): Insight | null {
     title: `${lineName(account, lineIndex)} asgari ödemesi ${when}`,
     body: `Son ödeme ${formatShort(view.due)}. Ödenmemiş asgari tutar ${formatTL(minimumOutstanding)}${estimate}.`,
     amount: minimumOutstanding,
+    accountId: account.id,
   }
 }
 
@@ -103,6 +104,7 @@ function cardNearLimit(input: InsightInput): Insight[] {
       title: health === 'empty' ? `${a.name} limiti doldu` : `${a.name} limiti azalıyor`,
       body: `Boş limit ${formatTL(free)}, toplam limit ${formatTL(a.limit)}.`,
       amount: free,
+      accountId: a.id,
     })
   }
   return out
@@ -129,6 +131,7 @@ function kmhInterestInsight(a: KmhAccount, used: Kurus, daily: Kurus): Insight {
     title: `${a.name} borcu faiz işletiyor`,
     body: `Kullandığın ${formatTL(used)} için günlük yaklaşık ${formatTL(daily)} faiz ve vergi işliyor (tahmini).`,
     amount: daily,
+    accountId: a.id,
   }
 }
 
@@ -146,6 +149,7 @@ function minimumInterest(input: InsightInput): Insight[] {
         title: `${lineName(a, i)} asgari ödeme faizi`,
         body: `Yalnızca asgariyi ödersen sonraki ekstreye tahmini ${formatTL(projected.total)} faiz yansır.`,
         amount: projected.total,
+        accountId: a.id,
       })
     })
   }
@@ -270,6 +274,7 @@ function bestCard(input: InsightInput): Insight[] {
       title: `Bugünkü alışveriş için ${best.card.name}`,
       body: `Bugün yapacağın bir alışverişin tahmini son ödemesi ${formatShort(best.due)}, yani ${best.days} gün sonra. Boş limit ${formatTL(best.card.available)}.`,
       amount: best.card.available,
+      accountId: best.card.id,
     },
   ]
 }

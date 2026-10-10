@@ -4,7 +4,8 @@ import { budgetProgress, monthPace, type BudgetRow } from '../../domain/budget'
 import { formatTL } from '../../domain/money'
 import type { Kurus } from '../../domain/types'
 import { Button, MoneyField, Pill } from '../../ui/components/controls'
-import { Amount } from '../../ui/components/Amount'
+import { Amount, figure } from '../../ui/components/Amount'
+import { Icon } from '../../ui/components/Icon'
 import { toast } from '../../ui/components/toast'
 import { barRatio, hasForecast, shownRemaining, statusLabel, statusTone, unplannedCategories } from './budgetPlanModel'
 import './budget-plan.css'
@@ -126,17 +127,22 @@ export function BudgetPlan() {
       <div class="assistant-card budget-plan-month">
         <p class="budget-plan-label">Bu ay</p>
         <Amount value={pace.spent} size="xl" />
-        {hasForecast(pace) ? (
-          <p class="budget-plan-line">
-            Ay sonu tahmini: <span class="num">{formatTL(pace.projected)}</span>
-          </p>
-        ) : (
-          <p class="budget-plan-line">Ay sonu tahmini için birkaç gün daha gerekli.</p>
-        )}
-        {pace.lastMonthTotal > 0 && (
-          <p class="budget-plan-line">
-            Geçen ay toplam: <span class="num">{formatTL(pace.lastMonthTotal)}</span>
-          </p>
+        {!hasForecast(pace) && <p class="budget-plan-line">Ay sonu tahmini için birkaç gün daha gerekli.</p>}
+        {(hasForecast(pace) || pace.lastMonthTotal > 0) && (
+          <dl class="budget-plan-facts">
+            {hasForecast(pace) && (
+              <div class="budget-plan-fact">
+                <dt>Ay sonu tahmini</dt>
+                <dd class="num">{figure(formatTL(pace.projected))}</dd>
+              </div>
+            )}
+            {pace.lastMonthTotal > 0 && (
+              <div class="budget-plan-fact">
+                <dt>Geçen ay toplam</dt>
+                <dd class="num">{figure(formatTL(pace.lastMonthTotal))}</dd>
+              </div>
+            )}
+          </dl>
         )}
         <p class="budget-plan-note">Tahminler bugüne kadarki günlük ortalamaya dayanır.</p>
       </div>
@@ -188,7 +194,14 @@ export function BudgetPlan() {
 
       {unplanned.length > 0 && (
         <div class="budget-plan-add">
-          <Button variant="secondary" block aria-expanded={adding} onClick={() => setAdding(!adding)}>
+          <Button
+            variant="secondary"
+            block
+            class="budget-plan-add-btn"
+            aria-expanded={adding}
+            onClick={() => setAdding(!adding)}
+          >
+            <Icon name="plus" size={18} />
             Kategori için hedef ekle
           </Button>
           {adding && (

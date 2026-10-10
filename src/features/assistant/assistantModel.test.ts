@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import {
+  assistantInput,
   canSend,
   DISCLAIMER,
+  insightIcon,
   PROVIDERS,
   QUICK_PROMPTS,
   severityLabel,
@@ -62,5 +64,34 @@ describe('static copy', () => {
 
   it('states that answers are estimates', () => {
     expect(DISCLAIMER).toBe('Tahmindir, finansal tavsiye değildir.')
+  })
+})
+
+describe('insightIcon', () => {
+  it('draws an alert for due dates, limits and shortfalls', () => {
+    expect(insightIcon('statementDue')).toBe('alert')
+    expect(insightIcon('cardNearLimit')).toBe('alert')
+    expect(insightIcon('cashShortfall')).toBe('alert')
+  })
+
+  it('uses the card icon for card interest and the bank icon for KMH', () => {
+    expect(insightIcon('minimumInterest')).toBe('card')
+    expect(insightIcon('kmhInterest')).toBe('bank')
+  })
+
+  it('uses the wallet icon for spending pace and falls back to info', () => {
+    expect(insightIcon('budgetOver')).toBe('wallet')
+    expect(insightIcon('budgetPace')).toBe('wallet')
+    expect(insightIcon('monthPace')).toBe('wallet')
+    expect(insightIcon('categoryIncrease')).toBe('wallet')
+    expect(insightIcon('bestCard')).toBe('info')
+  })
+})
+
+describe('assistantInput', () => {
+  it('passes the budget picture through unchanged', () => {
+    const today = new Date(2026, 9, 10)
+    const src = { accounts: [], expenses: [], categories: [], recurring: [], budgets: [], today }
+    expect(assistantInput(src)).toEqual(src)
   })
 })
