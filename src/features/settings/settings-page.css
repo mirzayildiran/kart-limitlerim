@@ -257,3 +257,48 @@
     transform: none;
   }
 }
+
+/* Bu iPhone: switch rows with an icon tile; a status note sits under a row that could not turn on. */
+.phone-card > * + * {
+  border-top: 1px solid var(--line);
+}
+
+.phone-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+}
+
+.phone-row-main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+
+.phone-row-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-top: 4px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.phone-row-switch {
+  flex: 1;
+  min-width: 0;
+}
+
+.phone-note {
+  margin: 0 0 0 48px;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--warn-soft);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
