@@ -10,14 +10,22 @@ Yöntem: Opus yönetir (brief, karar, inceleme, commit); uygulama, ekran görün
 |---|---|---|---|---|
 | Özet | ✅ | ✅ | ✅ 3 tur | **ship** |
 | Hareket sistemi (sayfa geçişleri, pencereler, basma, toast) | ✅ | ✅ | ✅ kare kontrolü | uygulandı |
-| Harcamalar | ✅ | ✅ düzeltme turu sürüyor | ⏳ | ⏳ |
-| Takvim | ✅ | ⏳ | ⏳ | ⏳ |
-| Ayarlar | ✅ | ⏳ | ⏳ | ⏳ |
-| Alt pencereler (7 adet) | ⏳ | ⏳ | ⏳ | ⏳ |
+| Harcamalar | ✅ | ✅ | ✅ 24/40 → 2 tur | **ship** |
+| Takvim | ✅ | ✅ | ✅ 24/40 → 3 tur | son puanlama |
+| Ayarlar | ✅ | ✅ | ✅ 27/40 → 2 tur | segment düzeltmesini bekliyor |
+| Alt pencereler (7 adet) | ✅ | ⏳ Opus: ortak bileşenler + 2 pencere | ⏳ | ⏳ |
 | Bütün uygulama: harden, onboard, adapt, audit, polish | ⏳ | ⏳ | ⏳ | ⏳ |
-| Bütçe asistanı (ayrı oturum) | yol haritasında | ayrı Opus oturumu | ⏳ | ⏳ |
+| Bütçe asistanı (ayrı oturum) | ✅ | ✅ kod bitti (532 test, `claude/budget-assistant`) | ⏳ tasarım geçişi | Worker canlıya alınmadı (yerel adım gerekiyor) |
 
 ## Kayıtlar
+
+### 2026-10-10 (devam)
+- Harcamalar: süzgeçler birbirine bağlı (sonuçsuz seçenekler devre dışı), durum satırı ve ekran okuyucu duyurusu, kuruşlu tutarlar her yerde iki hane (741,50 ₺), gün başlıkları tonlu şerit, seçili karo kendi renginde parlıyor, süzgeçte haptik. Karar: **ship**.
+- Takvim: olaylar hesap renginde madalyonlarla, dönem toplamı büyük rakam, bekleyen ödemede "gün geçti" etiketi ve geri alınabilir "Atla", tahmin ve eksik tutar uyarıları, tonlu gün başlıkları.
+- Ayarlar: gerçek başlıklar, faiz kuralları tablo + "tahmindir, esas olan ekstredir" uyarısı, kurulum rehberi yalnızca kurulu değilken, tehlikeli bölge uyarısı önce, sürüm package.json'dan.
+- Açık temada uyarı zemini nötr + ince amber kenar (şeftali hissi kalktı).
+- Alt pencereler için brief yazıldı; ortak bileşenler (hesap seçici, kategori seçici, açılır bölüm, büyük tutar alanı) ve en zor iki pencere Opus alt ajanında.
+- Bütçe asistanı oturumu kodu bitirdi; Worker'ı Cloudflare'e kurmak için yerel bir adım gerekiyor (o oturum sana devir dosyası gönderdi). Dal, tasarım bitince bu dala birleştirilecek; asistan ekranı da tasarım geçişinden geçecek.
 
 ### 2026-10-10
 - Impeccable projeye kuruldu (`.claude/skills/impeccable`, ajanlar, detector hook'u). impeccable.style ağda engelli olduğu için GitHub'dan kuruldu.
