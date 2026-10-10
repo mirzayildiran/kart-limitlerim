@@ -47,6 +47,16 @@ Gerçek ekran görüntüleriyle yapılan değerlendirmede beş bankada 29 satır
 - [ ] Son ödeme hatırlatma bildirimleri
 - [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası
 
+## Aşama 4.5 — Bütçe asistanı (tasarım tamamlandıktan sonra ilk iş)
+
+Karar (2026-10-10): Telefonda çalışan model yerine ücretsiz bulut API'leri kullanılacak. Uygulamanın boyutu büyümeyecek.
+
+- [ ] Kurala dayalı öneriler (yapay zekasız): kategori artışları, kesime kadar risk, "hangi kartla öde" önerisi. Rakamlar yalnızca `src/domain/` hesaplarından gelir.
+- [ ] Sohbet ekranı: model uygulamanın hesapladığı özeti okur, açıklar ve bütçe planını tartışır. Model hesap yapmaz.
+- [ ] Sağlayıcı katmanı: ücretsiz katmanı olan API'ler (Gemini, Groq, OpenRouter) için tek arayüz.
+- [ ] Gizlilik: varsayılan kapalı. Açmadan önce hangi verinin hangi servise gideceğini gösteren açık onay ekranı. Ham harcama listesi yerine özet gönderilir. PRODUCT.md'deki "veriler cihazdan çıkmaz" sözü bu özellik için güncellenir.
+- [ ] Her yanıtta "tahmindir, finansal tavsiye değildir" ibaresi.
+
 ## Aşama 5 — İleri özellikler
 
 - [ ] "Bu harcamayı hangi kartla yapmalıyım?" önerisi (boş limit ve faizsiz süreye göre)
