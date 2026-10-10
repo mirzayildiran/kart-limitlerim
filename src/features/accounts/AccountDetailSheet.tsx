@@ -126,16 +126,16 @@ function CardContent({ account }: { account: CardAccount }): JSX.Element {
               {data.dailyCosts.length > 0 && (
                 <li>
                   Borcun her gün{' '}
-                  <strong class="num">~{figure(formatTLExact(data.dailyCosts.reduce((s, d) => s + d.cost, 0)))}</strong> faiz
+                  <strong class="num">{figure(`~${formatTLExact(data.dailyCosts.reduce((s, d) => s + d.cost, 0))}`)}</strong> faiz
                   işletiyor.
                 </li>
               )}
               {data.lineProjections.map((proj) => (
                 <li key={proj.lineIndex}>
-                  <strong>{proj.label}:</strong> bu ekstrede <span class="num">~{figure(formatTLExact(proj.projectedAsEntered))}</span>
+                  <strong>{proj.label}:</strong> bu ekstrede <span class="num">{figure(`~${formatTLExact(proj.projectedAsEntered)}`)}</span>
                   {(proj.payment === 'unpaid' || proj.payment === 'partial') && proj.projectedMinimum !== null && (
                     <>
-                      ; yalnız asgariyi ödersen <span class="num">~{figure(formatTLExact(proj.projectedMinimum))}</span>
+                      ; yalnız asgariyi ödersen <span class="num">{figure(`~${formatTLExact(proj.projectedMinimum)}`)}</span>
                     </>
                   )}
                   .
@@ -220,7 +220,7 @@ function KmhContent({ account }: { account: KmhAccount }): JSX.Element {
         <InterestPanel figure={dailyCost} sub="KMH borcun her gün bu kadar faiz işletiyor">
           <ul class="account-detail-interest-lines">
             <li>
-              Aylık tahmini <strong class="num">~{figure(formatTLExact(dailyCost * 30))}</strong>.
+              Aylık tahmini <strong class="num">{figure(`~${formatTLExact(dailyCost * 30)}`)}</strong>.
             </li>
           </ul>
           <p class="account-detail-interest-caption">

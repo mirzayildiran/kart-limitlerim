@@ -2,6 +2,7 @@ import type { ComponentChildren } from 'preact'
 import { useEffect, useId, useRef } from 'preact/hooks'
 import { sheetClosing } from '../nav'
 import { lockScroll, unlockScroll } from '../scrollLock'
+import { FOCUSABLE, trapTarget } from '../focusTrap'
 import { Icon } from './Icon'
 import './sheet.css'
 
@@ -15,8 +16,9 @@ interface Props {
 }
 
 /**
- * Bottom sheet dialog. Traps focus loosely (focus moves in on open and back to
- * the opener on close), closes on Escape and on a tap on the scrim, locks page scroll.
+ * Bottom sheet dialog. Focus moves in on open, Tab and Shift+Tab stay inside the
+ * sheet, and focus returns to the opener on close. Closes on Escape and on a tap
+ * on the scrim, locks page scroll.
  */
 export function Sheet({ open, title, onClose, children, footer }: Props) {
   const titleId = useId()
@@ -33,6 +35,15 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
     first?.focus({ preventScroll: true })
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !sheetClosing.value) onClose()
+      if (e.key === 'Tab' && panel.current) {
+        // Roving radios keep their other options at tabindex -1; those are not Tab stops.
+        const items = [...panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.tabIndex >= 0)
+        const target = trapTarget(items, document.activeElement, e.shiftKey)
+        if (target) {
+          e.preventDefault()
+          target.focus()
+        }
+      }
     }
     document.addEventListener('keydown', onKey)
     // iOS: when the keyboard opens, the viewport shrinks after focus; bring the field back into view.
@@ -60,7 +71,8 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
   }
   return (
     <div class={closing ? 'sheet-scrim is-closing' : 'sheet-scrim'} role="presentation">
-      <button type="button" class="sheet-backdrop" aria-label="Kapat" tabIndex={-1} onClick={close} />
+      {/* Pointer-only: the header's Kapat button is the one screen readers and keyboards reach. */}
+      <button type="button" class="sheet-backdrop" aria-hidden="true" tabIndex={-1} onClick={close} />
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={panel}>
         <div class="sheet-grab" aria-hidden="true" />
         <header class="sheet-head">

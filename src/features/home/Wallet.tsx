@@ -1,6 +1,6 @@
 import { useRef, useState } from 'preact/hooks'
 import { daysBetween, startOfDay } from '../../domain/dates'
-import { formatTL } from '../../domain/money'
+import { formatTL, spokenTL } from '../../domain/money'
 import type { StatementItem } from '../../domain/power'
 import type { Account } from '../../domain/types'
 import { Amount } from '../../ui/components/Amount'
@@ -36,7 +36,16 @@ function WalletCard({ account, slot, items }: { account: Account; slot: number; 
   const free = hasLimit ? account.available : account.balance
   const share = hasLimit && account.limit > 0 ? Math.min(1, Math.max(0, account.available / account.limit)) : 0
   const date = account.kind === 'card' ? nextDate(items) : null
-  const label = `${account.name}, ${KIND_LABEL[account.kind]}, ${formatTL(free)} ${hasLimit ? 'kullanılabilir' : 'bakiye'}`
+  // Everything the card shows, in reading order, so VoiceOver does not skip the limit or a due date.
+  const label = [
+    account.name,
+    KIND_LABEL[account.kind],
+    `${spokenTL(free)} ${hasLimit ? 'kullanılabilir' : 'bakiye'}`,
+    hasLimit && (account.limit > 0 ? `limit ${spokenTL(account.limit)}` : 'limit girilmedi'),
+    date?.text,
+  ]
+    .filter(Boolean)
+    .join(', ')
 
   return (
     <button
