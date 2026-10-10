@@ -6,6 +6,7 @@
 #   GEMINI_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY  en az biri
 # Token yoksa hiçbir şey yapmaz; uygulama sohbetsiz derlenir.
 set -euo pipefail
+export WRANGLER_SEND_METRICS=false
 
 WRANGLER="npx --yes wrangler@4.149.0"
 API="https://api.cloudflare.com/client/v4"
