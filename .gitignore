@@ -34,3 +34,5 @@ legacy/
 .wrangler/
 
 # Impeccable launcher binary, downloaded on first run
+test-results/
+playwright-report/

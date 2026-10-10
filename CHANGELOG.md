@@ -8,9 +8,14 @@ Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izle
 
 - Yedek dosyasında şema sürümü 2 ve eski dosyalar için 1→2 geçişi (`migrate`). Her kayıt alan alan doğrulanır, bilinmeyen alanlar atılır; hata mesajı bozuk kaydı söyler ("3. harcama, tutar geçersiz"). Dosya boyutu okunmadan önce denetlenir. Otomatik yedek ve "Yedeği dışa aktar" aynı biçimi yazar.
 - Asistan Worker'ı özeti alan alan yeniden kurar; serbest metin kısa ad ve öneri alanlarıyla sınırlı.
+- Uçtan uca testler (Playwright, 390×844, koyu ve açık tema): örnek veri, harcama ve kart ekleme, Takvim'den ödeme işaretleme, yedek dışa aktar → sil → geri yükle, asistan onay ekranı (Worker taklit edilir) ve her ana sayfada axe-core taraması. `npm run e2e`.
+- Bileşen testleri (happy-dom, Testing Library): pencere odak tuzağı ve Escape, kilit ekranı mesajları, ilk açılış ve geri yükleme önerisi, tutar alanı, harcama formu doğrulaması. `npm run test:components`.
 - `npm run check:csp`: derlenmiş uygulamada Content-Security-Policy ihlali denetimi (web ve `CAP_NATIVE=1`).
 
 ### Fixed
+
+- Alan ipuçları ve ekran görüntüsü gizlilik notu açık temada 3,2:1, koyu temada 3,6:1 kontrastla yazılıyordu (axe). Artık `--muted` (AA).
+- Ekstre penceresinde oran "aylık %3.25" diye noktalı yazılıyordu; "%3,25".
 
 - Son ödeme tarihi resmi tatile denk gelince bir sonraki iş gününe kayıyor (önceden yalnızca hafta sonu). 2026–2028 için resmi tatil tablosu (dini bayramlar ve arifeler dahil, kaynak: 2429 sayılı Kanun ve Diyanet); arife yarım gün olduğu için tarih kaydırılmaz.
 - KMH'de yalnızca gecikme oranı girilince akdi oran kart oranıyla (%3,25) dolduruluyordu; artık nakit/KMH azami oranı (%4,25). Kart için en düşük dilim kullanılır.

@@ -10,6 +10,7 @@ import { formatLong, toIso } from '../../domain/dates'
 import { formatTLExact } from '../../domain/money'
 import { viewStatement, rollToCurrentCycle } from '../../domain/statement'
 import { figure } from '../../ui/components/Amount'
+import { formatRate } from '../accounts/detailModel'
 import {
   initStatementFormState,
   validateStatementForm,
@@ -209,7 +210,7 @@ export function StatementSheet({ request }: StatementSheetProps) {
               </p>
               <p class="statement-interest-detail">
                 Akdi {formatTLExact(preview.contractual)} + gecikme {formatTLExact(preview.late)} + vergiler{' '}
-                {formatTLExact(preview.taxes)} · aylık %{preview.rate}
+                {formatTLExact(preview.taxes)} · aylık {formatRate(preview.rate)}
               </p>
               {preview.minimumScenario !== null && (
                 <p class="statement-interest-minimum">Yalnız asgariyi ödersen: ~{formatTLExact(preview.minimumScenario)}</p>

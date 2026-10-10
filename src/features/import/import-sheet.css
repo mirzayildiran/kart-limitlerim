@@ -47,7 +47,7 @@
 .import-privacy {
   margin: 0;
   font-size: var(--text-xs);
-  color: var(--faint);
+  color: var(--muted);
   text-align: center;
 }
 
