@@ -8,6 +8,13 @@ vi.mock('../ui/nav', () => ({ go: vi.fn(), openSheet: vi.fn() }))
 const { parseDeepLink, statementLink } = await import('./deeplinks')
 
 describe('parseDeepLink', () => {
+  it('ignores names inherited from Object.prototype, overlong ids and overlong URLs', () => {
+    for (const name of ['constructor', '__proto__', 'toString', 'hasOwnProperty']) expect(parseDeepLink(`kartlimitlerim://${name}`)).toBeNull()
+    expect(parseDeepLink(`kartlimitlerim://ekstre/${'a'.repeat(65)}/0`)).toBeNull()
+    expect(parseDeepLink(`kartlimitlerim://ekstre/${'a'.repeat(64)}/0`)).toEqual({ sheet: 'statement', accountId: 'a'.repeat(64), lineIndex: 0 })
+    expect(parseDeepLink(`kartlimitlerim://takvim?${'x'.repeat(300)}`)).toBeNull()
+  })
+
   it('maps the quick actions', () => {
     expect(parseDeepLink('kartlimitlerim://harcama-ekle')).toEqual({ sheet: 'expense' })
     expect(parseDeepLink('kartlimitlerim://takvim')).toEqual({ route: 'calendar' })

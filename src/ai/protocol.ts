@@ -34,6 +34,8 @@ export type AssistantErrorCode =
   | 'rate_limited'
   | 'bad_request'
   | 'unavailable'
+  /** Client only: the user has not consented, so nothing was sent. The proxy never returns it. */
+  | 'no_consent'
 
 export interface AssistantErrorBody {
   error: AssistantErrorCode
