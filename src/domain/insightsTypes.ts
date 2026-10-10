@@ -84,6 +84,16 @@ export interface BudgetSummary {
   budgets: SummaryBudget[]
   /** Rule-based insights, already worded. */
   insights: { severity: InsightSeverity; title: string; body: string }[]
+  /** Card installment plans still being billed; absent when there are none. */
+  installments?: SummaryInstallments
+}
+
+export interface SummaryInstallments {
+  plans: number
+  /** This month's installments, all plans together. */
+  monthly: string
+  /** Everything still to be billed, this month included. */
+  remaining: string
 }
 
 export interface SummaryAccount {

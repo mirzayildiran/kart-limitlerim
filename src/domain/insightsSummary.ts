@@ -1,5 +1,6 @@
 import { budgetProgress, monthPace } from './budget'
 import { toIso } from './dates'
+import { installmentPlans } from './installments'
 import { formatTL } from './money'
 import { isCard, isKmh, outlook, spendingPower, statementItems, type StatementItem } from './power'
 import type {
@@ -54,7 +55,7 @@ export function budgetSummary(input: InsightInput, insights: Insight[]): BudgetS
       .slice(0, MAX_BUDGETS)
       .map(
         (r): SummaryBudget => ({
-          category: r.name,
+          category: scrub(r.name),
           monthly: formatTL(r.monthly),
           spent: formatTL(r.spent),
           remaining: formatTL(r.remaining),
@@ -67,7 +68,7 @@ export function budgetSummary(input: InsightInput, insights: Insight[]): BudgetS
       .slice(0, MAX_CATEGORIES)
       .map(
         (c): SummaryCategory => ({
-          name: c.name,
+          name: scrub(c.name),
           thisMonth: formatTL(c.thisMonth),
           lastMonthSamePeriod: formatTL(c.lastMonthSamePeriod),
           changePercent:
@@ -76,8 +77,26 @@ export function budgetSummary(input: InsightInput, insights: Insight[]): BudgetS
               : Math.round(((c.thisMonth - c.lastMonthSamePeriod) / c.lastMonthSamePeriod) * 100),
         }),
       ),
-    insights: insights.slice(0, MAX_INSIGHTS).map((i) => ({ severity: i.severity, title: i.title, body: i.body })),
+    insights: insights.slice(0, MAX_INSIGHTS).map((i) => ({ severity: i.severity, title: scrub(i.title), body: scrub(i.body) })),
+    ...installmentsOf(input),
   }
+}
+
+function installmentsOf(input: InsightInput): Pick<BudgetSummary, 'installments'> {
+  const p = installmentPlans(input.expenses, input.accounts, input.today)
+  return p.plans === 0 ? {} : { installments: { plans: p.plans, monthly: formatTL(p.monthly), remaining: formatTL(p.remaining) } }
+}
+
+/**
+ * Names are the user's own text and go out as written, except anything that looks like a
+ * personal identifier: card, IBAN, phone or ID numbers (4+ digits in a row, spaces allowed) and
+ * e-mail addresses. "Bonus 4543" becomes "Bonus ••••". Figures in insight texts ("1.280 ₺",
+ * "40 gün") are short or dotted, so they are kept.
+ */
+export function scrub(text: string): string {
+  return text
+    .replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, '[e-posta]')
+    .replace(/(?:TR)?\d(?:[ -]?\d){3,}/gi, '••••')
 }
 
 function summarizeMonth(input: InsightInput): SummaryMonth {
@@ -138,7 +157,7 @@ function orderAccounts(accounts: Account[]): Account[] {
 function summarizeAccount(a: Account, statements: StatementItem[]): SummaryAccount {
   if (isCard(a)) {
     const summary: SummaryAccount = {
-      name: a.name,
+      name: scrub(a.name),
       kind: 'kart',
       available: formatTL(a.available),
       limit: formatTL(a.limit),
@@ -159,7 +178,7 @@ function summarizeAccount(a: Account, statements: StatementItem[]): SummaryAccou
     return summary
   }
   if (isKmh(a)) {
-    return { name: a.name, kind: 'KMH', available: formatTL(a.available), limit: formatTL(a.limit) }
+    return { name: scrub(a.name), kind: 'KMH', available: formatTL(a.available), limit: formatTL(a.limit) }
   }
-  return { name: a.name, kind: a.kind === 'bank' ? 'banka' : 'nakit', available: formatTL(a.balance) }
+  return { name: scrub(a.name), kind: a.kind === 'bank' ? 'banka' : 'nakit', available: formatTL(a.balance) }
 }

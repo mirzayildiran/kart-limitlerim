@@ -14,6 +14,7 @@ const SENT = [
   'Hesap adların, limitler, bakiyeler ve ekstre tutarları',
   'Bu ay ve geçen ay kategori toplamları',
   'Bütçe planın (kategori hedefleri) ve bu ayki harcama gidişatı',
+  'Süren taksitlerinin toplamı (tek tek alışverişler değil)',
   'Cihazdaki öneriler',
   'Sohbete yazdığın mesajlar',
 ]
@@ -22,7 +23,7 @@ const NOT_SENT = [
   'Tek tek harcamaların ve notların',
   'Düzenli ödeme adların',
   'Yedek dosyan',
-  'Kart numarası, şifre gibi bilgiler (uygulama zaten istemez)',
+  'Kart numarası, şifre gibi bilgiler (uygulama zaten istemez; adlardaki uzun rakamlar ve e-postalar maskelenir)',
 ]
 
 export function ConsentPanel({ summary, onAccept }: Props) {
