@@ -10,12 +10,12 @@ Yayın öncesi denetim, 2026-10-10. Dal: `claude/security-pass`. Bulgular önem 
 - Yedek dosyasında 20 milyon karakter sınırı (bulgu 6).
 - Derlemede sır taraması: temiz (bulgu 7).
 - Worker özeti alan alan yeniden kuruyor; bilinmeyen alanlar atılıyor (bulgu 2, bulut oturumu).
+- Yedekte kayıt başına şema denetimi, şema sürümü 2 ve 1→2 geçişi (bulgu 4, bulut oturumu).
 
 ## Açık kalanlar
 
 1. **İstemci doğrulaması (bulgu 2'nin kalanı):** Gerekirse Turnstile ya da App Attest. Alan doğrulaması yapıldı.
-2. **Yedek kayıt şeması (düşük, bulgu 4):** En azından `accounts` için tür, kuruş ve tarih denetimi.
-3. **iOS'ta CSP doğrulaması:** WKWebView'da `capacitor://localhost` için `'self'` ve Capacitor köprüsü (bulgu 3). Chromium'da doğrulandı, cihazda denenmedi.
+2. **iOS'ta CSP doğrulaması:** WKWebView'da `capacitor://localhost` için `'self'` ve Capacitor köprüsü (bulgu 3). Chromium'da doğrulandı, cihazda denenmedi.
 
 ## Bulgular
 
@@ -24,7 +24,7 @@ Yayın öncesi denetim, 2026-10-10. Dal: `claude/security-pass`. Bulgular önem 
 | 1 | Yüksek | Asistan onayı yalnızca arayüzde uygulanıyordu | Düzeltildi |
 | 2 | Orta | Worker, Origin taklidiyle genel bir LLM aracısı gibi kullanılabilir | Alan doğrulaması yapıldı; istemci doğrulaması açık |
 | 3 | Orta | Content-Security-Policy yoktu | Düzeltildi |
-| 4 | Düşük | Yedek geri yüklemede kayıt içi alanlar doğrulanmıyor | Açık, öneri aşağıda |
+| 4 | Düşük | Yedek geri yüklemede kayıt içi alanlar doğrulanmıyor | Düzeltildi |
 | 5 | Düşük | Derin bağlantıda prototip anahtarları ve sınırsız uzunluk | Düzeltildi |
 | 6 | Düşük | Yedek dosyasında boyut sınırı yoktu | Düzeltildi |
 | 7 | Bilgi | Derlemede sır yok | Temiz |
@@ -82,7 +82,11 @@ object-src 'none'; base-uri 'none'; form-action 'none'
 - **Chromium'da doğrulandı:** native (`CAP_NATIVE=1`) ve web (`/kart-limitlerim/`, service worker'lı) derlemelerinde akış baştan sona çalıştı ve hiç `securitypolicyviolation` olmadı. Denenen akış: açık temada açılış, örnek veri, dört sayfa, asistana istek, gerçek bir görüntüyle OCR.
 - **iOS'ta doğrulanmalı:** WKWebView'da `capacitor://localhost` için `'self'` eşleşmesi ve Capacitor köprüsü. Köprü WKUserScript olarak enjekte edildiği için CSP'ye takılmaması beklenir.
 
-## 4. Yedek geri yüklemede kayıt içi alanlar doğrulanmıyor (düşük, açık)
+## 4. Yedek geri yüklemede kayıt içi alanlar doğrulanmıyor (düşük, düzeltildi)
+
+**Düzeltme:** `src/data/backupSchema.ts` her kaydı bilinen alanlardan yeniden kurar; bilinmeyen alanlar IndexedDB'ye girmez. Tutarlar tam sayı kuruş (±1 milyar ₺ içinde), tarihler geçerli `YYYY-AA-GG`, tür ve durum alanları izin listesinden, metinler uzunluk sınırlı. Eski sürümlerin yazmadığı alanlar bugünkü varsayılanla dolar; yanlış türde bir alan hata verir ve mesaj kaydı adıyla söyler ("Yedek dosyası bozuk: 3. harcama, tutar geçersiz."). Liste başına en çok 100.000 kayıt. Dosyada şema sürümü var (`BACKUP_SCHEMA = 2`); eski dosyalar `migrate()` ile yükseltilir, daha yeni sürüm reddedilir. Testler `src/data/backup.test.ts`.
+
+Önceki durum:
 
 `parseBackup` uygulama adını, şema sürümünü, beş listenin varlığını ve her kaydın `id`'sini denetliyor. Kayıtların iç alanlarına bakmıyor; örneğin `limit` metin olabilir ya da `kind` bilinmeyen bir değer olabilir.
 
