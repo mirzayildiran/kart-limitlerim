@@ -246,6 +246,12 @@ describe('expenseModel', () => {
       expect(interestNudgeAmount(account, 100000)).toBe(6500)
     })
 
+    it('picks the card tier from what is used plus the expense, not the expense alone', () => {
+      // 200.000 ₺ used + 1.000 ₺ → statement tier above 180.000 ₺: 4,25%.
+      const account = mockCardAccount({ limit: 50_000_000, available: 30_000_000, rateOverride: null })
+      expect(interestNudgeAmount(account, 100000)).toBe(Math.round(100000 * 0.0425 * 1.3))
+    })
+
     it('matches the figure inside the sentence', () => {
       const account = mockKmhAccount({ rateOverride: { contractual: 5, late: 6 } })
       expect(interestNudge(account, 100000)).toContain('~65 ₺')

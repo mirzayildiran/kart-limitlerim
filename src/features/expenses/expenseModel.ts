@@ -1,6 +1,6 @@
 import { cycleKeyOf, fromIso, shiftMonth } from '../../domain/dates'
 import { formatTLExact } from '../../domain/money'
-import { cardTierFor, CURRENT_RATES } from '../../domain/rates'
+import { cardTierFor, CURRENT_RATES, withTaxes } from '../../domain/rates'
 import type { Account, CardAccount, KmhAccount, Expense, IsoDate, Kurus } from '../../domain/types'
 
 /**
@@ -157,13 +157,15 @@ export function validateCategoryName(
 export function interestNudgeAmount(account: CardAccount | KmhAccount, amount: Kurus): Kurus | null {
   if (amount <= 0) return null
 
-  // Use the interest rate for this amount; KMH uses the cash rate.
+  // The card tier follows the statement debt, so the rate is the one for what is used plus this
+  // expense; KMH uses the cash rate.
+  const used = Math.max(0, account.limit - account.available)
   const rate =
     account.kind === 'card'
-      ? account.rateOverride?.contractual ?? cardTierFor(amount, CURRENT_RATES).contractual
+      ? account.rateOverride?.contractual ?? cardTierFor(used + amount, CURRENT_RATES).contractual
       : account.rateOverride?.contractual ?? CURRENT_RATES.cash.contractual
 
-  const monthlyInterest = Math.round(((amount * rate) / 100) * 1.3)
+  const monthlyInterest = Math.round(withTaxes((amount * rate) / 100))
   return monthlyInterest > 0 ? monthlyInterest : null
 }
 

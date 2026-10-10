@@ -47,13 +47,8 @@ export function shiftMonth(key: CycleKey, delta: number): CycleKey {
   return cycleKeyOf(new Date(d.getFullYear(), d.getMonth() + delta, 1))
 }
 
-/** Saturday/Sunday → following Monday. Public holidays are not modelled. */
-export function nextBusinessDay(d: Date): Date {
-  const wd = d.getDay()
-  if (wd === 6) return addDays(d, 2)
-  if (wd === 0) return addDays(d, 1)
-  return d
-}
+/** Weekend or official holiday → the next business day (see holidays.ts). */
+export { nextBusinessDay } from './holidays'
 
 const shortFmt = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' })
 const longFmt = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long' })
