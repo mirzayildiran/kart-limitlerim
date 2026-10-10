@@ -159,7 +159,7 @@ describe('providers', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
 
     const [url, init] = fetchMock.mock.calls[0]
-    expect(String(url)).toContain('gemini-flash-latest')
+    expect(String(url)).toContain('gemini-flash-lite-latest')
     expect(init?.headers).toMatchObject({ 'x-goog-api-key': KEYS.GEMINI_API_KEY })
     const sent: unknown = JSON.parse(String(init?.body))
     expect(sent).toMatchObject({ generationConfig: { thinkingConfig: { thinkingLevel: 'low' } } })

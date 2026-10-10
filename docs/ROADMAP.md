@@ -53,7 +53,7 @@ Karar (2026-10-10): Telefonda çalışan model yerine ücretsiz bulut API'leri k
 
 - [x] Kurala dayalı öneriler (yapay zekasız): kesime kadar nakit açığı, yaklaşan ve geciken asgari ödemeler, limiti azalan kart, KMH günlük faizi, asgari ödeme faizi, kategori artışları, "bugün hangi kartla öde". Rakamlar yalnızca `src/domain/` hesaplarından gelir (`src/domain/insights.ts`).
 - [x] Sohbet ekranı (`#/asistan`): model uygulamanın hesapladığı özeti (`src/domain/insightsSummary.ts`) okur, açıklar ve tartışır. Model hesap yapmaz. Sohbet geçmişi yalnızca bellekte tutulur.
-- [x] Sağlayıcı katmanı: aracı sunucu sırayla Gemini (`gemini-flash-latest`), Groq ve OpenRouter'ı dener (`src/ai/`, `worker/assistant-proxy/`). CORS, IP başına dakikalık (Workers Rate Limiting) ve saatlik hız sınırı var. Gemini yolu gerçek anahtarla uçtan uca denendi.
+- [x] Sağlayıcı katmanı: aracı sunucu sırayla Gemini (`gemini-flash-lite-latest`), Groq ve OpenRouter'ı dener (`src/ai/`, `worker/assistant-proxy/`). CORS, IP başına dakikalık (Workers Rate Limiting) ve saatlik hız sınırı var. Gemini yolu gerçek anahtarla uçtan uca denendi (Flash Lite ~1 sn; tam Flash ~60 sn sürdüğü için kullanılmıyor).
 - [x] Bütçe planı: kategori başına aylık hedef, ay gidişatı ve tahmini ay sonu (`src/domain/budget.ts`). Hedef aşımı ve "bu hızla aşılır" önerileri; sohbet planı bu rakamlarla tartışır. Plan yedeğe girer.
 - [x] Gizlilik: varsayılan kapalı. Onay ekranı gönderilecek alanları, gönderilmeyenleri, servisleri ve özetin tam hâlini gösterir. PRODUCT.md ilkesi ve `docs/PRIVACY.md` güncellendi.
 - [x] Her yanıtta "Tahmindir, finansal tavsiye değildir." ibaresi (uygulama ekler, modele bırakılmaz).
