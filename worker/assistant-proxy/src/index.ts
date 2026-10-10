@@ -34,10 +34,18 @@ type ProviderName = 'gemini' | 'groq' | 'openrouter'
 interface Provider {
   name: ProviderName
   key: (env: Env) => string | undefined
-  call: (key: string, system: string, turns: ChatMessage[]) => Promise<string>
+  call: (key: string, system: string, turns: ChatMessage[], timeoutMs: number) => Promise<string>
 }
 
-const PROVIDER_TIMEOUT_MS = 20_000
+/** One provider may take this long before the next one is tried. The fast models answer in ~1 s. */
+const PROVIDER_TIMEOUT_MS = 12_000
+/**
+ * All providers together must finish within this, so the proxy answers 503 before the app's own
+ * 30 s timeout fires and the app can show "unavailable" instead of "timeout".
+ */
+const TOTAL_BUDGET_MS = 25_000
+/** Not worth starting a provider with less time than this left. */
+const MIN_PROVIDER_MS = 2_000
 const MAX_OUTPUT_TOKENS = 400
 const TEMPERATURE = 0.3
 const DEFAULT_RATE_LIMIT = 30
@@ -47,6 +55,7 @@ const RATE_MAP_PRUNE_AT = 5_000
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent'
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const OPENROUTER_MODELS = ['google/gemma-4-31b-it:free', 'nvidia/nemotron-3-super-120b-a12b:free']
 
 const PROVIDERS: readonly Provider[] = [
   {
@@ -57,17 +66,25 @@ const PROVIDERS: readonly Provider[] = [
   {
     name: 'groq',
     key: (env) => env.GROQ_API_KEY,
-    call: (key, system, turns) =>
+    call: (key, system, turns, timeoutMs) =>
       // gpt-oss reasons before answering; low effort keeps the reasoning inside MAX_OUTPUT_TOKENS.
-      callOpenAiStyle(GROQ_URL, key, 'openai/gpt-oss-120b', system, turns, {}, { reasoning_effort: 'low' }),
+      callOpenAiStyle(GROQ_URL, key, 'openai/gpt-oss-120b', system, turns, timeoutMs, {}, { reasoning_effort: 'low' }),
   },
   {
     name: 'openrouter',
     key: (env) => env.OPENROUTER_API_KEY,
-    call: (key, system, turns) =>
-      callOpenAiStyle(OPENROUTER_URL, key, 'meta-llama/llama-3.3-70b-instruct:free', system, turns, {
-        'X-Title': 'Kart Limitlerim',
-      }),
+    // Free models come and go; OpenRouter tries the `models` list in order when one is gone or busy.
+    call: (key, system, turns, timeoutMs) =>
+      callOpenAiStyle(
+        OPENROUTER_URL,
+        key,
+        OPENROUTER_MODELS[0],
+        system,
+        turns,
+        timeoutMs,
+        { 'X-Title': 'Kart Limitlerim' },
+        { models: OPENROUTER_MODELS },
+      ),
   },
 ]
 
@@ -129,9 +146,15 @@ export default {
     if (configured.length === 0) return reply(503, { error: 'not_configured' }, origin)
 
     const { system, turns } = buildMessages(req)
+    const deadline = Date.now() + TOTAL_BUDGET_MS
     for (const { provider, key } of configured) {
+      const left = deadline - Date.now()
+      if (left < MIN_PROVIDER_MS) {
+        console.warn(`assistant: out of time before ${provider.name}`)
+        break
+      }
       try {
-        const answer = (await provider.call(key, system, turns)).trim()
+        const answer = (await provider.call(key, system, turns, Math.min(PROVIDER_TIMEOUT_MS, left))).trim()
         if (answer) return reply(200, { text: answer, provider: provider.name }, origin)
         console.warn(`assistant: ${provider.name} returned no text`)
       } catch (err) {
@@ -144,7 +167,7 @@ export default {
   },
 }
 
-async function callGemini(key: string, system: string, turns: ChatMessage[]): Promise<string> {
+async function callGemini(key: string, system: string, turns: ChatMessage[], timeoutMs: number): Promise<string> {
   const body = {
     systemInstruction: { parts: [{ text: system }] },
     contents: turns.map((t) => ({
@@ -159,7 +182,7 @@ async function callGemini(key: string, system: string, turns: ChatMessage[]): Pr
       thinkingConfig: { thinkingLevel: 'low' },
     },
   }
-  const data = await postJson(GEMINI_URL, { 'x-goog-api-key': key }, body)
+  const data = await postJson(GEMINI_URL, { 'x-goog-api-key': key }, body, timeoutMs)
   return geminiText(data)
 }
 
@@ -169,6 +192,7 @@ async function callOpenAiStyle(
   model: string,
   system: string,
   turns: ChatMessage[],
+  timeoutMs: number,
   extraHeaders: Record<string, string>,
   extraBody: Record<string, unknown> = {},
 ): Promise<string> {
@@ -182,14 +206,14 @@ async function callOpenAiStyle(
       ...turns.map((t) => ({ role: t.role, content: t.text })),
     ],
   }
-  const data = await postJson(url, { Authorization: `Bearer ${key}`, ...extraHeaders }, body)
+  const data = await postJson(url, { Authorization: `Bearer ${key}`, ...extraHeaders }, body, timeoutMs)
   return openAiText(data)
 }
 
 /** POSTs JSON with a timeout. Throws on a non-OK status or an unreadable body. */
-async function postJson(url: string, headers: Record<string, string>, body: unknown): Promise<unknown> {
+async function postJson(url: string, headers: Record<string, string>, body: unknown, timeoutMs: number): Promise<unknown> {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), PROVIDER_TIMEOUT_MS)
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
     const res = await fetch(url, {
       method: 'POST',
