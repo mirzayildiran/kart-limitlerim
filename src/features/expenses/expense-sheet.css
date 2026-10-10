@@ -118,6 +118,12 @@
   font-size: var(--text-md);
 }
 
+/* "12 × 800 ₺ · tamamı 9.600 ₺ limitten düşer" under the count chips. */
+.expense-installment-preview {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
 /* The account switch and the preview of what it does. */
 .expense-effect {
   display: flex;

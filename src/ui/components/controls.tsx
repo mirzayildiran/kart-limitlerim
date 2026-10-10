@@ -109,7 +109,7 @@ interface TextFieldProps {
   type?: 'text' | 'date' | 'number'
   min?: number
   max?: number
-  inputMode?: 'text' | 'numeric'
+  inputMode?: 'text' | 'numeric' | 'decimal'
 }
 
 export function TextField({ label, value, onChange, placeholder, hint, error, type = 'text', min, max, inputMode }: TextFieldProps) {

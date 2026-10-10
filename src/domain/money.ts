@@ -2,6 +2,7 @@ import type { Kurus } from './types'
 
 const whole = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 })
 const twoDigits = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const percent = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 })
 
 /**
  * Exact text without the sign: a zero kuruş part is dropped ("215"), any other
@@ -42,6 +43,14 @@ export function formatTLExact(k: Kurus): string {
 /** Number only, for prefilling inputs: 123456 → "1.234,56". Same shape as formatNumberTLExact. */
 export function formatInput(k: Kurus): string {
   return exactText(k)
+}
+
+/**
+ * A percentage the Turkish way, sign first and a decimal comma: 3.25 → "%3,25", 20 → "%20".
+ * Takes the percent value itself (3.25 for 3,25 %), not a ratio.
+ */
+export function formatPercent(p: number): string {
+  return `%${percent.format(p)}`
 }
 
 /**

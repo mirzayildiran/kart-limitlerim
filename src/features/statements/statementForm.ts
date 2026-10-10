@@ -4,8 +4,8 @@
  */
 
 import type { CardLine, CardAccount, Kurus, PaymentState, IsoDate } from '../../domain/types'
-import { estimateMinimum } from '../../domain/rates'
-import { formatTLExact } from '../../domain/money'
+import { estimateMinimum, MINIMUM_RULE } from '../../domain/rates'
+import { formatPercent, formatTL, formatTLExact } from '../../domain/money'
 import { fromIso } from '../../domain/dates'
 import { statementInterest, rateFor } from '../../domain/interest'
 import type { StatementView } from '../../domain/statement'
@@ -69,6 +69,11 @@ export function isStatementFormValid(errors: StatementFormErrors): boolean {
   return Object.keys(errors).length === 0
 }
 
+/**
+ * Write the form onto the line. `paidAmount` is kept only for a partial payment: the
+ * other states say what was paid on their own, and a figure left over from an earlier
+ * "Kısmi" must not be read later (it used to shrink the daily interest of an unpaid card).
+ */
 export function updateStatementLine(line: CardLine, state: StatementFormState, cycle: string): CardLine {
   return {
     ...line,
@@ -77,7 +82,7 @@ export function updateStatementLine(line: CardLine, state: StatementFormState, c
     minimumDue: state.minimumDue,
     dueDate: state.dueDate,
     payment: state.payment,
-    paidAmount: state.paidAmount,
+    paidAmount: state.payment === 'partial' ? state.paidAmount : null,
     interestCharged: state.interestCharged,
     interestHistory: line.interestHistory,
   }
@@ -86,8 +91,51 @@ export function updateStatementLine(line: CardLine, state: StatementFormState, c
 export function getMinimumHint(debt: Kurus | null, cardLimit: Kurus): string | null {
   if (debt === null || debt <= 0) return null
   const estimate = estimateMinimum(debt, cardLimit)
-  return `Tahmini: ${formatTLExact(estimate)} (BDDK: limit 100.000 ₺'ye kadar %20, üstü %40)`
+  const r = MINIMUM_RULE
+  return `Tahmini: ${formatTLExact(estimate)} (BDDK: limit ${formatTL(r.threshold)}'ye kadar ${formatPercent(r.lowRatio * 100)}, üstü ${formatPercent(r.highRatio * 100)})`
 }
+
+/** Below this gap (1 ₺) a lower minimum is treated as rounding, not as a typo. */
+const MINIMUM_TOLERANCE: Kurus = 100
+
+/**
+ * True when the typed minimum is clearly lower than the BDDK estimate in the hint.
+ * Banks can print a higher minimum (interest, overdue amounts) but rarely a lower one,
+ * so a lower figure is worth a second look at the statement. Says nothing beyond that.
+ */
+export function minimumBelowEstimate(state: Pick<StatementFormState, 'statementDebt' | 'minimumDue'>, cardLimit: Kurus): boolean {
+  const debt = state.statementDebt
+  if (debt === null || debt <= 0 || state.minimumDue === null) return false
+  return state.minimumDue < estimateMinimum(debt, cardLimit) - MINIMUM_TOLERANCE
+}
+
+/**
+ * Title of the interest box, naming the scenario the figure was computed for
+ * (the paid amount statementInterestPreview used): nothing, the part paid so far, or the minimum.
+ */
+export function interestBoxTitle(payment: Exclude<PaymentState, 'full'>): string {
+  if (payment === 'minimum') return 'Yalnız asgariyi ödersen bu ekstrede işleyecek faiz'
+  if (payment === 'partial') return 'Kalanı ödemezsen bu ekstrede işleyecek faiz'
+  return 'Ödemezsen bu ekstrede işleyecek faiz'
+}
+
+export type StatementInterestPreview =
+  | { kind: 'none' }
+  | { kind: 'paidFull' }
+  | {
+      kind: 'charge'
+      /** Which paid amount the figures assume (unpaid → 0, partial → paidAmount, minimum → minimum). */
+      scenario: Exclude<PaymentState, 'full'>
+      total: Kurus
+      contractual: Kurus
+      late: Kurus
+      taxes: Kurus
+      /** Monthly contractual rate (%). */
+      rate: number
+      /** Monthly late rate (%). */
+      lateRate: number
+      minimumScenario: Kurus | null
+    }
 
 /**
  * Compute interest preview for rendering the interest box in StatementSheet.
@@ -96,7 +144,7 @@ export function statementInterestPreview(
   state: StatementFormState,
   account: CardAccount,
   view: StatementView,
-): { kind: 'none' } | { kind: 'paidFull' } | { kind: 'charge'; total: Kurus; contractual: Kurus; late: Kurus; taxes: Kurus; rate: number; minimumScenario: Kurus | null } {
+): StatementInterestPreview {
   const debt = state.statementDebt
   if (debt === null || debt <= 0) {
     return { kind: 'none' }
@@ -148,11 +196,13 @@ export function statementInterestPreview(
 
   return {
     kind: 'charge',
+    scenario: state.payment,
     total: breakdown.total,
     contractual: breakdown.contractual,
     late: breakdown.late,
     taxes: breakdown.kkdf + breakdown.bsmv,
     rate: rate.contractual,
+    lateRate: rate.late,
     minimumScenario,
   }
 }

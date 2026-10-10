@@ -102,12 +102,33 @@
   flex: none;
 }
 
+.sheet-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .sheet-head h2 {
   font-size: var(--text-xl);
   font-weight: 700;
 }
 
+/* The heading takes focus on open only to place screen readers; it is not a control. */
+.sheet-head h2:focus {
+  outline: none;
+}
+
+.sheet-subtitle {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+/* 36 px tile, 44 px target: the padding-box grows the hit area without growing the tile. */
 .sheet-close {
+  position: relative;
+  flex: none;
   width: 36px;
   height: 36px;
   display: grid;
@@ -116,6 +137,12 @@
   background: var(--surface-2);
   color: var(--muted);
   transition: transform var(--dur-tap) var(--ease-out-expo);
+}
+
+.sheet-close::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
 }
 
 .sheet-close:active {

@@ -1,13 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import type { CardAccount, CardLine } from '../../domain/types'
+import { formatPercent } from '../../domain/money'
 import {
   addExpenseLabel,
   cardInterestPanelData,
-  formatRate,
   interestHistory,
   interestSourceLine,
   kmhDailyCost,
   rateCaption,
+  staleStatementLine,
   statementRows,
 } from './detailModel'
 
@@ -275,8 +276,8 @@ describe('detailModel', () => {
 
   describe('rateCaption', () => {
     it('uses a Turkish decimal comma', () => {
-      expect(formatRate(4.25)).toBe('%4,25')
-      expect(formatRate(3)).toBe('%3')
+      expect(formatPercent(4.25)).toBe('%4,25')
+      expect(formatPercent(3)).toBe('%3')
     })
 
     it('names the user rate when overridden', () => {
@@ -288,6 +289,41 @@ describe('detailModel', () => {
     it('names the TCMB ceiling otherwise, cash for KMH', () => {
       expect(rateCaption({ override: null, contractual: 4.25, effective: '2026-01' })).toContain('TCMB azami oranları (2026-01), aylık %4,25')
       expect(rateCaption({ override: null, contractual: 4.25, effective: '2026-01', cash: true })).toContain('nakit çekme')
+    })
+  })
+
+  describe('staleStatementLine', () => {
+    const today = new Date(2026, 9, 20) // after the 15 Oct cut
+
+    it('is null when the carried statement fits inside what is used', () => {
+      // 3.000 ₺ unpaid statement, 4.000 ₺ used on a 50.000 ₺ limit.
+      const account = testCard([testLine('Main', { statementDebt: 3_000_00, payment: 'unpaid' })], { available: 46_000_00 })
+      expect(staleStatementLine(account, today)).toBeNull()
+    })
+
+    it('points at the line to update when the statement is bigger than what is used', () => {
+      // Statement 3.000 ₺ still "unpaid" here, but the bank shows only 500 ₺ used: it was paid there.
+      const account = testCard(
+        [testLine('Ek', { statementDebt: null }), testLine('Main', { statementDebt: 3_000_00, payment: 'unpaid' })],
+        { available: 49_500_00 },
+      )
+      expect(staleStatementLine(account, today)).toBe(1)
+    })
+
+    it('counts a partial payment and the minimum as paid', () => {
+      const partial = testCard([testLine('Main', { statementDebt: 3_000_00, payment: 'partial', paidAmount: 2_600_00 })], {
+        available: 49_500_00,
+      })
+      expect(staleStatementLine(partial, today)).toBeNull() // 400 ₺ carried ≤ 500 ₺ used
+      const minimum = testCard([testLine('Main', { statementDebt: 3_000_00, minimumDue: 600_00, payment: 'minimum' })], {
+        available: 49_500_00,
+      })
+      expect(staleStatementLine(minimum, today)).toBe(0) // 2.400 ₺ carried > 500 ₺ used
+    })
+
+    it('is null when nothing is carried', () => {
+      const account = testCard([testLine('Main', { statementDebt: 3_000_00, payment: 'full' })], { available: 50_000_00 })
+      expect(staleStatementLine(account, today)).toBeNull()
     })
   })
 
