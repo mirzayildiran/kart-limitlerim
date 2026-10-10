@@ -11,10 +11,11 @@ import { mkdir, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
+import { shiftDemoBackup } from '../src/data/demo.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const OUT = join(root, '.impeccable/review/shots')
-const FIXTURE = join(root, 'scripts/fixtures/demo-backup.json')
+const FIXTURE = join(root, 'src/data/demo-backup.json')
 const VITE = join(root, 'node_modules/.bin/vite')
 // Chromium from the shared Playwright install (the folder holds chrome-linux/chrome).
 const CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
@@ -111,48 +112,6 @@ async function startPreview() {
 }
 
 // ---- demo data ----------------------------------------------------------------
-
-const dayNumber = (y, m, d) => Date.UTC(y, m, d) / 86_400_000
-const isoOf = (y, m, d) => new Date(Date.UTC(y, m, d)).toISOString().slice(0, 10)
-const parseIso = (s) => s.split('-').map(Number)
-
-/** Key of the most recent statement cut on or before `today` (same rule as src/domain/statement.ts lastCut). */
-function currentCycleKey(cutDay, today) {
-  const y = today.getFullYear()
-  const m = today.getMonth()
-  const thisCut = new Date(y, m, Math.min(cutDay, new Date(y, m + 1, 0).getDate()))
-  const cut = thisCut <= today ? thisCut : new Date(y, m - 1, Math.min(cutDay, new Date(y, m, 0).getDate()))
-  return `${cut.getFullYear()}-${String(cut.getMonth() + 1).padStart(2, '0')}`
-}
-
-/**
- * The fixture is written for the day in `exportedAt` (2026-10-10). Every date is moved by the
- * same number of days so the demo stays "today"-relative, card cycles are recomputed for today,
- * and exportedAt becomes now.
- */
-function prepareDemo(backup, now) {
-  const [by, bm, bd] = parseIso(backup.exportedAt.slice(0, 10))
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const delta = dayNumber(today.getFullYear(), today.getMonth(), today.getDate()) - dayNumber(by, bm - 1, bd)
-  const shift = (s) => {
-    if (!s) return s
-    const [y, m, d] = parseIso(s)
-    return isoOf(y, m - 1, d + delta)
-  }
-  const data = structuredClone(backup.data)
-  data.expenses = data.expenses.map((e) => ({ ...e, date: shift(e.date) }))
-  data.recurring = data.recurring.map((r) => ({
-    ...r,
-    startDate: shift(r.startDate),
-    handledThrough: shift(r.handledThrough),
-    end: r.end.type === 'until' ? { ...r.end, date: shift(r.end.date) } : r.end,
-  }))
-  for (const a of data.accounts) {
-    if (a.kind !== 'card') continue
-    a.lines = a.lines.map((l) => ({ ...l, dueDate: shift(l.dueDate), cycle: currentCycleKey(l.cutDay, today) }))
-  }
-  return { ...backup, exportedAt: now.toISOString(), data }
-}
 
 /** Replace the app's IndexedDB content with the demo data (same stores the app's restoreBackup uses). */
 async function seed(page, data) {
@@ -358,7 +317,7 @@ async function shoot(page, file, opts = {}) {
 async function main() {
   await mkdir(OUT, { recursive: true })
   const demoRaw = JSON.parse(await readFile(FIXTURE, 'utf8'))
-  const demo = prepareDemo(demoRaw, new Date()).data
+  const demo = shiftDemoBackup(demoRaw, new Date()).data
 
   const preview = await startPreview()
   const appUrl = preview.url

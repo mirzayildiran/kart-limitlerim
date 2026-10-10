@@ -62,6 +62,11 @@ describe('static copy', () => {
     expect(PROVIDERS.every((p) => p.note.length > 0)).toBe(true)
   })
 
+  it('tells the user that every provider may keep what is sent (App Store 5.1.2)', () => {
+    expect(PROVIDERS.every((p) => p.note.includes('saklayabilir'))).toBe(true)
+    expect(PROVIDERS.find((p) => p.name === 'Google Gemini')?.note).toContain('inceleyiciler')
+  })
+
   it('states that answers are estimates', () => {
     expect(DISCLAIMER).toBe('Tahmindir, finansal tavsiye değildir.')
   })
