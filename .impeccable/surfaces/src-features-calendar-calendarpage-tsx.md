@@ -34,3 +34,12 @@ FORM:
 Add pure, tested helpers to `calendarModel.ts`: `periodSummary(days)` → `{ total: Kurus; estimated: boolean; payments: number; cuts: number }` and per-day totals. Existing `buildTimeline` / `groupByDay` stay the source.
 
 FINISH: critique on captures, fix round, finish reviewer verdict, DESIGN.md Rollout status updated.
+
+## As built (lead, 2026-10-10) — supersedes FORM where they differ
+
+- Summary: the period total sits under the title at the hero figure size (`--text-hero`, same as Harcamalar's month total), caption "N ödeme · M kesim" plus "· asgari tutar tahmini" / "· N ödemenin tutarı girilmedi" when they apply.
+- Agenda: one slate container with day divider rows (title-sm day label, day total only when the day has two or more amounts), matching Harcamalar's list.
+- Pending recurring: primary action reads "Harcamaya ekle"; "Atla" is undoable from the toast; overdue items carry the rose "N gün geçti" pill.
+- Rows that open a sheet end in a chevron; cut rows read "Ekstre kesimi".
+- The 52 px payment date tile from Özet is not used here: the day divider already carries the date, so a tile would repeat it on every row; the 36 px account medallion keeps the Owned Colour Rule.
+- Light-theme medallions get a 1 px inner hairline (yellow and green tiles vanish on white otherwise).
