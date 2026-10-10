@@ -45,7 +45,7 @@ Gerçek ekran görüntüleriyle yapılan değerlendirmede beş bankada 29 satır
 - [ ] Capacitor ile iOS ve Android paketleri
 - [ ] Face ID / parmak izi kilidi
 - [ ] Son ödeme hatırlatma bildirimleri
-- [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası
+- [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası (App Store paketi ve kalan eksikler: `docs/APP_STORE.md`; sayfalar: `public/privacy.html`, `public/support.html`)
 
 ## Aşama 4.5 — Bütçe asistanı 🚧
 
