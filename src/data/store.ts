@@ -5,7 +5,6 @@ import { closeCycle } from '../domain/interest'
 import { byMostAvailable, isCard, isKmh, isLiquid, outlook, spendingPower, statementItems } from '../domain/power'
 import { runway } from '../domain/runway'
 import type { Account, Category, CategoryBudget, Expense, Kurus, MerchantRule, RecurringPayment } from '../domain/types'
-import { parseBackup, restoreBackup, serializeBackup } from './backup'
 import * as repo from './db'
 
 /**
@@ -199,11 +198,16 @@ export async function saveBudget(categoryId: string, monthly: Kurus | null): Pro
 }
 
 // ---- backup ----
+// The backup code (format, record checks) loads on first use, not with the app.
+const backupModule = () => import('./backup')
+
 export async function exportBackupText(): Promise<string> {
+  const { serializeBackup } = await backupModule()
   return serializeBackup(await repo.loadAll(requireDb()))
 }
 
 export async function importBackupText(text: string): Promise<void> {
+  const { parseBackup, restoreBackup } = await backupModule()
   const backup = parseBackup(text)
   await restoreBackup(requireDb(), backup)
   hydrate(await repo.loadAll(requireDb()))
@@ -220,7 +224,11 @@ export async function setFlag(key: string): Promise<void> {
 
 /** Replaces this device's data with the sample data, dated relative to today. Loaded on demand. */
 export async function loadDemoData(): Promise<void> {
-  const [{ default: raw }, { shiftDemoBackup }] = await Promise.all([import('./demo-backup.json'), import('./demo')])
+  const [{ default: raw }, { shiftDemoBackup }, { parseBackup, restoreBackup }] = await Promise.all([
+    import('./demo-backup.json'),
+    import('./demo'),
+    backupModule(),
+  ])
   const backup = shiftDemoBackup(parseBackup(JSON.stringify(raw)), new Date())
   await restoreBackup(requireDb(), backup)
   hydrate(await repo.loadAll(requireDb()))
