@@ -371,7 +371,7 @@ export function ExpenseSheet({ request }: ExpenseSheetProps) {
         {monthlyInterest !== null && (
           <p class="expense-interest">
             Bu harcamayı ödemeyip taşırsan ayda{' '}
-            <strong class="expense-interest-figure num">~{figure(formatTLExact(monthlyInterest))}</strong> faiz işler.
+            <strong class="expense-interest-figure num">{figure(`~${formatTLExact(monthlyInterest)}`)}</strong> faiz işler.
           </p>
         )}
       </div>
