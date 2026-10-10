@@ -8,10 +8,12 @@ import { render } from 'preact'
 import { init } from './data/store'
 import { applySavedTheme } from './ui/theme'
 import { App } from './app.tsx'
+import { startReminders } from './platform/reminders'
 
 // Initialize data store (don't await before first render)
 init().catch(() => {})
 
 applySavedTheme()
+startReminders()
 
 render(<App />, document.getElementById('app')!)

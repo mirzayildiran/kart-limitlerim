@@ -5,7 +5,9 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // GitHub Pages serves the app under /kart-limitlerim/.
-const base = process.env.BASE_PATH ?? '/kart-limitlerim/'
+// CAP_NATIVE=1: iOS app build (Capacitor). Served from the app root, no service worker.
+const native = process.env.CAP_NATIVE === '1'
+const base = native ? '/' : (process.env.BASE_PATH ?? '/kart-limitlerim/')
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }
 
 export default defineConfig({
@@ -16,6 +18,7 @@ export default defineConfig({
   plugins: [
     preact(),
     VitePWA({
+      disable: native,
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
