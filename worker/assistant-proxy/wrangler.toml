@@ -1,0 +1,12 @@
+name = "kart-limitlerim-asistan"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+# Keys are secrets, never put here:
+#   npx wrangler secret put GEMINI_API_KEY
+#   npx wrangler secret put GROQ_API_KEY
+#   npx wrangler secret put OPENROUTER_API_KEY
+
+[vars]
+ALLOWED_ORIGINS = "https://mirzayildiran.github.io,http://localhost:5173"
+RATE_LIMIT_PER_HOUR = "30"
