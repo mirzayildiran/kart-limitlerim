@@ -108,8 +108,9 @@
 }
 
 .sheet-close {
-  width: 36px;
-  height: 36px;
+  width: var(--tap);
+  height: var(--tap);
+  margin-right: -4px;
   display: grid;
   place-items: center;
   border-radius: var(--r-md);
@@ -132,6 +133,7 @@
 .sheet-body {
   overflow-y: auto;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: var(--s-2) var(--gutter) var(--s-4);
   display: flex;
   flex-direction: column;
@@ -145,4 +147,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
+}
+
+/* No footer: the body is the last thing, so it clears the home indicator itself. */
+.sheet-body:last-child {
+  padding-bottom: calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
 }
