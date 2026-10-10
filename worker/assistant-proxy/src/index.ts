@@ -53,7 +53,8 @@ const PROVIDERS: readonly Provider[] = [
     name: 'groq',
     key: (env) => env.GROQ_API_KEY,
     call: (key, system, turns) =>
-      callOpenAiStyle(GROQ_URL, key, 'llama-3.3-70b-versatile', system, turns, {}),
+      // gpt-oss reasons before answering; low effort keeps the reasoning inside MAX_OUTPUT_TOKENS.
+      callOpenAiStyle(GROQ_URL, key, 'openai/gpt-oss-120b', system, turns, {}, { reasoning_effort: 'low' }),
   },
   {
     name: 'openrouter',
@@ -164,8 +165,10 @@ async function callOpenAiStyle(
   system: string,
   turns: ChatMessage[],
   extraHeaders: Record<string, string>,
+  extraBody: Record<string, unknown> = {},
 ): Promise<string> {
   const body = {
+    ...extraBody,
     model,
     temperature: TEMPERATURE,
     max_tokens: MAX_OUTPUT_TOKENS,
