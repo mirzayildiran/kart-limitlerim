@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import { Icon } from '../../ui/components/Icon'
 import { locked, shielded, unlock, unlockResult } from '../../platform/lock'
 import { lockMessage } from './lockMessage'
@@ -40,6 +40,12 @@ export function LockScreen() {
   // Stays mounted for the fade-out after the cover lifts.
   const [shown, setShown] = useState(covered)
   const [busy, setBusy] = useState(false)
+  const button = useRef<HTMLButtonElement>(null)
+
+  // The app behind is inert, so put VoiceOver and keyboard focus on the one control there is.
+  useEffect(() => {
+    if (isLocked) button.current?.focus({ preventScroll: true })
+  }, [isLocked])
 
   useEffect(() => {
     // Keep VoiceOver and keyboard focus out of the hidden content.
@@ -78,7 +84,7 @@ export function LockScreen() {
             <Icon name="lock" size={16} />
             Bakiyelerin kilitli
           </p>
-          <button type="button" class="lock-button" onClick={onUnlock} disabled={busy} aria-busy={busy}>
+          <button type="button" class="lock-button" ref={button} onClick={onUnlock} disabled={busy} aria-busy={busy}>
             <Icon name="faceid" size={22} />
             {busy ? 'Doğrulanıyor…' : 'Face ID ile aç'}
           </button>
