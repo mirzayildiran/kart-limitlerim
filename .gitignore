@@ -39,3 +39,5 @@ legacy/
 
 # Impeccable launcher binary, downloaded on first run
 .claude/skills/impeccable/scripts/bin/
+test-results/
+playwright-report/
