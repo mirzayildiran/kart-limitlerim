@@ -7,6 +7,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 // GitHub Pages serves the app under /kart-limitlerim/.
 // CAP_NATIVE=1: iOS app build (Capacitor). Served from the app root, no service worker.
 const native = process.env.CAP_NATIVE === '1'
+// The iOS app has no deploy workflow to inject the assistant proxy; the address is public.
+if (native) process.env.VITE_ASSISTANT_PROXY_URL ??= 'https://kart-limitlerim-asistan.kart-limitlerim-7e48db.workers.dev'
 const base = native ? '/' : (process.env.BASE_PATH ?? '/kart-limitlerim/')
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }
 
