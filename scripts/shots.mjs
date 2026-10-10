@@ -4,20 +4,21 @@
 //                                        sheet-account-edit sheet-account-new sheet-statement sheet-recurring
 //                                        sheet-category sheet-import sheet-expense-filled
 //   node scripts/shots.mjs --motion      frames of the home -> expenses tab transition (reduced motion off)
-// Output: .impeccable/review/shots/<screen>-<width>-<theme>.jpg (motion: motion-<ms>.jpg)
+//   node scripts/shots.mjs --store       App Store screenshots (6.9" 1320×2868, 6.5" 1284×2778) with a caption band
+// Output: .impeccable/review/shots/<screen>-<width>-<theme>.jpg (motion: motion-<ms>.jpg; store: store/screenshots/<size>/)
+// Chrome: CHROME_PATH, else the shared Playwright Chromium, else Google Chrome on macOS.
 // Builds the app first, then uses a running preview on :4173 or starts one and stops it at the end.
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdir, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
+import { chromePath } from './store-assets.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const OUT = join(root, '.impeccable/review/shots')
 const FIXTURE = join(root, 'scripts/fixtures/demo-backup.json')
 const VITE = join(root, 'node_modules/.bin/vite')
-// Chromium from the shared Playwright install (the folder holds chrome-linux/chrome).
-const CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
 const PORT = 4173
 // Mirrors DB_NAME / DB_VERSION in src/data/db.ts. Store names are the ones createObjectStore uses there.
 const DB_NAME = 'kart-limitlerim'
@@ -55,6 +56,7 @@ const MOTION_MS = [0, 60, 120, 200, 320]
 
 const args = process.argv.slice(2)
 const motion = args.includes('--motion')
+const store = args.includes('--store')
 const selected = args.filter((a) => !a.startsWith('--'))
 for (const s of selected) {
   if (!SCREENS.includes(s)) {
@@ -363,7 +365,7 @@ async function main() {
   const preview = await startPreview()
   const appUrl = preview.url
   const browser = await chromium.launch({
-    executablePath: CHROME,
+    executablePath: chromePath(),
     headless: true,
     // Chromium refuses to start its sandbox as root; this is a local screenshot run only.
     args: process.getuid?.() === 0 ? ['--no-sandbox'] : [],
@@ -372,6 +374,8 @@ async function main() {
   try {
     if (motion) {
       await shootMotion(browser, appUrl, demo)
+    } else if (store) {
+      await shootStore(browser, appUrl, demo)
     } else {
       const browserScreens = wanted.filter((s) => PAGE_SCREENS.includes(s) || SHEET_SCREENS.includes(s))
       if (browserScreens.length) {
@@ -448,6 +452,93 @@ async function shootMotion(browser, appUrl, demo) {
     }
   } finally {
     await context.close()
+  }
+}
+
+// ---- App Store screenshots -----------------------------------------------------
+
+// Device sizes in CSS points; at 3x they give the pixel sizes App Store Connect asks for.
+const STORE_SIZES = [
+  { name: '6.9', width: 440, height: 956 },
+  { name: '6.5', width: 428, height: 926 },
+]
+// One frame per screen: what to open, then the caption above it. Captions state only what the app does.
+const STORE_FRAMES = [
+  { file: '01-ozet', title: 'Ne kadar harcayabileceğini tek bakışta gör', open: (page) => goRoute(page, ROUTES.home) },
+  {
+    file: '02-kesime-kadar',
+    title: 'Kesime kadar ne kalacağını gün gün izle',
+    open: async (page) => {
+      await goRoute(page, ROUTES.home)
+      await page.locator('.home-runway').evaluate((el) => el.scrollIntoView({ block: 'center' }))
+      await page.waitForTimeout(300)
+    },
+  },
+  { file: '03-harcamalar', title: 'Harcamalarını kategoriye ve karta göre gör', open: (page) => goRoute(page, ROUTES.expenses) },
+  { file: '04-takvim', title: 'Son ödemeleri ve kesimleri kaçırma', open: (page) => goRoute(page, ROUTES.calendar) },
+  { file: '05-kart', title: 'Her kartın işleyen faizini gör', open: (page) => openScreen(page, 'sheet-account') },
+  { file: '06-asistan', title: 'Bütçe asistanından öneri al', open: (page) => goRoute(page, ROUTES.assistant) },
+]
+
+/** Phone screenshot under a caption band, on the app's dark ground, at the exact store pixel size. */
+async function composeStoreFrame(page, shot, title, size) {
+  const src = `data:image/jpeg;base64,${shot.toString('base64')}`
+  await page.evaluate(
+    ({ src, title, w, h }) => {
+      document.getElementById('store-frame')?.remove()
+      const frame = document.createElement('div')
+      frame.id = 'store-frame'
+      frame.style.cssText = `position:fixed;inset:0;z-index:2147483647;width:${w}px;height:${h}px;background:#0a0a11;display:flex;flex-direction:column;align-items:center;overflow:hidden`
+      const caption = document.createElement('p')
+      caption.textContent = title
+      caption.style.cssText =
+        "flex:0 0 auto;margin:0;padding:56px 36px 34px;box-sizing:border-box;color:#f5f5fa;font:700 31px/1.18 'Schibsted Grotesk Variable',sans-serif;letter-spacing:-0.02em;text-align:center;text-wrap:balance"
+      const phone = document.createElement('img')
+      phone.src = src
+      const pw = Math.round(w * 0.86)
+      phone.style.cssText = `width:${pw}px;height:auto;border-radius:44px;box-shadow:0 0 0 7px #24242f,0 30px 60px -20px rgb(0 0 0 / .8)`
+      frame.append(caption, phone)
+      document.body.append(frame)
+      return phone.decode()
+    },
+    { src, title, w: size.width, h: size.height },
+  )
+}
+
+async function shootStore(browser, appUrl, demo) {
+  for (const size of STORE_SIZES) {
+    const dir = join(root, 'store/screenshots', size.name)
+    await mkdir(dir, { recursive: true })
+    console.log(`${size.name}" ${size.width * 3}×${size.height * 3}`)
+    const context = await browser.newContext({
+      viewport: { width: size.width, height: size.height },
+      deviceScaleFactor: 3,
+      reducedMotion: 'reduce',
+      colorScheme: 'dark',
+      locale: 'tr-TR',
+    })
+    const page = await context.newPage()
+    track(page, `store-${size.name}`)
+    try {
+      await bootApp(page, appUrl, 'dark', demo)
+      for (const frame of STORE_FRAMES) {
+        try {
+          await frame.open(page)
+          const shot = await page.screenshot({ type: 'jpeg', quality: 95 })
+          await composeStoreFrame(page, shot, frame.title, size)
+          await page.screenshot({ path: join(dir, `${frame.file}.jpg`), type: 'jpeg', quality: 92 })
+          console.log(`  ${frame.file}.jpg`)
+        } catch (err) {
+          skipped.push({ screen: frame.file, variant: size.name, reason: String(err?.message ?? err).split('\n')[0] })
+        } finally {
+          await page.evaluate(() => document.getElementById('store-frame')?.remove())
+          await page.keyboard.press('Escape')
+          await page.waitForTimeout(200)
+        }
+      }
+    } finally {
+      await context.close()
+    }
   }
 }
 
