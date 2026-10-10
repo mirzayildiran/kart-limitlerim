@@ -49,7 +49,7 @@ jq -n \
   '{GEMINI_API_KEY: $g, GROQ_API_KEY: $q, OPENROUTER_API_KEY: $o} | with_entries(select(.value != ""))' \
   > "$SECRETS_FILE"
 if [ "$(jq 'length' "$SECRETS_FILE")" = "0" ]; then
-  echo "::warning::Hiç yapay zekâ anahtarı yok; aracı 'not_configured' yanıtı verecek."
+  echo "::warning::Bu çalıştırmada yapay zekâ anahtarı verilmedi; Worker'daki mevcut gizli değerler korunuyor (hiç yoksa aracı 'not_configured' döner)."
 else
   $WRANGLER secret bulk "$SECRETS_FILE"
 fi
