@@ -217,7 +217,7 @@ Density is mobile-first and generous: one column, at most 560px wide, 24px betwe
 
 The user has explicitly rejected, across this redesign: grey stone ground with an evergreen accent, a warm peach ground, and violet panels or accents; and, as a durable brand commitment, any themed costume world (road signs, boarding passes, transit boards, calendars, banknotes). Treat those as closed doors.
 
-Rollout status: the world is built on Özet (`src/features/home/`), Harcamalar (`src/features/expenses/ExpensesPage.tsx`), Takvim (`src/features/calendar/`) and Ayarlar (`src/features/settings/`), plus the shared components (Amount, LimitStrip, controls, Sheet, TabBar) and the motion system (`.impeccable/surfaces/motion-system.md`). The bottom sheets are being migrated (`.impeccable/surfaces/sheets.md`); until then they inherit the tokens only.
+Rollout status (2026-10-10): the world is built on Özet (`src/features/home/`), Harcamalar (`src/features/expenses/ExpensesPage.tsx`), Takvim (`src/features/calendar/`) and Ayarlar (`src/features/settings/`), plus the shared components (Amount, LimitStrip, controls, Sheet, TabBar) and the motion system (`.impeccable/surfaces/motion-system.md`). The bottom sheets are being migrated (`.impeccable/surfaces/sheets.md`); until then they inherit the tokens only.
 
 **Key Characteristics:**
 - Near-black ground, slate surfaces, colour reserved for meaning.
