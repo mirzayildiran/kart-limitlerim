@@ -94,7 +94,7 @@ function RowBody({ row, onEdit }: { row: BudgetRow; onEdit: () => void }) {
       </p>
       {row.status === 'pace' && (
         <p class="budget-plan-line">
-          Ay sonu tahmini <span class="num">{formatTL(row.projected)}</span>
+          Ay sonu tahmini <span class="num">~{formatTL(row.projected)}</span>
         </p>
       )}
       <div class="budget-plan-actions">
@@ -133,7 +133,7 @@ export function BudgetPlan() {
             {hasForecast(pace) && (
               <div class="budget-plan-fact">
                 <dt>Ay sonu tahmini</dt>
-                <dd class="num">{figure(formatTL(pace.projected))}</dd>
+                <dd class="num">{figure(`~${formatTL(pace.projected)}`)}</dd>
               </div>
             )}
             {pace.lastMonthTotal > 0 && (
@@ -144,7 +144,9 @@ export function BudgetPlan() {
             )}
           </dl>
         )}
-        <p class="budget-plan-note">Tahminler bugüne kadarki günlük ortalamaya dayanır.</p>
+        <p class="budget-plan-note">
+          Tahminler bugüne kadarki günlük ortalamaya dayanır; büyük tek seferlik harcamalar tahmini yükseltir.
+        </p>
       </div>
 
       {rows.length > 0 && (

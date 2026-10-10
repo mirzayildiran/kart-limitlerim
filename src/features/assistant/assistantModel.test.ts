@@ -3,12 +3,27 @@ import {
   assistantInput,
   canSend,
   DISCLAIMER,
+  dueTag,
   insightIcon,
   PROVIDERS,
   QUICK_PROMPTS,
   severityLabel,
   severityTone,
 } from './assistantModel'
+
+describe('dueTag', () => {
+  it('shows the days left as a warning', () => {
+    expect(dueTag(3)).toEqual({ tone: 'warn', label: '3 gün' })
+  })
+
+  it('says Bugün on the due day', () => {
+    expect(dueTag(0)).toEqual({ tone: 'warn', label: 'Bugün' })
+  })
+
+  it('shows the days past due as critical', () => {
+    expect(dueTag(-2)).toEqual({ tone: 'crit', label: '2 gün geçti' })
+  })
+})
 
 describe('severityTone and severityLabel', () => {
   it('maps crit to Acil and crit tone', () => {
@@ -52,7 +67,7 @@ describe('canSend', () => {
 })
 
 describe('static copy', () => {
-  it('has four quick prompts', () => {
+  it('has five quick prompts', () => {
     expect(QUICK_PROMPTS).toHaveLength(5)
     expect(QUICK_PROMPTS.every((p) => p.trim().length > 0)).toBe(true)
   })
@@ -60,6 +75,12 @@ describe('static copy', () => {
   it('names every provider with a note', () => {
     expect(PROVIDERS.map((p) => p.name)).toEqual(['Google Gemini', 'Groq', 'OpenRouter'])
     expect(PROVIDERS.every((p) => p.note.length > 0)).toBe(true)
+  })
+
+  it('points Groq and OpenRouter users to the provider terms', () => {
+    const notes = Object.fromEntries(PROVIDERS.map((p) => [p.name, p.note]))
+    expect(notes['Groq']).toContain('Bu servisin kendi gizlilik ve saklama koşulları geçerlidir.')
+    expect(notes['OpenRouter']).toContain('Bu servisin kendi gizlilik ve saklama koşulları geçerlidir.')
   })
 
   it('states that answers are estimates', () => {

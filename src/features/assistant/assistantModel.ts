@@ -62,11 +62,27 @@ export function severityLabel(s: InsightSeverity): string {
   return 'Öneri'
 }
 
+/**
+ * Pill at the end of a statement suggestion, from days until the due date: crit once
+ * it has passed, "Bugün" on the day, otherwise the number of days left.
+ */
+export function dueTag(days: number): { tone: 'warn' | 'crit'; label: string } {
+  if (days < 0) return { tone: 'crit', label: `${-days} gün geçti` }
+  if (days === 0) return { tone: 'warn', label: 'Bugün' }
+  return { tone: 'warn', label: `${days} gün` }
+}
+
 /** Services that may receive the chat. Shown on the consent screen. */
 export const PROVIDERS: { name: string; note: string }[] = [
   { name: 'Google Gemini', note: 'Ücretsiz katman; gönderilen metni ürün geliştirmek için kullanabilir.' },
-  { name: 'Groq', note: 'Ücretsiz katman; açık kaynak Llama modelini çalıştırır.' },
-  { name: 'OpenRouter', note: 'İsteği ücretsiz bir açık modele iletir.' },
+  {
+    name: 'Groq',
+    note: 'Ücretsiz katman; açık kaynak Llama modelini çalıştırır. Bu servisin kendi gizlilik ve saklama koşulları geçerlidir.',
+  },
+  {
+    name: 'OpenRouter',
+    note: 'İsteği ücretsiz bir açık modele iletir. Bu servisin kendi gizlilik ve saklama koşulları geçerlidir.',
+  },
 ]
 
 /** A message can be sent when it is not blank, fits the limit, and no reply is pending. */
