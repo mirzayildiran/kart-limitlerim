@@ -2,6 +2,7 @@ import { computed } from '@preact/signals'
 import type { JSX } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { cycleKeyOf, formatShort } from '../../domain/dates'
+import { displayHue } from '../../domain/categories'
 import { formatTL, formatTLExact } from '../../domain/money'
 import { byMostAvailable } from '../../domain/power'
 import type { Account, Kurus } from '../../domain/types'
@@ -202,7 +203,7 @@ function renderExpenseSection(): JSX.Element | null {
               if (!cat) return null
               const shareOfTotal = monthTotalValue > 0 ? amount / monthTotalValue : 0
               return (
-                <li key={catId} class="home-expenses-category cat-color" style={{ '--h': cat.hue }}>
+                <li key={catId} class="home-expenses-category cat-color" style={{ '--h': displayHue(cat.hue) }}>
                   <span class="home-expenses-category-label">{cat.name}</span>
                   <span class="home-expenses-category-amount num">{figure(formatTL(amount))}</span>
                   <span class="home-expenses-category-bar" aria-hidden="true">

@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact'
 import { useRef, useState } from 'preact/hooks'
 import { activeCategories, categories, exportBackupText, importBackupText, resetAllData } from '../../data/store'
+import { displayHue } from '../../domain/categories'
 import { BackupError, parseBackup } from '../../data/backup'
 import { CURRENT_RATES, MINIMUM_RULE } from '../../domain/rates'
 import { go, openSheet, route } from '../../ui/nav'
@@ -62,7 +63,7 @@ function CategoriesSection() {
       <div class="settings-card">
         {activeCategories.value.map((c) => (
           <button key={c.id} type="button" class="settings-row settings-row-tap" onClick={() => open(c.id)}>
-            <span class="settings-dot cat-color" style={{ '--h': c.hue }} aria-hidden="true" />
+            <span class="settings-dot cat-color" style={{ '--h': displayHue(c.hue) }} aria-hidden="true" />
             <span class="settings-row-label">{c.name}</span>
             <Icon name="chevron" size={18} class="settings-chev" />
           </button>
@@ -78,7 +79,7 @@ function CategoriesSection() {
           <div class="settings-card">
             {archived.map((c) => (
               <button key={c.id} type="button" class="settings-row settings-row-tap" onClick={() => open(c.id)}>
-                <span class="settings-dot cat-color" style={{ '--h': c.hue }} aria-hidden="true" />
+                <span class="settings-dot cat-color" style={{ '--h': displayHue(c.hue) }} aria-hidden="true" />
                 <span class="settings-row-label settings-muted">{c.name}</span>
                 <Icon name="chevron" size={18} class="settings-chev" />
               </button>

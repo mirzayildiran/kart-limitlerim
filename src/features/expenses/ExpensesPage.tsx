@@ -1,5 +1,6 @@
 import { computed, signal } from '@preact/signals'
 import { cycleKeyOf, formatMonth } from '../../domain/dates'
+import { displayHue } from '../../domain/categories'
 import { formatTLExact } from '../../domain/money'
 import {
   accountById,
@@ -140,7 +141,7 @@ export function ExpensesPage() {
               <h2 class="expenses-section-title">Kategoriler</h2>
               <div class="expenses-category-bars">
                 {topCategories.value.map((cat) => (
-                  <div key={cat.catId} class="expenses-category-item cat-color" style={{ '--h': cat.hue }}>
+                  <div key={cat.catId} class="expenses-category-item cat-color" style={{ '--h': displayHue(cat.hue) }}>
                     <span class="expenses-category-name">{cat.name}</span>
                     <span class="expenses-category-amount num">{figure(formatTLExact(cat.amount))}</span>
                     <span class="expenses-category-bar" aria-hidden="true">
@@ -188,7 +189,7 @@ export function ExpensesPage() {
                         class="expenses-item"
                         onClick={() => openSheet({ type: 'expense', expense: exp })}
                       >
-                        <span class="expenses-item-dot cat-color" style={{ '--h': cat?.hue ?? 160 }} aria-hidden="true" />
+                        <span class="expenses-item-dot cat-color" style={{ '--h': displayHue(cat?.hue ?? 160) }} aria-hidden="true" />
                         <span class="expenses-item-main">
                           <span class="expenses-item-label">
                             {exp.note || catName}
