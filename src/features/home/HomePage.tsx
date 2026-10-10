@@ -73,7 +73,7 @@ function renderTopbar(status: { text: string; tone: 'ok' | 'warn' | 'crit' } | u
           <span class="home-status-dot" aria-hidden="true" />
           <span class="home-status-text">
             {status.text}
-            {suggestions > 1 && ` · ${suggestions} öneri`}
+            {suggestions > 1 && <span class="home-status-more"> · {suggestions} öneri</span>}
           </span>
           {chevron}
         </button>

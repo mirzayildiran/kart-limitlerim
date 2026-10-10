@@ -40,12 +40,20 @@ Her aşamanın sonunda telefonda denenebilir, çalışan bir sürüm çıkar.
 
 Gerçek ekran görüntüleriyle yapılan değerlendirmede beş bankada 29 satırın 28'i doğru okundu (28/29).
 
-## Aşama 4 — Mağaza sürümleri
+## Aşama 4 — App Store 🚧
 
-- [ ] Capacitor ile iOS ve Android paketleri
-- [ ] Face ID / parmak izi kilidi
-- [ ] Son ödeme hatırlatma bildirimleri
-- [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası
+Karar (2026-10-10): Öncelik App Store. Google Play çok sonraki bir plan. Ayrıntılar `docs/IOS.md`'de.
+
+- [x] Capacitor ile iOS paketi (`ios/`), iPhone'da canlı test (`npm run ios:dev`)
+- [x] Yedek dışa aktarma iOS paylaşım menüsüyle (`src/platform/files.ts`)
+- [x] Face ID kilidi; uygulama değiştiricide bakiyeler gizli (`src/platform/lock.ts`)
+- [x] Son ödeme yerel bildirimleri, iki gün önce ve son gün (`src/domain/reminders.ts`)
+- [x] iOS dokunsal geri bildirim (`src/platform/haptics.ts`)
+- [ ] Gerçek iPhone'da ilk deneme (Xcode kurulumu bekleniyor)
+- [ ] `PrivacyInfo.xcprivacy` ve App Store gizlilik etiketleri
+- [ ] Mağaza metinleri, ekran görüntüleri, gizlilik politikası adresi
+- [ ] Apple Developer Program üyeliği (TestFlight ve yayın için; şimdilik ücretsiz hesap)
+- [ ] Android paketi (sonra)
 
 ## Aşama 4.5 — Bütçe asistanı 🚧
 
@@ -53,7 +61,7 @@ Karar (2026-10-10): Telefonda çalışan model yerine ücretsiz bulut API'leri k
 
 - [x] Kurala dayalı öneriler (yapay zekasız): kesime kadar nakit açığı, yaklaşan ve geciken asgari ödemeler, limiti azalan kart, KMH günlük faizi, asgari ödeme faizi, kategori artışları, "bugün hangi kartla öde". Rakamlar yalnızca `src/domain/` hesaplarından gelir (`src/domain/insights.ts`).
 - [x] Sohbet ekranı (`#/asistan`): model uygulamanın hesapladığı özeti (`src/domain/insightsSummary.ts`) okur, açıklar ve tartışır. Model hesap yapmaz. Sohbet geçmişi yalnızca bellekte tutulur.
-- [x] Sağlayıcı katmanı: aracı sunucu sırayla Gemini (`gemini-flash-lite-latest`), Groq (`openai/gpt-oss-120b`) ve OpenRouter'ı dener (`src/ai/`, `worker/assistant-proxy/`). CORS, IP başına dakikalık (Workers Rate Limiting) ve saatlik hız sınırı var. Gemini ve Groq yolları gerçek anahtarla uçtan uca denendi (Flash Lite ~1 sn; tam Flash ~60 sn sürdüğü için kullanılmıyor. Groq'un Llama 3.3 modeli kapatıldı, yerine gpt-oss-120b ~1 sn).
+- [x] Sağlayıcı katmanı: aracı sunucu sırayla Gemini (`gemini-flash-lite-latest`), Groq (`openai/gpt-oss-120b`) ve OpenRouter'ı (ücretsiz model listesiyle) dener; sağlayıcı başına 12 sn, toplam 25 sn (`src/ai/`, `worker/assistant-proxy/`). CORS, IP başına dakikalık (Workers Rate Limiting) ve saatlik hız sınırı var. Gemini ve Groq yolları gerçek anahtarla uçtan uca denendi (Flash Lite ~1 sn; tam Flash ~60 sn sürdüğü için kullanılmıyor. Groq'un Llama 3.3 modeli kapatıldı, yerine gpt-oss-120b ~1 sn).
 - [x] Bütçe planı: kategori başına aylık hedef, ay gidişatı ve tahmini ay sonu (`src/domain/budget.ts`). Hedef aşımı ve "bu hızla aşılır" önerileri; sohbet planı bu rakamlarla tartışır. Plan yedeğe girer.
 - [x] Gizlilik: varsayılan kapalı. Onay ekranı gönderilecek alanları, gönderilmeyenleri, servisleri ve özetin tam hâlini gösterir. PRODUCT.md ilkesi ve `docs/PRIVACY.md` güncellendi.
 - [x] Her yanıtta "Tahmindir, finansal tavsiye değildir." ibaresi (uygulama ekler, modele bırakılmaz).
