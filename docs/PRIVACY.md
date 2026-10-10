@@ -4,7 +4,7 @@ Kart Limitlerim bir bütçe uygulamasıdır. Verilerinizi toplamaz, bir sunucuya
 
 ## Verileriniz nerede durur
 
-- Bütün veriler yalnızca kullandığınız cihazın tarayıcı deposunda (IndexedDB) tutulur. Hesaplar, kartlar, harcamalar, kategoriler, düzenli ödemeler ve kurallar bu depodadır.
+- Bütün veriler yalnızca kullandığınız cihazın tarayıcı deposunda (IndexedDB) tutulur. Hesaplar, kartlar, harcamalar, kategoriler, bütçe planı, düzenli ödemeler ve kurallar bu depodadır.
 - Hesap açmanız gerekmez. Uygulamanın sunucusu, kullanıcı tablosu ya da giriş sistemi yoktur.
 - Uygulama analiz, izleme ya da reklam kodu içermez. Kullanım bilgisi toplanmaz.
 - Banka şifresi, internet bankacılığı bilgisi, kart numarası veya CVV hiçbir zaman istenmez ve girilmemelidir.
@@ -19,7 +19,7 @@ Kart Limitlerim bir bütçe uygulamasıdır. Verilerinizi toplamaz, bir sunucuya
 
 - **Öneriler** (kesime kadar nakit, yaklaşan asgari ödemeler, kategori artışları, "hangi kartla öde") tamamen cihazda hesaplanır. İnternet gerekmez, hiçbir şey gönderilmez.
 - **Sohbet** varsayılan olarak kapalıdır. Açmadan önce hangi bilgilerin hangi servislere gideceğini gösteren bir onay ekranı çıkar; onay vermeden hiçbir şey gönderilmez.
-- Sohbet açıksa her mesajda şunlar gönderilir: cihazda hesaplanan bir **özet** (harcama gücü toplamları, kesime kadar görünüm, hesap adlarınız ve limit/bakiye/ekstre tutarları, kategori toplamları, cihazdaki öneriler) ve yazdığınız mesajlar. Tek tek harcamalar, notlar, düzenli ödeme adları ve yedek dosyası **gönderilmez**. Gönderilen özetin tam hâlini onay ekranında görebilirsiniz.
+- Sohbet açıksa her mesajda şunlar gönderilir: cihazda hesaplanan bir **özet** (harcama gücü toplamları, kesime kadar görünüm, hesap adlarınız ve limit/bakiye/ekstre tutarları, kategori toplamları, bütçe planınız ve bu ayki harcama gidişatı, cihazdaki öneriler) ve yazdığınız mesajlar. Tek tek harcamalar, notlar, düzenli ödeme adları ve yedek dosyası **gönderilmez**. Gönderilen özetin tam hâlini onay ekranında görebilirsiniz.
 - Özet önce projenin Cloudflare Workers üzerindeki aracı sunucusuna gider. Aracı yalnızca yapay zekâ servislerinin anahtarlarını tutar; istekleri kaydetmez ve günlüğe yazmaz. Kötüye kullanımı önlemek için IP adresiniz yalnızca bellekte, en çok bir saat boyunca istek saymak için kullanılır.
 - Aracı isteği sırasıyla şu ücretsiz yapay zekâ servislerinden birine iletir: Google Gemini, Groq, OpenRouter. Bu servislerin ücretsiz katmanları gönderilen metni kendi koşullarına göre saklayabilir ve modellerini geliştirmek için kullanabilir. Bu nedenle sohbete kimlik, kart numarası ya da şifre yazmayın.
 - Sohbet geçmişi yalnızca açık olan ekranda, bellekte tutulur; kaydedilmez.
