@@ -1,6 +1,7 @@
 import { effect, signal } from '@preact/signals'
 import { accounts, ready, today } from '../data/store'
 import { reminderPlan, type Reminder } from '../domain/reminders'
+import { statementLink, handleDeepLink } from './deeplinks'
 import { isNativeApp } from './files'
 
 /**
@@ -47,7 +48,13 @@ async function sync(plan: Reminder[]): Promise<void> {
   if (pending.length > 0) await notifications.cancel({ notifications: pending.map((n) => ({ id: n.id })) })
   if (plan.length === 0) return
   await notifications.schedule({
-    notifications: plan.map((r) => ({ id: r.id, title: r.title, body: r.body, schedule: { at: r.at, allowWhileIdle: true } })),
+    notifications: plan.map((r) => ({
+      id: r.id,
+      title: r.title,
+      body: r.body,
+      schedule: { at: r.at, allowWhileIdle: true },
+      extra: { url: statementLink(r.accountId, r.lineIndex) },
+    })),
   })
 }
 
@@ -56,6 +63,16 @@ let timer: ReturnType<typeof setTimeout> | undefined
 /** Keeps scheduled reminders in step with card data. Call once at startup. */
 export function startReminders(): void {
   if (!isNativeApp) return
+  // Tapping a reminder opens that card's statement (after Face ID), where it can be marked paid.
+  // No "Ödendi" action button: minimum or full is the user's call, and an action from the lock
+  // screen would change data without passing the Face ID lock.
+  load()
+    .then(({ LocalNotifications }) =>
+      LocalNotifications.addListener('localNotificationActionPerformed', ({ notification }) =>
+        handleDeepLink((notification.extra as { url?: string } | undefined)?.url),
+      ),
+    )
+    .catch(() => {})
   effect(() => {
     // Until data has loaded, accounts look empty and a sync would cancel every reminder.
     if (!ready.value) return
