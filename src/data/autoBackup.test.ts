@@ -145,6 +145,20 @@ describe('createAutoBackup', () => {
     expect(parseBackup(disk.get(NEWEST)!).exportedAt).toBe(onDisk.exportedAt)
   })
 
+  it('treats the copy read back from disk as unchanged when the live records hold fewer keys', async () => {
+    const { disk, files } = memoryFiles()
+    const auto = createAutoBackup({ files })
+    const card = { kind: 'card', id: 'k', name: 'Kart', limit: 100, available: 50, lines: [{ id: 'l', cutDay: 5, cycle: null }] }
+    const live = (): Snapshot => ({ ...empty(), accounts: [card as unknown as Account] })
+    disk.set(NEWEST, JSON.stringify(makeBackup(live())))
+    const onDisk = parseBackup(disk.get(NEWEST)!)
+    expect(onDisk.data.accounts[0]).not.toEqual(card) // defaults filled on read
+    auto.prime(onDisk)
+    auto.schedule(live())
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(disk.size).toBe(1)
+  })
+
   it('flush() writes the pending change at once', async () => {
     const { disk, files } = memoryFiles()
     const auto = createAutoBackup({ files })
