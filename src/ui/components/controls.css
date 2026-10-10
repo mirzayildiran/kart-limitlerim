@@ -126,7 +126,7 @@
   flex: none;
   width: 50px;
   height: 30px;
-  border-radius: 15px;
+  border-radius: var(--r-lg);
   background: var(--line-strong);
   position: relative;
   cursor: pointer;
@@ -213,7 +213,7 @@
   width: 100%;
   justify-content: center;
   border: 0;
-  border-radius: 9px;
+  border-radius: var(--r-sm);
   background: transparent;
 }
 .choice-segment .choice-item input:checked + span {
