@@ -94,6 +94,9 @@ function setRoute(next: Route) {
     // Let Preact flush the render inside the snapshot.
     await new Promise((r) => setTimeout(r, 0))
   })
+  // A skipped or aborted transition (a new tap, a first load straight onto a tab) rejects these;
+  // the route has already changed, so the rejection is expected and must not surface as an error.
+  for (const p of [transition.ready, transition.finished, transition.updateCallbackDone]) p?.catch(() => {})
 }
 
 export function go(r: Route) {

@@ -1,6 +1,7 @@
 import type { ComponentChildren } from 'preact'
 import { useEffect, useId, useRef } from 'preact/hooks'
 import { sheetClosing } from '../nav'
+import { lockScroll, unlockScroll } from '../scrollLock'
 import { Icon } from './Icon'
 import './sheet.css'
 
@@ -25,8 +26,7 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
   useEffect(() => {
     if (!open) return
     opener.current = document.activeElement
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    lockScroll()
     const first =
       panel.current?.querySelector<HTMLElement>('[data-autofocus]') ??
       panel.current?.querySelector<HTMLElement>('input, select, textarea, button:not([data-close])')
@@ -47,7 +47,7 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
     return () => {
       vv?.removeEventListener('resize', keepFocusedInView)
       document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prevOverflow
+      unlockScroll()
       ;(opener.current as HTMLElement | null)?.focus?.({ preventScroll: true })
     }
   }, [open])

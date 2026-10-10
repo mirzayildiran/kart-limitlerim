@@ -9,6 +9,7 @@ html {
   text-size-adjust: 100%;
   /* iOS rubber-band overscroll shows the html background: keep it the app ground, never white. */
   background: var(--bg);
+  overscroll-behavior: none;
 }
 
 body {
@@ -46,12 +47,16 @@ button {
   text-align: inherit;
   touch-action: manipulation;
   -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 input,
 select,
 textarea {
   font: inherit;
+  /* Safety net: iOS zooms the page when a focused field's text is under 16px. */
+  font-size: max(16px, 1em);
   color: inherit;
 }
 
