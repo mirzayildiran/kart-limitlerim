@@ -356,42 +356,6 @@ function renderStatementsSection(colors: Map<string, number>): JSX.Element | nul
 export function HomePage() {
   const accountsValue = accounts.value
 
-  // Empty, but the iOS app's automatic backup still holds data (e.g. iOS cleared the web storage).
-  const offer = restoreOffer.value
-  if (accountsValue.length === 0 && offer) {
-    const restore = async () => {
-      try {
-        await acceptRestore()
-        toast('Verilerin geri yüklendi')
-      } catch {
-        toast('Geri yükleme tamamlanamadı. Tekrar dene.')
-      }
-    }
-    const { accounts: savedAccounts, expenses: savedExpenses } = offer.data
-    return (
-      <div class="home-page">
-        {renderTopbar(undefined, assistantCount.value)}
-        <section class="home-welcome" aria-labelledby="home-restore-title">
-          <h2 id="home-restore-title" class="home-welcome-title">
-            Önceki verilerin bulundu
-          </h2>
-          <p class="home-welcome-text">
-            Bu telefondaki otomatik yedekte {savedAccounts.length} hesap ve {savedExpenses.length} harcama var (son kayıt{' '}
-            {formatLong(new Date(offer.exportedAt))}). Geri yükleyelim mi?
-          </p>
-          <div class="home-welcome-actions">
-            <Button variant="primary" block onClick={restore}>
-              Geri yükle
-            </Button>
-            <Button variant="ghost" block onClick={dismissRestore}>
-              Şimdi değil
-            </Button>
-          </div>
-        </section>
-      </div>
-    )
-  }
-
   // Empty state: no accounts at all
   if (accountsValue.length === 0) {
     const tryDemo = async () => {
@@ -403,17 +367,53 @@ export function HomePage() {
       }
     }
 
+    // The iOS app's automatic backup still holds data (e.g. iOS cleared the web storage):
+    // getting it back comes first, starting over is the quieter second choice.
+    const offer = restoreOffer.value
+    const restore = async () => {
+      try {
+        await acceptRestore()
+        toast('Verilerin geri yüklendi')
+      } catch {
+        toast('Geri yükleme tamamlanamadı. Tekrar dene.')
+      }
+    }
+
     return (
       <div class="home-page">
         {renderTopbar(undefined, assistantCount.value)}
-        <section class="home-welcome" aria-labelledby="home-welcome-title">
-          <div class="home-welcome-fan" aria-hidden="true">
-            <span class="home-welcome-card" data-slot="2" />
-            <span class="home-welcome-card" data-slot="5" />
-            <span class="home-welcome-card" data-slot="4" />
-          </div>
+        {offer && (
+          <section class="home-restore" aria-labelledby="home-restore-title">
+            <span class="home-restore-icon" aria-hidden="true">
+              <Icon name="download" size={22} />
+            </span>
+            <h2 id="home-restore-title" class="home-restore-title">
+              Önceki verilerin bulundu
+            </h2>
+            <p class="home-restore-text">
+              Bu telefondaki otomatik yedekte <span class="num">{offer.data.accounts.length}</span> hesap ve{' '}
+              <span class="num">{offer.data.expenses.length}</span> harcama var. Son kayıt {formatLong(new Date(offer.exportedAt))}.
+            </p>
+            <div class="home-restore-actions">
+              <button type="button" class="home-restore-primary" onClick={restore}>
+                Geri yükle
+              </button>
+              <button type="button" class="home-restore-dismiss" onClick={dismissRestore}>
+                Şimdi değil
+              </button>
+            </div>
+          </section>
+        )}
+        <section class={`home-welcome${offer ? ' is-secondary' : ''}`} aria-labelledby="home-welcome-title">
+          {!offer && (
+            <div class="home-welcome-fan" aria-hidden="true">
+              <span class="home-welcome-card" data-slot="2" />
+              <span class="home-welcome-card" data-slot="5" />
+              <span class="home-welcome-card" data-slot="4" />
+            </div>
+          )}
           <h2 id="home-welcome-title" class="home-welcome-title">
-            Cüzdanını kuralım
+            {offer ? 'Ya da baştan başla' : 'Cüzdanını kuralım'}
           </h2>
           <p class="home-welcome-text">
             Kartlarını ekle; şu an ne kadar harcayabileceğini ve kesime kadar ne kalacağını hemen görelim.
@@ -423,10 +423,10 @@ export function HomePage() {
             Verilerin yalnızca bu cihazda. Hesap yok.
           </p>
           <div class="home-welcome-actions">
-            <Button variant="primary" block onClick={() => openSheet({ type: 'account', kind: 'card' })}>
+            <Button variant={offer ? 'secondary' : 'primary'} block onClick={() => openSheet({ type: 'account', kind: 'card' })}>
               Kart ekle
             </Button>
-            <Button variant="secondary" block onClick={tryDemo}>
+            <Button variant={offer ? 'ghost' : 'secondary'} block onClick={tryDemo}>
               Örnek verilerle dene
             </Button>
             <div class="home-welcome-more">
