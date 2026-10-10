@@ -6,7 +6,7 @@ import {
   formatLongDate,
   formatPercent,
   isCategoryInUse,
-  rateRows,
+  rateGroups,
   sourceLine,
   sourceLines,
 } from './settingsModel'
@@ -41,15 +41,18 @@ describe('formatLongDate', () => {
   })
 })
 
-describe('rateRows', () => {
-  it('lists the three card tiers, cash, taxes and the minimum rule in order', () => {
-    expect(rateRows()).toEqual([
-      { label: '30.000 ₺ altı', value: 'akdi %3,25 · gecikme %3,55' },
-      { label: '30.000 ₺ – 180.000 ₺ arası', value: 'akdi %3,75 · gecikme %4,05' },
-      { label: '180.000 ₺ üzeri', value: 'akdi %4,25 · gecikme %4,55' },
-      { label: 'Nakit çekim ve KMH', value: 'akdi %4,25 · gecikme %4,55' },
-      { label: 'KKDF + BSMV', value: '%15 + %15' },
-      { label: 'Asgari ödeme, limit 100.000 ₺ ve altı', value: '%20 · üstü %40' },
+describe('rateGroups', () => {
+  it('splits the rows into the interest rates and the charges, in order', () => {
+    const { interest, charges } = rateGroups()
+    expect(interest).toEqual([
+      { label: 'Limit 30.000 ₺ altı', lines: ['akdi %3,25', 'gecikme %3,55'] },
+      { label: 'Limit 30.000 ₺ – 180.000 ₺', lines: ['akdi %3,75', 'gecikme %4,05'] },
+      { label: 'Limit 180.000 ₺ üzeri', lines: ['akdi %4,25', 'gecikme %4,55'] },
+      { label: 'Nakit çekim ve KMH', lines: ['akdi %4,25', 'gecikme %4,55'] },
+    ])
+    expect(charges).toEqual([
+      { label: 'KKDF + BSMV', lines: ['%15 + %15'] },
+      { label: 'Asgari ödeme', lines: ['%20 · limit 100.000 ₺ üstü %40'] },
     ])
   })
 
@@ -62,7 +65,7 @@ describe('rateRows', () => {
       cash: { contractual: 3, late: 3.5 },
       foreignCurrency: { contractual: 1, late: 1 },
     }
-    expect(rateRows(table)[0]).toEqual({ label: 'Tüm limitler', value: 'akdi %2 · gecikme %2,5' })
+    expect(rateGroups(table).interest[0]).toEqual({ label: 'Tüm limitler', lines: ['akdi %2', 'gecikme %2,5'] })
   })
 
   it('labels a two-tier table with an open lower and upper bound', () => {
@@ -77,26 +80,33 @@ describe('rateRows', () => {
       cash: { contractual: 3, late: 3.5 },
       foreignCurrency: { contractual: 1, late: 1 },
     }
-    const rows = rateRows(table)
-    expect(rows[0].label).toBe('10.000 ₺ altı')
-    expect(rows[1].label).toBe('10.000 ₺ üzeri')
+    const rows = rateGroups(table).interest
+    expect(rows[0].label).toBe('Limit 10.000 ₺ altı')
+    expect(rows[1].label).toBe('Limit 10.000 ₺ üzeri')
   })
 
   it('writes the tax rates from the given percentages with a decimal comma', () => {
-    expect(rateRows(undefined, { kkdf: 0.1, bsmv: 0.025 })[4]).toEqual({ label: 'KKDF + BSMV', value: '%10 + %2,5' })
+    expect(rateGroups(undefined, { kkdf: 0.1, bsmv: 0.025 }).charges[0]).toEqual({ label: 'KKDF + BSMV', lines: ['%10 + %2,5'] })
   })
 
   it('states the minimum-payment threshold from the rule', () => {
     const rule = { effective: '2026-10-01', source: 'test', threshold: 50_000_000, lowRatio: 0.2, highRatio: 0.4 }
-    expect(rateRows(undefined, undefined, rule)[5]).toEqual({
-      label: 'Asgari ödeme, limit 500.000 ₺ ve altı',
-      value: '%20 · üstü %40',
+    expect(rateGroups(undefined, undefined, rule).charges[1]).toEqual({
+      label: 'Asgari ödeme',
+      lines: ['%20 · limit 500.000 ₺ üstü %40'],
     })
   })
 
   it('keeps every row label unique so it can serve as a list key', () => {
-    const labels = rateRows().map((r) => r.label)
+    const { interest, charges } = rateGroups()
+    const labels = [...interest, ...charges].map((r) => r.label)
     expect(new Set(labels).size).toBe(labels.length)
+  })
+})
+
+describe('app version', () => {
+  it('is defined in the test environment from package.json', () => {
+    expect(__APP_VERSION__).toBe('0.1.0')
   })
 })
 

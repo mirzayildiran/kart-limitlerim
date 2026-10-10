@@ -8,12 +8,9 @@ import { Button, Choice, ConfirmButton } from '../../ui/components/controls'
 import { Icon } from '../../ui/components/Icon'
 import { toast } from '../../ui/components/toast'
 import { setTheme, themePref, type ThemePref } from '../../ui/theme'
-import { backupFileName, rateRows, sourceLines } from './settingsModel'
+import { backupFileName, rateGroups, sourceLines, type RateRow } from './settingsModel'
 import { InstallGuide } from './InstallGuide'
 import './settings-page.css'
-
-/** Keep in step with package.json "version". */
-const APP_VERSION = '0.1.0'
 
 function Section({ title, id, children }: { title: string; id: string; children: ComponentChildren }) {
   return (
@@ -140,7 +137,7 @@ function BackupSection() {
   return (
     <Section title="Yedek" id="settings-backup">
       <div class="settings-card settings-pad settings-stack">
-        <p class="settings-text">Verilerin yalnızca bu cihazda. Telefon değiştirirken yedeği indirip yeni cihazda geri yükle.</p>
+        <p class="settings-text">Verilerin yalnızca bu cihazda duruyor. Telefon değiştirirken yedeği indirip yeni cihazda geri yükle.</p>
         <div class="settings-actions">
           <Button block onClick={download}>
             <Icon name="download" size={18} />
@@ -173,19 +170,34 @@ function BackupSection() {
   )
 }
 
+/** One definition list; each row has its label left and its figures right, one figure per line. */
+function RateList({ rows, class: cls }: { rows: RateRow[]; class?: string }) {
+  return (
+    <dl class={cls ? `settings-rates ${cls}` : 'settings-rates'}>
+      {rows.map((row) => (
+        <div key={row.label} class="settings-rate">
+          <dt class="settings-rate-label">{row.label}</dt>
+          <dd class="settings-rate-value num">
+            {row.lines.map((line) => (
+              <span key={line} class="settings-rate-line">
+                {line}
+              </span>
+            ))}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
 function RatesSection() {
-  const rows = rateRows()
+  const { interest, charges } = rateGroups()
   return (
     <Section title="Faiz nasıl tahmin ediliyor" id="settings-rates">
+      <p class="settings-lead">Bunlar tahmindir. Esas olan bankanın ekstresidir.</p>
       <div class="settings-card">
-        <dl class="settings-rates">
-          {rows.map((row) => (
-            <div key={row.label} class="settings-rate">
-              <dt class="settings-rate-label">{row.label}</dt>
-              <dd class="settings-rate-value num">{row.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <RateList rows={interest} />
+        <RateList rows={charges} class="settings-rates-charges" />
       </div>
       <div class="settings-captions">
         {sourceLines().map((line) => (
@@ -202,12 +214,9 @@ function RatesSection() {
 function PrivacySection() {
   return (
     <Section title="Gizlilik" id="settings-privacy">
-      <div class="settings-card settings-pad settings-privacy">
-        <Icon name="info" size={20} class="settings-privacy-icon" />
-        <div class="settings-stack">
-          <p class="settings-text">Hesap yok, sunucu yok. Verilerin bu cihazda kalır.</p>
-          <p class="settings-text">Ekran görüntüsü içe aktarma cihazda okunur ve hiçbir yerde saklanmaz.</p>
-        </div>
+      <div class="settings-card settings-pad settings-stack">
+        <p class="settings-text">Kart numaran ya da banka şifren hiçbir zaman sorulmaz.</p>
+        <p class="settings-text">Ekran görüntüsü içe aktarma cihazda okunur ve hiçbir yerde saklanmaz.</p>
       </div>
     </Section>
   )
@@ -225,9 +234,9 @@ function DangerSection() {
   }
   return (
     <Section title="Tehlikeli bölge" id="settings-danger">
-      <div class="settings-card settings-pad settings-stack">
+      <div class="settings-card settings-pad settings-danger settings-stack">
+        <p class="settings-text">Bu işlem bu cihazdaki bütün verileri siler ve geri alınamaz.</p>
         <ConfirmButton label="Tüm verileri sil" confirmLabel="Geri alınamaz. Silmek için tekrar dokun" onConfirm={eraseAll} />
-        <p class="settings-caption">Bu işlem geri alınamaz.</p>
       </div>
     </Section>
   )
@@ -240,6 +249,7 @@ export function SettingsPage() {
     <div class="settings-page">
       <header class="settings-header">
         <h1>Ayarlar</h1>
+        <p class="settings-caption">Hesap yok, sunucu yok. Verilerin bu cihazda kalır.</p>
       </header>
       <AppearanceSection />
       <CategoriesSection />
@@ -248,7 +258,7 @@ export function SettingsPage() {
       <PrivacySection />
       <InstallGuide />
       <DangerSection />
-      <footer class="settings-foot">Kart Limitlerim · sürüm {APP_VERSION}</footer>
+      <footer class="settings-foot">Kart Limitlerim · sürüm {__APP_VERSION__}</footer>
     </div>
   )
 }
