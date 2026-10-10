@@ -1,3 +1,4 @@
+/* Night island: the launch ground in both themes, so the splash hands over without a flash. */
 .lock-screen {
   position: fixed;
   inset: 0;
@@ -6,22 +7,132 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--s-3);
+  gap: var(--s-6);
   padding: calc(env(safe-area-inset-top, 0px) + var(--s-6)) var(--gutter) calc(env(safe-area-inset-bottom, 0px) + var(--s-6));
-  background: var(--bg);
-  color: var(--ink);
+  background: var(--night-ground);
+  color: var(--night-ink);
+}
+
+.lock-screen.is-leaving {
+  pointer-events: none;
+  animation: lock-leave 280ms var(--ease-in, ease-in) forwards;
+}
+
+.lock-mark {
+  width: 132px;
+  height: 132px;
+}
+
+.lock-mark-back {
+  fill: var(--w2);
+}
+
+.lock-mark-mid {
+  fill: var(--w1);
+}
+
+.lock-mark-front {
+  fill: var(--night-action);
+}
+
+.lock-mark-chip {
+  fill: var(--night-ground);
+  opacity: 0.2;
+}
+
+.lock-mark-bar {
+  fill: var(--night-ground);
+}
+
+.lock-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+  animation: lock-body-in 0.5s var(--ease-out-expo) both;
 }
 
 .lock-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  color: var(--night-ink);
 }
 
 .lock-caption {
-  margin: 0 0 var(--s-4);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--s-5);
   font-size: var(--text-sm);
-  color: var(--muted);
+  color: var(--night-muted);
+}
+
+.lock-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--s-5);
+  border-radius: var(--r-pill);
+  background: var(--night-action);
+  color: var(--night-action-ink);
+  font-weight: 700;
+  font-size: var(--text-md);
+  transition: transform var(--dur-tap, 120ms) var(--ease-out-expo);
+}
+
+.lock-button:active {
+  transform: scale(var(--press, 0.97));
+}
+
+.lock-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+.lock-button:focus-visible {
+  outline: 2px solid var(--night-action);
+  outline-offset: 3px;
+}
+
+/* Reserved height so the button does not jump when the message appears. */
+.lock-error {
+  min-height: 2.6em;
+  margin: var(--s-2) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.3;
+  color: var(--night-crit);
+}
+
+@keyframes lock-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes lock-body-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lock-body,
+  .lock-screen.is-leaving {
+    animation: none;
+  }
+
+  .lock-button {
+    transition: none;
+  }
 }

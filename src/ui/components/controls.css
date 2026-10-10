@@ -171,6 +171,8 @@
 }
 .switch input:checked::after {
   transform: translateX(20px);
+  /* White on neon lime has no contrast; the knob takes the ink that reads on the accent. */
+  background: var(--accent-ink);
 }
 
 /* Choice: chips and segment */
