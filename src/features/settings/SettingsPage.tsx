@@ -172,7 +172,16 @@ function RateList({ rows, class: cls }: { rows: RateRow[]; class?: string }) {
     <dl class={cls ? `settings-rates ${cls}` : 'settings-rates'}>
       {rows.map((row) => (
         <div key={row.label} class="settings-rate">
-          <dt class="settings-rate-label">{row.label}</dt>
+          <dt class="settings-rate-label">
+            {row.spoken ? (
+              <>
+                <span aria-hidden="true">{row.label}</span>
+                <span class="sr-only">{row.spoken}</span>
+              </>
+            ) : (
+              row.label
+            )}
+          </dt>
           <dd class="settings-rate-value num">
             {row.lines.map((line) => (
               <span key={line} class="settings-rate-line">
