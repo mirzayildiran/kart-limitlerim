@@ -35,13 +35,14 @@ Ekran görüntüsü aktarmada aynı kural geçerlidir: `importExpenses` bütün 
 
 Açılış sırası (`init`): veritabanını aç (ilk açılışta varsayılan kategorileri yaz), bütün mağazaları yükle, kesimi geçmiş satırlar için `closeCycle` çalıştır, sonra `ready` yap. Gün değişince (`visibilitychange`, `focus`) `today` yenilenir ve kesim kontrolü tekrarlanır.
 
-Veritabanı: IndexedDB, ad `kart-limitlerim`, sürüm 1. Mağazalar: `accounts`, `expenses` (dizinler `byDate`, `byAccount`), `categories`, `recurring`, `rules`, `meta`. `meta` şu an kullanılmıyor. Uygulama `navigator.storage.persist()` ile tarayıcıdan verinin silinmemesini ister.
+Veritabanı: IndexedDB, ad `kart-limitlerim`, sürüm 1. Mağazalar: `accounts`, `expenses` (dizinler `byDate`, `byAccount`), `categories`, `recurring`, `rules`, `meta`. `meta` anahtar–değer deposudur; bugün yalnızca `budgets` anahtarında bütçe planını (`CategoryBudget[]`: kategori başına aylık hedef) tutar. Bu sayede plan için veritabanı sürümü değişmedi. Uygulama `navigator.storage.persist()` ile tarayıcıdan verinin silinmemesini ister.
 
 Tema tercihi tek başına `localStorage` içinde (`kl:theme`) tutulur. Bu, veri değildir.
 
 ## Yedek
 
 - Dışa aktarma: bütün mağazalar okunur ve `{ app: 'kart-limitlerim', schema: 1, exportedAt, data }` biçiminde JSON olarak indirilir. Dosya adı `kart-limitlerim-yedek-YYYY-AA-GG.json`.
+- Bütçe planı yedekte isteğe bağlı `data.budgets` alanıdır; bu alan olmayan eski yedekler boş planla açılır.
 - İçe aktarma: önce `parseBackup` dosyayı doğrular (uygulama adı, şema sürümü, beş listenin varlığı ve her kaydın `id`'si). Doğrulama geçerse kullanıcı onaylar, sonra `restoreBackup` beş mağazayı tek işlemde temizleyip yeniden yazar. Yarım kalan geri yükleme olmaz.
 - Şema sürümü 1 dışındaki yedekler reddedilir. Daha yeni bir sürümden alınmış yedek için uygulamanın güncellenmesi istenir.
 - Yedek hiçbir yere gönderilmez; kullanıcı dosyayı kendisi saklar.
@@ -50,7 +51,7 @@ Tema tercihi tek başına `localStorage` içinde (`kl:theme`) tutulur. Bu, veri 
 
 İki katman var:
 
-1. **Öneriler** (`src/domain/insights.ts`): kurala dayalıdır, cihazda çalışır, ağa çıkmaz. Kesime kadar nakit açığı, yaklaşan ve geciken asgari ödemeler, limiti azalan kart ya da KMH, KMH günlük faizi, asgari ödeme faizi, kategori artışı (bu ayın ilk N günü ile geçen ayın aynı günleri) ve "bugün hangi kartla öde" (bugünkü alışverişin son ödemesine en uzun süre kalan kart). Tutarlar `power.ts`, `interest.ts` ve `statement.ts` hesaplarından gelir.
+1. **Öneriler** (`src/domain/insights.ts`): kurala dayalıdır, cihazda çalışır, ağa çıkmaz. Bütçe planı hedefinin aşılması ya da bu hızla aşılacak olması, ayın geçen aydan pahalı gitmesi, kesime kadar nakit açığı, yaklaşan ve geciken asgari ödemeler, limiti azalan kart ya da KMH, KMH günlük faizi, asgari ödeme faizi, kategori artışı (bu ayın ilk N günü ile geçen ayın aynı günleri) ve "bugün hangi kartla öde" (bugünkü alışverişin son ödemesine en uzun süre kalan kart). Tutarlar `power.ts`, `interest.ts` ve `statement.ts` hesaplarından gelir.
 2. **Sohbet** (`src/features/assistant/`, `src/ai/`, `worker/assistant-proxy/`): varsayılan kapalıdır. Kullanıcı onay ekranında gönderilecek özeti görüp kabul edince açılır; onay `localStorage`'da (`kl:assistant-consent`, sürümlü) tutulur.
 
 Sohbet akışı:
@@ -83,6 +84,8 @@ Sohbet geçmişi yalnızca bellekte tutulur. Worker, `main` dalına her gönderi
 | `rates.ts` | TCMB azami faiz tablosu (1 Ekim 2026), kart kademeleri, KMH ve nakit oranı, KKDF/BSMV, BDDK asgari ödeme kuralı. |
 | `interest.ts` | Faiz hesabı, kart oranı seçimi, günlük maliyet, dönem kapatma, toplam işleyen faiz. |
 | `categories.ts` | Başlangıç kategorileri ve yeni kategori rengi. |
+| `budget.ts` | Ay gidişatı (`monthPace`: bu ay, geçen ayın aynı günleri, tahmini ay sonu) ve kategori hedefi ilerlemesi (`budgetProgress`). |
+| `insights.ts`, `insightsSummary.ts` | Bütçe asistanının kurala dayalı önerileri ve modele giden özet. |
 
 Harcama gücü ve kesime kadar sayıları `power.ts` içinde hesaplanır; ekran yalnızca bunları gösterir.
 
