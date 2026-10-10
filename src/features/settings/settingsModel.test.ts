@@ -45,9 +45,9 @@ describe('rateGroups', () => {
   it('splits the rows into the interest rates and the charges, in order', () => {
     const { interest, charges } = rateGroups()
     expect(interest).toEqual([
-      { label: 'Limit 30.000 ₺ altı', spoken: 'Limit 30.000 lira altı', lines: ['akdi %3,25', 'gecikme %3,55'] },
-      { label: 'Limit 30.000 ₺ – 180.000 ₺', spoken: 'Limit 30.000 ile 180.000 lira arası', lines: ['akdi %3,75', 'gecikme %4,05'] },
-      { label: 'Limit 180.000 ₺ üzeri', spoken: 'Limit 180.000 lira üzeri', lines: ['akdi %4,25', 'gecikme %4,55'] },
+      { label: 'Dönem borcu 30.000 ₺ altı', spoken: 'Dönem borcu 30.000 lira altı', lines: ['akdi %3,25', 'gecikme %3,55'] },
+      { label: 'Dönem borcu 30.000 ₺ – 180.000 ₺', spoken: 'Dönem borcu 30.000 ile 180.000 lira arası', lines: ['akdi %3,75', 'gecikme %4,05'] },
+      { label: 'Dönem borcu 180.000 ₺ üzeri', spoken: 'Dönem borcu 180.000 lira üzeri', lines: ['akdi %4,25', 'gecikme %4,55'] },
       { label: 'Nakit çekim ve KMH', lines: ['akdi %4,25', 'gecikme %4,55'] },
     ])
     expect(charges).toEqual([
@@ -65,7 +65,7 @@ describe('rateGroups', () => {
       cash: { contractual: 3, late: 3.5 },
       foreignCurrency: { contractual: 1, late: 1 },
     }
-    expect(rateGroups(table).interest[0]).toEqual({ label: 'Tüm limitler', lines: ['akdi %2', 'gecikme %2,5'] })
+    expect(rateGroups(table).interest[0]).toEqual({ label: 'Tüm dönem borçları', lines: ['akdi %2', 'gecikme %2,5'] })
   })
 
   it('labels a two-tier table with an open lower and upper bound', () => {
@@ -81,9 +81,9 @@ describe('rateGroups', () => {
       foreignCurrency: { contractual: 1, late: 1 },
     }
     const rows = rateGroups(table).interest
-    expect(rows[0].label).toBe('Limit 10.000 ₺ altı')
-    expect(rows[1].label).toBe('Limit 10.000 ₺ üzeri')
-    expect(rows.map((r) => r.spoken)).toEqual(['Limit 10.000 lira altı', 'Limit 10.000 lira üzeri', undefined])
+    expect(rows[0].label).toBe('Dönem borcu 10.000 ₺ altı')
+    expect(rows[1].label).toBe('Dönem borcu 10.000 ₺ üzeri')
+    expect(rows.map((r) => r.spoken)).toEqual(['Dönem borcu 10.000 lira altı', 'Dönem borcu 10.000 lira üzeri', undefined])
   })
 
   it('writes the tax rates from the given percentages with a decimal comma', () => {
