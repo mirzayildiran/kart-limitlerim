@@ -15,7 +15,8 @@
     "ios:dev": "node scripts/ios-dev.mjs",
     "ios:build": "CAP_NATIVE=1 npm run build && cap sync ios",
     "ios:open": "cap open ios",
-    "ios:release": "node scripts/ios-version.mjs && npm run ios:build"
+    "ios:release": "node scripts/ios-version.mjs && npm run ios:build",
+    "check:csp": "node scripts/check-csp.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
