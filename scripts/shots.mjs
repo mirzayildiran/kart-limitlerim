@@ -1,6 +1,6 @@
 // Design-review screenshots of the built app, seeded with the demo backup.
 // Usage:
-//   node scripts/shots.mjs [screen...]   screens: home expenses calendar settings welcome sheet-expense sheet-account
+//   node scripts/shots.mjs [screen...]   screens: home expenses calendar settings assistant welcome sheet-expense sheet-account
 //                                        sheet-account-edit sheet-account-new sheet-statement sheet-recurring
 //                                        sheet-category sheet-import sheet-expense-filled
 //   node scripts/shots.mjs --motion      frames of the home -> expenses tab transition (reduced motion off)
@@ -23,12 +23,12 @@ const PORT = 4173
 const DB_NAME = 'kart-limitlerim'
 const STORES = ['accounts', 'expenses', 'categories', 'recurring', 'rules']
 // Hash routes from src/ui/nav.ts.
-const ROUTES = { home: '#/', expenses: '#/harcamalar', calendar: '#/takvim', settings: '#/ayarlar' }
+const ROUTES = { home: '#/', expenses: '#/harcamalar', calendar: '#/takvim', settings: '#/ayarlar', assistant: '#/asistan' }
 
 const SIZES = [360, 430]
 const WELCOME_WIDTH = 390
 const THEMES = ['dark', 'light']
-const PAGE_SCREENS = ['home', 'expenses', 'calendar', 'settings']
+const PAGE_SCREENS = ['home', 'expenses', 'calendar', 'settings', 'assistant']
 // Sheets are opened with the taps a user makes (role, visible text, a few classes), never by setting the hash.
 const NEW_SHEETS = [
   'sheet-account-edit',
