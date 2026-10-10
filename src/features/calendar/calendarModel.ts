@@ -2,7 +2,6 @@ import { addDays, daysBetween, formatLong, fromIso, startOfDay, toIso } from '..
 import { occurrences } from '../../domain/recurring'
 import { nextCut, SOON_DAYS } from '../../domain/statement'
 import type { StatementItem } from '../../domain/power'
-import { formatTL } from '../../domain/money'
 import type { Account, CardAccount, IsoDate, Kurus, RecurringPayment } from '../../domain/types'
 
 /** Pure calendar logic. No UI, no storage. Dates are local calendar days. */
@@ -62,12 +61,16 @@ export interface TimelineEvent {
   kind: TimelineKind
   date: Date
   iso: IsoDate
+  /** Owner account: its wallet colour marks the event. */
+  accountId: string
   title: string
-  /** Second line: minimum due, "tutar bekleniyor", or the account name. */
+  /** Second line: "Asgari ödeme", "Tutar bekleniyor", or null. */
   detail: string | null
-  /** Amount shown on the right, if known. */
+  /** Amount shown on the right, if known. A due date carries its outstanding minimum. */
   amount: Kurus | null
-  /** Due within SOON_DAYS: rendered in the warning colour. */
+  /** The amount is an estimate (the minimum was not entered), so totals get a "~". */
+  estimated: boolean
+  /** Due within SOON_DAYS, or overdue. */
   soon: boolean
   target: TimelineTarget
 }
@@ -76,7 +79,8 @@ const KIND_ORDER: Record<TimelineKind, number> = { cut: 0, due: 1, recurring: 2 
 
 /**
  * One date-sorted list of statement cuts, statement due dates (unpaid only) and
- * recurring charges within the next `days` days, counting today.
+ * recurring charges within the next `days` days, counting today. Unpaid due
+ * dates already passed are kept, so they show as overdue at the top.
  */
 export function buildTimeline(
   accounts: Account[],
@@ -102,9 +106,11 @@ export function buildTimeline(
         kind: 'cut',
         date: cut,
         iso: toIso(cut),
+        accountId: card.id,
         title: card.lines.length > 1 ? `${card.name} ${line.label} kesim` : `${card.name} kesim`,
         detail: null,
         amount: null,
+        estimated: false,
         soon: false,
         target: { type: 'statement', accountId: card.id, lineIndex },
       })
@@ -112,17 +118,22 @@ export function buildTimeline(
   }
 
   for (const item of statements) {
-    if (item.view.status === 'paid' || !inWindow(item.view.due)) continue
+    if (item.view.status === 'paid') continue
+    const overdue = item.view.status === 'overdue'
+    if (!overdue && !inWindow(item.view.due)) continue
     const due = item.view.due
     const label = item.account.lines.length > 1 ? ` ${item.account.lines[item.lineIndex].label}` : ''
+    const minimum = item.minimumOutstanding
     events.push({
       id: `due:${item.account.id}:${item.lineIndex}:${toIso(due)}`,
       kind: 'due',
       date: due,
       iso: toIso(due),
+      accountId: item.account.id,
       title: `${item.account.name}${label} son ödeme`,
-      detail: item.minimumOutstanding != null ? `Asgari ${formatTL(item.minimumOutstanding)}` : 'tutar bekleniyor',
-      amount: null,
+      detail: minimum != null ? 'Asgari ödeme' : 'Tutar bekleniyor',
+      amount: minimum,
+      estimated: minimum != null && item.minimumIsEstimate,
       soon: daysBetween(due, now) <= SOON_DAYS,
       target: { type: 'statement', accountId: item.account.id, lineIndex: item.lineIndex },
     })
@@ -135,10 +146,12 @@ export function buildTimeline(
         kind: 'recurring',
         date,
         iso: toIso(date),
+        accountId: r.accountId,
         title: `${r.name} · ${byId.get(r.accountId)?.name ?? 'Hesap yok'}`,
         detail: null,
         amount: r.amount,
-        soon: daysBetween(date, now) <= SOON_DAYS,
+        estimated: false,
+        soon: false,
         target: { type: 'recurring', id: r.id },
       })
     }
@@ -173,6 +186,36 @@ export function groupByDay(events: TimelineEvent[], today: Date): TimelineDay[] 
     else days.push({ iso: e.iso, label: dayLabel(e.date, today), events: [e] })
   }
   return days
+}
+
+export interface MoneyOut {
+  total: Kurus
+  /** At least one amount in the total is an estimate. */
+  estimated: boolean
+}
+
+/** Exact kuruş sum of the known amounts. Events without an amount (kesim, unknown minimum) add nothing. */
+export function sumAmounts(events: TimelineEvent[]): MoneyOut {
+  let total = 0
+  let estimated = false
+  for (const e of events) {
+    if (e.amount == null) continue
+    total += e.amount
+    if (e.estimated) estimated = true
+  }
+  return { total, estimated }
+}
+
+/** Known money out on one agenda day. */
+export function dayTotal(day: TimelineDay): MoneyOut {
+  return sumAmounts(day.events)
+}
+
+/** Known money out over the whole agenda, with the number of payments and statement cuts in it. */
+export function periodSummary(days: TimelineDay[]): MoneyOut & { payments: number; cuts: number } {
+  const events = days.flatMap((d) => d.events)
+  const cuts = events.filter((e) => e.kind === 'cut').length
+  return { ...sumAmounts(events), payments: events.length - cuts, cuts }
 }
 
 export function accountName(accounts: Account[], id: string): string {
