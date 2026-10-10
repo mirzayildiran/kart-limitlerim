@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { initFormState, validateForm, isFormValid, formStateToAccount, mergeLines, shouldWarnAvailable, type CardFormState, type KmhFormState, type BankFormState, type CashFormState } from './accountForm'
+import { initFormState, validateForm, isFormValid, formStateToAccount, mergeLines, shouldWarnAvailable, rateHint, type CardFormState, type KmhFormState, type BankFormState, type CashFormState } from './accountForm'
 import type { CardAccount, CardLine, KmhAccount, BalanceAccount } from '../../domain/types'
 
 describe('accountForm', () => {
@@ -313,6 +313,25 @@ describe('accountForm', () => {
     it('does not warn with null values', () => {
       expect(shouldWarnAvailable(null, 50000)).toBe(false)
       expect(shouldWarnAvailable(60000, null)).toBe(false)
+    })
+  })
+
+  describe('rateHint', () => {
+    it('names the lowest card tier with a Turkish percentage', () => {
+      expect(rateHint('card', 'contractual')).toBe('TCMB azami (30.000 ₺ altı): %3,25 ay')
+      expect(rateHint('card', 'late')).toBe('TCMB azami (30.000 ₺ altı): %3,55 ay')
+    })
+
+    it('uses the cash ceiling for KMH', () => {
+      expect(rateHint('kmh', 'contractual')).toBe('TCMB azami: %4,25 ay')
+      expect(rateHint('kmh', 'late')).toBe('TCMB azami: %4,55 ay')
+    })
+
+    it('never writes "₺%" or a dot decimal', () => {
+      for (const text of [rateHint('card', 'contractual'), rateHint('card', 'late'), rateHint('kmh', 'contractual')]) {
+        expect(text).not.toContain('₺%')
+        expect(text).not.toMatch(/\d\.\d{2}(?!\d)/)
+      }
     })
   })
 })

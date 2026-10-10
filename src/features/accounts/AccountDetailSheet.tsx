@@ -19,6 +19,7 @@ import {
   interestSourceLine,
   kmhDailyCost,
   rateCaption,
+  staleStatementLine,
   statementRows,
 } from './detailModel'
 import './account-detail.css'
@@ -102,6 +103,8 @@ function CardContent({ account }: { account: CardAccount }): JSX.Element {
   const data = cardInterestPanelData(account, t)
   const used = account.limit - account.available
   const hist = interestHistory(account)
+  // The daily figure runs on the unpaid statement, not on "Kullanılan"; flag it when they disagree.
+  const stale = staleStatementLine(account, t)
 
   // Rate shown in the caption: the tier of the first statement debt, else of what is used.
   const firstDebt = account.lines.find((l) => (l.statementDebt ?? 0) > 0)?.statementDebt ?? used
@@ -125,9 +128,21 @@ function CardContent({ account }: { account: CardAccount }): JSX.Element {
             <ul class="account-detail-interest-lines">
               {data.dailyCosts.length > 0 && (
                 <li>
-                  Borcun her gün{' '}
+                  Ödenmemiş ekstre borcuna göre her gün{' '}
                   <strong class="num">~{figure(formatTLExact(data.dailyCosts.reduce((s, d) => s + d.cost, 0)))}</strong> faiz
-                  işletiyor.
+                  işliyor.
+                  {stale !== null && (
+                    <span class="account-detail-interest-stale">
+                      Ekstre ödeme durumunu güncellersen bu rakam düzelir.
+                      <button
+                        type="button"
+                        class="account-detail-interest-link"
+                        onClick={() => openSheet({ type: 'statement', accountId: account.id, lineIndex: stale })}
+                      >
+                        Ekstreyi güncelle
+                      </button>
+                    </span>
+                  )}
                 </li>
               )}
               {data.lineProjections.map((proj) => (

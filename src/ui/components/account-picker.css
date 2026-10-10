@@ -23,6 +23,12 @@
   display: none;
 }
 
+/* More chips off to the right: the trailing edge fades out (set only while the row can still scroll). */
+.account-picker-rail.has-more {
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, black calc(100% - 48px), transparent);
+}
+
 .account-picker-chip {
   position: relative;
   flex: 0 0 auto;

@@ -8,8 +8,6 @@ import { Disclosure } from '../../ui/components/Disclosure'
 import { Button, MoneyField, TextField, Choice, ConfirmButton } from '../../ui/components/controls'
 import { toast } from '../../ui/components/toast'
 import { saveAccount, removeAccount, newId, accountById } from '../../data/store'
-import { CURRENT_RATES } from '../../domain/rates'
-import { formatTLExact } from '../../domain/money'
 import type { Account, CardAccount } from '../../domain/types'
 import {
   initFormState,
@@ -18,6 +16,7 @@ import {
   formStateToAccount,
   mergeLines,
   shouldWarnAvailable,
+  rateHint,
   type FormState,
   type CardFormState,
   type KmhFormState,
@@ -50,7 +49,7 @@ export function AccountSheet({ request }: AccountSheetProps) {
 
   const isEdit = id && account
 
-  const title = isEdit ? (account?.name ?? 'Hesap') : 'Hesap ekle'
+  const title = isEdit ? 'Hesabı düzenle' : 'Hesap ekle'
 
   const handleKindChange = (newKind: string) => {
     const newForm = initFormState(undefined, newKind as typeof kind)
@@ -131,7 +130,7 @@ export function AccountSheet({ request }: AccountSheetProps) {
   )
 
   return (
-    <Sheet open title={title} onClose={closeSheet} footer={footer}>
+    <Sheet open title={title} subtitle={isEdit ? account?.name : undefined} onClose={closeSheet} footer={footer}>
       <div class="account-sheet">
         {!isEdit && (
           <Choice
@@ -248,9 +247,9 @@ function CardFields({ state, errors, setFormState }: { state: CardFormState; err
                   const newLines = state.lines.filter((_, j) => j !== i)
                   setFormState({ ...state, lines: newLines })
                 }}
-                aria-label="Kartı kaldır"
               >
-                <Icon name="close" size={16} />
+                <Icon name="close" size={18} />
+                {line.label.trim() ? `${line.label.trim()} kartını kaldır` : 'Bu kartı kaldır'}
               </button>
             )}
           </div>
@@ -279,9 +278,9 @@ function CardFields({ state, errors, setFormState }: { state: CardFormState; err
             value={state.contractualRate ? String(state.contractualRate) : ''}
             onChange={(v) => setFormState({ ...state, contractualRate: v === '' ? null : parseFloat(v) })}
             placeholder="Boş bırakırsan TCMB azami oranı kullanılır"
-            hint={`TCMB azami: ${formatTLExact(CURRENT_RATES.cardTiers[0].contractual * 100)}% ay`}
+            hint={rateHint('card', 'contractual')}
             error={errors.contractualRate}
-            inputMode="numeric"
+            inputMode="decimal"
           />
           <TextField
             label="Aylık geç ödeme oranı"
@@ -289,8 +288,9 @@ function CardFields({ state, errors, setFormState }: { state: CardFormState; err
             value={state.lateRate ? String(state.lateRate) : ''}
             onChange={(v) => setFormState({ ...state, lateRate: v === '' ? null : parseFloat(v) })}
             placeholder="Boş bırakırsan TCMB azami oranı kullanılır"
+            hint={rateHint('card', 'late')}
             error={errors.lateRate}
-            inputMode="numeric"
+            inputMode="decimal"
           />
         </Disclosure>
       </div>
@@ -327,9 +327,9 @@ function KmhFields({ state, errors, setFormState }: { state: KmhFormState; error
             value={state.contractualRate ? String(state.contractualRate) : ''}
             onChange={(v) => setFormState({ ...state, contractualRate: v === '' ? null : parseFloat(v) })}
             placeholder="Boş bırakırsan TCMB azami oranı kullanılır"
-            hint={`TCMB azami: ${CURRENT_RATES.cash.contractual}% ay`}
+            hint={rateHint('kmh', 'contractual')}
             error={errors.contractualRate}
-            inputMode="numeric"
+            inputMode="decimal"
           />
           <TextField
             label="Aylık geç ödeme oranı"
@@ -337,8 +337,9 @@ function KmhFields({ state, errors, setFormState }: { state: KmhFormState; error
             value={state.lateRate ? String(state.lateRate) : ''}
             onChange={(v) => setFormState({ ...state, lateRate: v === '' ? null : parseFloat(v) })}
             placeholder="Boş bırakırsan TCMB azami oranı kullanılır"
+            hint={rateHint('kmh', 'late')}
             error={errors.lateRate}
-            inputMode="numeric"
+            inputMode="decimal"
           />
         </Disclosure>
       </div>

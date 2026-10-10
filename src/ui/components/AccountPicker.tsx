@@ -1,5 +1,5 @@
 import type { ComponentChildren } from 'preact'
-import { useEffect, useId, useRef } from 'preact/hooks'
+import { useEffect, useId, useRef, useState } from 'preact/hooks'
 import { formatTL } from '../../domain/money'
 import type { Account, Kurus } from '../../domain/types'
 import { Icon } from './Icon'
@@ -38,6 +38,22 @@ export function AccountPicker({ label, accounts, colors, value, onChange, error,
   const hasSelection = accounts.some((a) => a.id === value)
   const rail = useRef<HTMLDivElement>(null)
 
+  // Trailing edge fade while more chips sit off to the right (the row gives no other hint).
+  const [more, setMore] = useState(false)
+  useEffect(() => {
+    const el = rail.current
+    if (!el) return
+    const update = () => setMore(el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update)
+    ro?.observe(el)
+    return () => {
+      el.removeEventListener('scroll', update)
+      ro?.disconnect()
+    }
+  }, [accounts.length])
+
   // Keep the chosen account in view: an edited expense may point at the sixth card.
   useEffect(() => {
     const el = rail.current?.querySelector<HTMLElement>('[aria-checked="true"]')
@@ -50,7 +66,7 @@ export function AccountPicker({ label, accounts, colors, value, onChange, error,
         {label}
       </span>
       <div
-        class="account-picker-rail"
+        class={more ? 'account-picker-rail has-more' : 'account-picker-rail'}
         ref={rail}
         role="radiogroup"
         aria-labelledby={`${id}-l`}

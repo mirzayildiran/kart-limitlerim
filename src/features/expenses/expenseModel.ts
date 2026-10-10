@@ -174,7 +174,21 @@ export function interestNudgeAmount(account: CardAccount | KmhAccount, amount: K
 export function interestNudge(account: CardAccount | KmhAccount, amount: Kurus): string | null {
   const monthly = interestNudgeAmount(account, amount)
   if (monthly === null) return null
-  return `Bu harcamayı ödemeyip taşırsan ayda ~${formatTLExact(monthly)} faiz işler.`
+  return `Bu harcamayı ödemeyip taşırsan ayda ~${formatTLExact(monthly)} faiz işler (vergiler dahil).`
+}
+
+/**
+ * The line under the instalment chips: what each instalment is and what leaves the limit now.
+ * "12 × 800 ₺ · tamamı 9.600 ₺ limitten düşer". When the total does not split evenly the
+ * per-instalment figure is marked "~" (the bank decides where the extra kuruş go).
+ * Null when there is no amount yet or no split.
+ */
+export function installmentPreview(amount: Kurus | null, count: number, affectsAccount: boolean): string | null {
+  if (amount === null || amount <= 0 || !Number.isInteger(count) || count < 2) return null
+  const even = amount % count === 0
+  const each = `${even ? '' : '~'}${formatTLExact(Math.round(amount / count))}`
+  const total = formatTLExact(amount)
+  return affectsAccount ? `${count} × ${each} · tamamı ${total} limitten düşer` : `${count} × ${each} · toplam ${total}`
 }
 
 /**

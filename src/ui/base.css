@@ -72,6 +72,12 @@ textarea {
   caret-color: var(--accent);
 }
 
+/* Placeholders are hints, not values: themed muted at full opacity (browsers default to a faded ink). */
+::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;

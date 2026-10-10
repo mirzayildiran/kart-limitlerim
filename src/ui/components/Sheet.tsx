@@ -7,6 +7,8 @@ import './sheet.css'
 interface Props {
   open: boolean
   title: string
+  /** Second line under the title, e.g. which account a statement belongs to. Part of the dialog's name. */
+  subtitle?: string
   onClose: () => void
   children: ComponentChildren
   /** Sticky footer (primary action). */
@@ -16,10 +18,14 @@ interface Props {
 /**
  * Bottom sheet dialog. Traps focus loosely (focus moves in on open and back to
  * the opener on close), closes on Escape and on a tap on the scrim, locks page scroll.
+ * Focus on open: the element marked `data-autofocus` (a create sheet's first field),
+ * otherwise the heading, so an edit sheet does not pop the keyboard.
  */
-export function Sheet({ open, title, onClose, children, footer }: Props) {
+export function Sheet({ open, title, subtitle, onClose, children, footer }: Props) {
   const titleId = useId()
+  const subId = `${titleId}-s`
   const panel = useRef<HTMLDivElement>(null)
+  const heading = useRef<HTMLHeadingElement>(null)
   const opener = useRef<Element | null>(null)
 
   useEffect(() => {
@@ -27,9 +33,7 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
     opener.current = document.activeElement
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    const first =
-      panel.current?.querySelector<HTMLElement>('[data-autofocus]') ??
-      panel.current?.querySelector<HTMLElement>('input, select, textarea, button:not([data-close])')
+    const first = panel.current?.querySelector<HTMLElement>('[data-autofocus]') ?? heading.current
     first?.focus({ preventScroll: true })
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !sheetClosing.value) onClose()
@@ -51,10 +55,19 @@ export function Sheet({ open, title, onClose, children, footer }: Props) {
   return (
     <div class={closing ? 'sheet-scrim is-closing' : 'sheet-scrim'} role="presentation">
       <button type="button" class="sheet-backdrop" aria-label="Kapat" tabIndex={-1} onClick={close} />
-      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={panel}>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby={subtitle ? `${titleId} ${subId}` : titleId} ref={panel}>
         <div class="sheet-grab" aria-hidden="true" />
         <header class="sheet-head">
-          <h2 id={titleId}>{title}</h2>
+          <div class="sheet-titles">
+            <h2 id={titleId} ref={heading} tabIndex={-1}>
+              {title}
+            </h2>
+            {subtitle && (
+              <p class="sheet-subtitle" id={subId}>
+                {subtitle}
+              </p>
+            )}
+          </div>
           <button class="sheet-close" type="button" data-close onClick={close} aria-label="Kapat">
             <Icon name="close" size={20} />
           </button>

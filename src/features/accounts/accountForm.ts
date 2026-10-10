@@ -4,6 +4,20 @@
  */
 
 import type { Account, AccountKind, CardAccount, CardLine, KmhAccount, BalanceAccount, RateOverride, Kurus } from '../../domain/types'
+import { CURRENT_RATES, type RateTable } from '../../domain/rates'
+import { formatPercent, formatTL } from '../../domain/money'
+
+/**
+ * Hint under a rate field: the TCMB ceiling the estimate falls back to when the field is empty.
+ * Cards name the lowest debt tier ("TCMB azami (30.000 ₺ altı): %3,25 ay"); KMH uses the
+ * cash-withdrawal ceiling, which has no tiers.
+ */
+export function rateHint(kind: 'card' | 'kmh', which: 'contractual' | 'late', table: RateTable = CURRENT_RATES): string {
+  if (kind === 'kmh') return `TCMB azami: ${formatPercent(table.cash[which])} ay`
+  const tier = table.cardTiers[0]
+  const scope = tier.upTo === null ? '' : ` (${formatTL(tier.upTo)} ${tier.inclusive ? 've altı' : 'altı'})`
+  return `TCMB azami${scope}: ${formatPercent(tier[which])} ay`
+}
 
 export interface CardFormState {
   kind: 'card'
