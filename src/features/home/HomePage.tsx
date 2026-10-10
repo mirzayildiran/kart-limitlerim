@@ -379,22 +379,27 @@ export function HomePage() {
             Cüzdanını kuralım
           </h2>
           <p class="home-welcome-text">
-            Kartlarını ve hesaplarını ekle; ne kadar harcayabileceğini ve kesime kadar ne kalacağını hemen görelim. Her şey
-            yalnızca bu telefonda kalır.
+            Kartlarını ekle; şu an ne kadar harcayabileceğini ve kesime kadar ne kalacağını hemen görelim.
+          </p>
+          <p class="home-welcome-privacy">
+            <Icon name="lock" size={16} />
+            Verilerin yalnızca bu cihazda. Hesap yok.
           </p>
           <div class="home-welcome-actions">
             <Button variant="primary" block onClick={() => openSheet({ type: 'account', kind: 'card' })}>
               Kart ekle
             </Button>
-            <Button variant="secondary" block onClick={() => openSheet({ type: 'account', kind: 'bank' })}>
-              Nakit veya hesap ekle
-            </Button>
-            <Button variant="ghost" block onClick={tryDemo}>
+            <Button variant="secondary" block onClick={tryDemo}>
               Örnek verilerle dene
             </Button>
-            <Button variant="ghost" block onClick={() => go('settings')}>
-              Yedekten geri yükle
-            </Button>
+            <div class="home-welcome-more">
+              <Button variant="ghost" onClick={() => openSheet({ type: 'account', kind: 'bank' })}>
+                Nakit veya hesap ekle
+              </Button>
+              <Button variant="ghost" onClick={() => go('settings')}>
+                Yedekten geri yükle
+              </Button>
+            </div>
           </div>
         </section>
       </div>

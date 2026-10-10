@@ -6,6 +6,7 @@ import { ExpenseSheet } from './expenses/ExpenseSheet'
 import { RecurringSheet } from './recurring/RecurringSheet'
 import { CategorySheet } from './categories/CategorySheet'
 import { ImportSheet } from './import/ImportSheet'
+import { PhoneSetupSheet } from './onboarding/PhoneSetupSheet'
 
 export function SheetHost() {
   const req = sheet.value
@@ -26,5 +27,7 @@ export function SheetHost() {
       return <CategorySheet request={req} />
     case 'import':
       return <ImportSheet request={req} />
+    case 'phoneSetup':
+      return <PhoneSetupSheet />
   }
 }
