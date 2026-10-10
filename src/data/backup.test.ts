@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { BackupError, makeBackup, parseBackup } from './backup'
+import { BackupError, MAX_BACKUP_CHARS, makeBackup, parseBackup } from './backup'
 import type { Snapshot } from './db'
 
 const snapshot = (): Snapshot => ({
@@ -64,5 +64,11 @@ describe('parseBackup budgets', () => {
     const original = makeBackup(snapshot(), new Date('2026-03-04T05:06:07.000Z'))
     const parsed = parseBackup(JSON.stringify(original))
     expect(parsed).toEqual(original)
+  })
+})
+
+describe('parseBackup size limit', () => {
+  it('rejects text over MAX_BACKUP_CHARS before parsing it', () => {
+    expect(() => parseBackup(' '.repeat(MAX_BACKUP_CHARS + 1))).toThrow(BackupError)
   })
 })
