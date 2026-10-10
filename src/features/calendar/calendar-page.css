@@ -96,6 +96,7 @@
   padding: 0;
   list-style: none;
   background: var(--warn-soft);
+  border: 1px solid var(--warn-line);
   border-radius: var(--r-lg);
   overflow: hidden;
 }
