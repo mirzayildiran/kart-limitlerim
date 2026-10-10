@@ -1,6 +1,6 @@
 import { effect, signal } from '@preact/signals'
 import { isNativeApp, libraryFiles } from '../platform/files'
-import { createAutoBackup, readLatest, restoreCandidate, type AutoBackup } from './autoBackup'
+import type { AutoBackup } from './autoBackup'
 import type { BackupFile } from './backup'
 import type { Snapshot } from './db'
 import { accounts, budgets, categories, expenses, importBackupText, loadError, ready, recurring, rules } from './store'
@@ -34,8 +34,20 @@ function loadDismissed(): string | null {
 /** Call once at startup. Does nothing in the browser, where the PWA asks for persistent storage instead. */
 export function startAutoBackup(): void {
   if (!isNativeApp) return
-  const files = libraryFiles()
-  const backup = (auto = createAutoBackup({ files }))
+  // Loaded here, not at the top: the web build never needs the backup code on first paint.
+  void import('./autoBackup').then(({ createAutoBackup, readLatest, restoreCandidate }) => {
+    const files = libraryFiles()
+    const backup = (auto = createAutoBackup({ files }))
+    watch(backup, files, readLatest, restoreCandidate)
+  })
+}
+
+function watch(
+  backup: AutoBackup,
+  files: ReturnType<typeof libraryFiles>,
+  readLatest: typeof import('./autoBackup').readLatest,
+  restoreCandidate: typeof import('./autoBackup').restoreCandidate,
+): void {
   let started = false
   effect(() => {
     if (!ready.value || started) return

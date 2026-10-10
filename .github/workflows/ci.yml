@@ -19,7 +19,51 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
-      - run: npx tsc -p worker/assistant-proxy/tsconfig.json
+      - name: Worker typecheck
+        run: npx tsc -p worker/assistant-proxy/tsconfig.json
       - run: npm run lint
-      - run: npm test
+      - name: Unit tests
+        run: npm run test:unit
+      - name: Component tests
+        run: npm run test:components
       - run: npm run build
+      # First-load JS ≤ 40 KB and CSS ≤ 12 KB gzipped (scripts/size-budget.mjs).
+      - name: Bundle size budget
+        run: npm run size
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright Chromium
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - name: Install Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Chromium system dependencies
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: End-to-end tests (iPhone viewport, dark and light, axe)
+        run: npm run e2e
+      - name: No CSP violations (web build)
+        run: npm run build && npm run check:csp -- /kart-limitlerim/
+      - name: No CSP violations (iOS build)
+        run: CAP_NATIVE=1 npm run build && npm run check:csp -- /
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7

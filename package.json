@@ -20,7 +20,8 @@
     "test:unit": "vitest run --project unit",
     "test:components": "vitest run --project components",
     "e2e:build": "VITE_ASSISTANT_PROXY_URL=https://asistan.e2e.test vite build",
-    "e2e": "npm run e2e:build && playwright test"
+    "e2e": "npm run e2e:build && playwright test",
+    "size": "node scripts/size-budget.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
