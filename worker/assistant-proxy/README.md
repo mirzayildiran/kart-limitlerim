@@ -9,6 +9,8 @@ Kart Limitlerim'deki bütçe asistanı, mesajlarını doğrudan bir LLM sağlay�
 - Kaynak (Origin) sitesini `ALLOWED_ORIGINS` listesiyle sınırlar.
 - IP başına dakikada 10 istek (LIMITER binding) ve saatlik kaba bir fren uygular (varsayılan 30 istek).
 - Bütçe özetini ve sohbeti sağlayıcıya gönderir. Sağlayıcı hata verirse ya da boş yanıt dönerse bir sonrakini dener.
+- Her sağlayıcıya en çok 12 sn, hepsine birlikte 25 sn tanır. Böylece uygulamanın 30 sn'lik zaman aşımından önce yanıt ya da `unavailable` döner. 2 sn'den az süre kaldıysa sıradaki sağlayıcıyı başlatmaz.
+- OpenRouter'a bir ücretsiz model listesi gönderir (`models`); bir model kaldırılırsa ya da yoğunsa OpenRouter sıradakini dener.
 - Başarıda `{ text, provider }` döner.
 
 ## Gizlilik
