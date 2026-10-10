@@ -25,6 +25,9 @@ const PATHS = {
   download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
   upload: 'M12 20V9M7 14l5-5 5 5M5 4h14',
   tag: 'M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9zM7.5 7.5h.01',
+  lock: 'M6 11h12v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zM8.5 11V8a3.5 3.5 0 0 1 7 0v3M12 15v2',
+  bell: 'M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0',
+  faceid: 'M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9v1.5M15 9v1.5M12 9v4h-1M9 16a4.5 4.5 0 0 0 6 0',
 } as const
 
 export type IconName = keyof typeof PATHS
