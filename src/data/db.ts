@@ -14,8 +14,8 @@ interface Schema extends DBSchema {
   meta: { key: string; value: { key: string; value: unknown } }
 }
 
-export const DB_NAME = 'kart-limitlerim'
-export const DB_VERSION = 1
+const DB_NAME = 'kart-limitlerim'
+const DB_VERSION = 1
 
 export type Db = IDBPDatabase<Schema>
 

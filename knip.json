@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["scripts/*.mjs", "e2e/**/*.ts", "worker/assistant-proxy/src/index.ts"],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs", "e2e/**/*.ts", "worker/assistant-proxy/src/**/*.ts"],
+  "ignoreDependencies": ["@capacitor/ios", "@tesseract.js-data/tur"]
+}

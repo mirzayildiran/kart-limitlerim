@@ -14,7 +14,7 @@ export const AUTO_BACKUP_FILES = [
   'autobackup/autobackup.2.json',
 ] as const
 
-export const AUTO_BACKUP_DELAY_MS = 5_000
+const AUTO_BACKUP_DELAY_MS = 5_000
 
 /** The few file operations the backup needs. Paths are relative to one private folder. */
 export interface BackupFiles {
@@ -30,7 +30,7 @@ export function hasUserData(s: Snapshot): boolean {
 }
 
 /** Compares data regardless of when it was exported, or of key order and defaults in the records. */
-export function dataKey(snapshot: Snapshot): string {
+function dataKey(snapshot: Snapshot): string {
   const s = normalizeSnapshot(snapshot)
   return JSON.stringify([s.accounts, s.expenses, s.categories, s.recurring, s.rules, s.budgets])
 }
@@ -59,7 +59,7 @@ export async function readLatest(files: BackupFiles): Promise<BackupFile | null>
   return null
 }
 
-export async function removeAll(files: BackupFiles): Promise<void> {
+async function removeAll(files: BackupFiles): Promise<void> {
   for (const path of AUTO_BACKUP_FILES) await files.remove(path).catch(() => {})
 }
 
@@ -70,7 +70,7 @@ export function restoreCandidate(current: Snapshot, backup: BackupFile | null, d
   return backup
 }
 
-export interface AutoBackupDeps {
+interface AutoBackupDeps {
   files: BackupFiles
   delayMs?: number
   now?: () => Date

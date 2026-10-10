@@ -27,7 +27,7 @@ import {
 } from './accountForm'
 import './accountsheet.css'
 
-export interface AccountSheetProps {
+interface AccountSheetProps {
   request: Extract<SheetRequest, { type: 'account' }>
 }
 

@@ -9,7 +9,7 @@ import { locked } from './lock'
  * so both arrive through the App plugin: appUrlOpen while running, getLaunchUrl on a cold launch.
  */
 
-export type DeepLink =
+type DeepLink =
   | { route: Route }
   | { sheet: 'expense' }
   /** A card line's statement, from a due-date reminder; its quick buttons mark it paid. */

@@ -188,7 +188,7 @@ export function groupByDay(events: TimelineEvent[], today: Date): TimelineDay[] 
   return days
 }
 
-export interface MoneyOut {
+interface MoneyOut {
   total: Kurus
   /** At least one amount in the total is an estimate. */
   estimated: boolean

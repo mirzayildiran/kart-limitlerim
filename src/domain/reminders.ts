@@ -19,8 +19,8 @@ export interface Reminder {
 }
 
 /** Days before the due date to remind; 0 is the morning of the due date. */
-export const REMINDER_OFFSETS: readonly number[] = [2, 0]
-export const REMINDER_HOUR = 10
+const REMINDER_OFFSETS: readonly number[] = [2, 0]
+const REMINDER_HOUR = 10
 
 export function reminderPlan(accounts: Account[], now: Date): Reminder[] {
   const plan: Reminder[] = []

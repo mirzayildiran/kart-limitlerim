@@ -29,7 +29,7 @@ import { toast } from '../../ui/components/toast'
 import { interestNudgeAmount, previewAvailable, validateCategoryName } from './expenseModel'
 import './expense-sheet.css'
 
-export interface ExpenseSheetProps {
+interface ExpenseSheetProps {
   request: Extract<SheetRequest, { type: 'expense' }>
 }
 

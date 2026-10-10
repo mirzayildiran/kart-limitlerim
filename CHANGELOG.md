@@ -15,6 +15,8 @@ Bu dosya [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) biçimini izle
 
 ### Changed
 
+- Kod sağlığı: kullanılmayan `LimitStrip` bileşeni ve iki fonksiyon silindi, 57 gereksiz dışa aktarım kaldırıldı; `npm run knip` CI'da. Lint uyarı sınırı 0.
+
 - Asistan: sistem istemi kısaldı ve alan sözlüğü eklendi; özet modele boş alanları atılarak gider. Örnek veride sistem metni 4.546'dan 4.006 karaktere indi. Özete süren taksitlerin toplamı eklendi; hesap ve kategori adlarındaki kart/telefon/kimlik numarası benzeri rakam dizileri ve e-postalar maskelenir. 26 soruluk ağsız değerlendirme seti (`src/ai/assistant.eval.test.ts`).
 
 - Yedek kodu (biçim, doğrulama, otomatik yedek) ilk pakette değil, ilk kullanımda yüklenir: ilk JS 40,0 KB'tan 37,5 KB'a (gzip) indi.

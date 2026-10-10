@@ -38,7 +38,7 @@ export interface RateTable {
   foreignCurrency: { contractual: number; late: number }
 }
 
-export const RATES_2026_10: RateTable = {
+const RATES_2026_10: RateTable = {
   effective: '2026-10-01',
   source: 'TCMB azami kredi kartı faiz oranları',
   reference: 3.11,

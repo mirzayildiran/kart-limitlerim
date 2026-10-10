@@ -48,7 +48,7 @@ export interface RateRow {
   lines: string[]
 }
 
-export interface RateGroups {
+interface RateGroups {
   /** Card tiers, then cash and KMH: the interest rates. */
   interest: RateRow[]
   /** KKDF + BSMV and the minimum-payment rule. */
@@ -107,9 +107,9 @@ export function sourceLines(table: RateTable = CURRENT_RATES, rule: MinimumRule 
   return [sourceLine(table.source, table.effective), sourceLine(rule.source, rule.effective)]
 }
 
-export const CATEGORY_NAME_MAX = 24
+const CATEGORY_NAME_MAX = 24
 
-export type NameCheck = { ok: true; name: string } | { ok: false; error: string }
+type NameCheck = { ok: true; name: string } | { ok: false; error: string }
 
 /**
  * Validate a category name. Trims and collapses spaces, counts characters

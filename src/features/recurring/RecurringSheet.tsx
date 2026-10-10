@@ -32,7 +32,7 @@ import {
 import './recurring-sheet.css'
 
 /** Rendered by SheetHost while `sheet.value.type === 'recurring'`. */
-export interface RecurringSheetProps {
+interface RecurringSheetProps {
   request: Extract<SheetRequest, { type: 'recurring' }>
 }
 

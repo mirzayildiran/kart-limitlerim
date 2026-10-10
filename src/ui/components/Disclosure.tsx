@@ -3,7 +3,7 @@ import { useId, useState } from 'preact/hooks'
 import { Icon } from './Icon'
 import './disclosure.css'
 
-export interface DisclosureProps {
+interface DisclosureProps {
   /** Text of the toggle row, e.g. "Faiz oranı". */
   label: ComponentChildren
   children: ComponentChildren

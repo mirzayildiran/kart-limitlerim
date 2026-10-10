@@ -22,6 +22,8 @@ jobs:
       - name: Worker typecheck
         run: npx tsc -p worker/assistant-proxy/tsconfig.json
       - run: npm run lint
+      - name: Dead code and unused exports
+        run: npm run knip
       - name: Unit tests
         run: npm run test:unit
       - name: Component tests
