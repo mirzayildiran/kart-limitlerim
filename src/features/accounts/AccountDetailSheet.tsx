@@ -1,5 +1,5 @@
 import type { ComponentChildren, JSX } from 'preact'
-import { useState } from 'preact/hooks'
+import { useId, useState } from 'preact/hooks'
 import type { Account, CardAccount, KmhAccount, BalanceAccount, Kurus } from '../../domain/types'
 import { formatTL, formatTLExact } from '../../domain/money'
 import { formatMonth, fromIso } from '../../domain/dates'
@@ -15,6 +15,7 @@ import { accountFree } from '../../ui/components/AccountPicker'
 import {
   addExpenseLabel,
   cardInterestPanelData,
+  type InterestPanelData,
   interestHistory,
   interestSourceLine,
   kmhDailyCost,
@@ -86,12 +87,45 @@ function LimitStats({ limit, used }: { limit: Kurus; used: Kurus }) {
   )
 }
 
-/** Rose wash panel: the title and sentences in ink, only the figure in rose. */
-function InterestPanel({ figure, sub, children }: { figure: Kurus; sub: string; children: ComponentChildren }) {
+/**
+ * Rose wash panel: the title and sentences in ink, only the figure in rose. The figure is an
+ * estimate, so it opens with "~"; `sub` says what it is made of.
+ */
+/** Whether the statement's own minimum-payment figure is worth a sentence. */
+function minimumLineShown(proj: InterestPanelData['lineProjections'][number]): boolean {
+  return (proj.payment === 'unpaid' || proj.payment === 'partial') && proj.projectedMinimum !== null
+}
+
+/** A line shows unless it only repeats the figure above and has no minimum case to add. */
+function showLineProjection(proj: InterestPanelData['lineProjections'][number]): boolean {
+  return !proj.repeatsTotal || minimumLineShown(proj)
+}
+
+function InterestPanel({
+  title,
+  figure,
+  sub,
+  children,
+}: {
+  title: string
+  figure: Kurus
+  sub: string
+  children: ComponentChildren
+}) {
+  const tone = figure > 0 ? 'crit' : 'default'
+  const titleId = useId()
   return (
-    <section class="account-detail-interest" aria-label="İşleyen faiz">
-      <h3 class="account-detail-interest-title">İşleyen faiz</h3>
-      <Amount value={figure} exact size="xl" tone={figure > 0 ? 'crit' : 'default'} />
+    <section class="account-detail-interest" aria-labelledby={titleId}>
+      <h3 class="account-detail-interest-title" id={titleId}>
+        {title}
+      </h3>
+      <p class={`account-detail-interest-figure is-${tone}`}>
+        <span class="account-detail-interest-approx" aria-hidden="true">
+          ~
+        </span>
+        <span class="sr-only">yaklaşık </span>
+        <Amount value={figure} exact size="xl" tone={tone} />
+      </p>
       <p class="account-detail-interest-sub">{sub}</p>
       {children}
     </section>
@@ -119,12 +153,12 @@ function CardContent({ account }: { account: CardAccount }): JSX.Element {
       <LimitStats limit={account.limit} used={used} />
 
       {data && (
-        <InterestPanel figure={data.totalInterest + (data.currentProjected ?? 0)} sub="Bu kartta toplam işleyen faiz">
-          <p class="account-detail-interest-source">
-            {interestSourceLine(data.historyCycles, data.currentProjected !== null)}
-          </p>
-
-          {(data.dailyCosts.length > 0 || data.lineProjections.length > 0) && (
+        <InterestPanel
+          title="Bu kartın tahmini işleyen faizi"
+          figure={data.totalInterest + (data.currentProjected ?? 0)}
+          sub={interestSourceLine(data.historyCycles, data.currentProjected !== null)}
+        >
+          {(data.dailyCosts.length > 0 || data.lineProjections.some((p) => showLineProjection(p))) && (
             <ul class="account-detail-interest-lines">
               {data.dailyCosts.length > 0 && (
                 <li>
@@ -145,17 +179,30 @@ function CardContent({ account }: { account: CardAccount }): JSX.Element {
                   )}
                 </li>
               )}
-              {data.lineProjections.map((proj) => (
-                <li key={proj.lineIndex}>
-                  <strong>{proj.label}:</strong> bu ekstrede <span class="num">~{figure(formatTLExact(proj.projectedAsEntered))}</span>
-                  {(proj.payment === 'unpaid' || proj.payment === 'partial') && proj.projectedMinimum !== null && (
-                    <>
-                      ; yalnız asgariyi ödersen <span class="num">~{figure(formatTLExact(proj.projectedMinimum))}</span>
-                    </>
-                  )}
-                  .
-                </li>
-              ))}
+              {data.lineProjections.map((proj) => {
+                if (!showLineProjection(proj)) return null
+                const minimumShown = minimumLineShown(proj)
+                return (
+                  <li key={proj.lineIndex}>
+                    <strong>{proj.label}:</strong>{' '}
+                    {proj.repeatsTotal ? (
+                      <>
+                        yalnız asgariyi ödersen <span class="num">~{figure(formatTLExact(proj.projectedMinimum!))}</span>
+                      </>
+                    ) : (
+                      <>
+                        bu ekstrede <span class="num">~{figure(formatTLExact(proj.projectedAsEntered))}</span>
+                        {minimumShown && (
+                          <>
+                            ; yalnız asgariyi ödersen <span class="num">~{figure(formatTLExact(proj.projectedMinimum!))}</span>
+                          </>
+                        )}
+                      </>
+                    )}
+                    .
+                  </li>
+                )
+              })}
             </ul>
           )}
 
@@ -232,7 +279,7 @@ function KmhContent({ account }: { account: KmhAccount }): JSX.Element {
       <LimitStats limit={account.limit} used={used} />
 
       {dailyCost !== null && (
-        <InterestPanel figure={dailyCost} sub="KMH borcun her gün bu kadar faiz işletiyor">
+        <InterestPanel title="Bu KMH'nin tahmini günlük faizi" figure={dailyCost} sub="KMH borcun her gün bu kadar faiz işletiyor">
           <ul class="account-detail-interest-lines">
             <li>
               Aylık tahmini <strong class="num">~{figure(formatTLExact(dailyCost * 30))}</strong>.
