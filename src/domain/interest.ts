@@ -1,5 +1,5 @@
 import { daysBetween, cycleKeyOf, fromIso, dayInMonth } from './dates'
-import { estimateMinimum, INTEREST_TAXES, cardTierFor, CURRENT_RATES } from './rates'
+import { estimateMinimum, INTEREST_TAXES, cardTierFor, CURRENT_RATES, withTaxes } from './rates'
 import { viewStatement, lastCut, estimatedDueDate, rollToCurrentCycle } from './statement'
 import type { CardAccount, CardLine, Kurus } from './types'
 
@@ -193,8 +193,8 @@ export function dailyInterestCost(
   if (carried <= 0) return null
 
   const rate = rateFor(account, view.statementDebt)
-  // Daily cost: carried × a/100 / 30 × 1.30 (includes taxes)
-  const value = Math.round(((carried * rate.contractual) / 100 / 30) * 1.3)
+  // Daily cost: carried × a/100 / 30, plus KKDF and BSMV.
+  const value = Math.round(withTaxes((carried * rate.contractual) / 100 / 30))
   return value
 }
 

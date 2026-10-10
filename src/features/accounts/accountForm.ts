@@ -4,6 +4,7 @@
  */
 
 import type { Account, AccountKind, CardAccount, CardLine, KmhAccount, BalanceAccount, RateOverride, Kurus } from '../../domain/types'
+import { defaultRates } from '../../domain/rates'
 
 export interface CardFormState {
   kind: 'card'
@@ -254,8 +255,8 @@ export function formStateToAccount(state: FormState, id: string, createdAt?: num
   const rateOverride: RateOverride | null =
     (state.kind === 'card' || state.kind === 'kmh') && (state.contractualRate !== null || state.lateRate !== null)
       ? {
-          contractual: state.contractualRate ?? 3.25,
-          late: state.lateRate ?? 3.55,
+          contractual: state.contractualRate ?? defaultRates(state.kind).contractual,
+          late: state.lateRate ?? defaultRates(state.kind).late,
         }
       : null
 

@@ -191,6 +191,16 @@ describe('accountForm', () => {
       })
     })
 
+    it('fills the missing rate from the cash caps for KMH and the card caps for cards', () => {
+      const kmh = initFormState(undefined, 'kmh') as KmhFormState
+      Object.assign(kmh, { name: 'KMH', available: 20000, limit: 50000, lateRate: 5 })
+      expect((formStateToAccount(kmh, 'k', 1000) as KmhAccount).rateOverride).toEqual({ contractual: 4.25, late: 5 })
+
+      const card = initFormState(undefined, 'card')
+      Object.assign(card, { name: 'Kart', available: 20000, limit: 50000, contractualRate: 3 })
+      expect((formStateToAccount(card, 'c', 1000) as CardAccount).rateOverride).toEqual({ contractual: 3, late: 3.55 })
+    })
+
     it('omits rate override when both are null', () => {
       const state = initFormState(undefined, 'kmh') as KmhFormState
       state.name = 'KMH'
