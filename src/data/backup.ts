@@ -31,6 +31,13 @@ export class BackupError extends Error {}
 
 /** Far above any real backup (years of data are well under 5 MB); stops a huge file freezing the app. */
 export const MAX_BACKUP_CHARS = 20_000_000
+/** A file this large is refused before it is read into memory (Turkish text is ≤ 2 bytes a character). */
+export const MAX_BACKUP_BYTES = MAX_BACKUP_CHARS * 2
+
+export function checkBackupSize(bytes: number): void {
+  if (bytes > MAX_BACKUP_BYTES) throw new BackupError('Dosya bir Kart Limitlerim yedeği için fazla büyük.')
+}
+
 /** Per list; a heavy user adds a few thousand expenses a year. */
 export const MAX_RECORDS = 100_000
 
