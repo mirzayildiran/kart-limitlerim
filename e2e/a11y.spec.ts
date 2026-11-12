@@ -48,7 +48,8 @@ test('applies the chosen theme from the first frame and switches it in Ayarlar',
   const other = theme === 'dark' ? 'Açık' : 'Koyu'
   await page.getByRole('radio', { name: other }).check()
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme === 'dark' ? 'light' : 'dark')
-  expect(await ground()).not.toBe(before)
+  // The new colours land a frame after the attribute flips; poll instead of reading once.
+  await expect.poll(ground).not.toBe(before)
 
   // Remembered after a reload.
   await page.reload()
