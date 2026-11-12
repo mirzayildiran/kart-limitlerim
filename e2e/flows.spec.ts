@@ -28,6 +28,15 @@ test.describe('main flows (sample data)', () => {
     await expect(sheet).toBeHidden()
     await expect(page.getByRole('button', { name: /^Deneme Kart, Kredi kartı, 12\.500 lira kullanılabilir, limit 20\.000 lira/ })).toBeVisible()
   })
+})
+
+test.describe('statement payments (sample data, pinned date)', () => {
+  test.beforeEach(async ({ page }) => {
+    // Sample data is generated relative to "today" and the assertion below names concrete
+    // statement dates, so pin the date: the result is then the same in any month.
+    await page.clock.setFixedTime(new Date('2026-10-10T12:00:00+03:00'))
+    await startWithDemo(page)
+  })
 
   test('marks a statement paid from Takvim', async ({ page }) => {
     await page.getByRole('navigation', { name: 'Ana menü' }).getByRole('button', { name: 'Takvim' }).click()
